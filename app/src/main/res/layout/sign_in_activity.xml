@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -9,15 +11,15 @@
       android:id="@+id/go4LunchImageView"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_gravity="center"
-      android:src="@drawable/icon_lunch"/>
+      android:layout_gravity="center"/>
+<!--      android:src="@drawable/icon_lunch"/>-->
 
   <androidx.appcompat.widget.AppCompatTextView
       android:id="@+id/go4LunchTextView"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_gravity="center"
-      android:text="Go4Lunch"
+      android:text="@string/app_name"
       android:textSize="60sp"
       android:textStyle="bold"
       android:textColor="@color/colorAccent" />
@@ -28,21 +30,20 @@
       android:layout_height="wrap_content"
       android:layout_gravity="center"
       android:layout_marginTop="10sp"
-      android:text="Trouvez un bon restaurant et invitez vos collègues à déjeuner !"
+      android:text="@string/description_text"
       android:textSize="13sp"/>
 
-  <androidx.appcompat.widget.AppCompatImageButton
-      android:id="@+id/facebookImageButton"
+  <com.facebook.login.widget.LoginButton
+      android:id="@+id/facebook_login_button"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_gravity="center"
-      android:layout_marginTop="20sp"/>
+      android:layout_gravity="center_horizontal"
+      android:layout_marginTop="30dp"
+      android:layout_marginBottom="30dp" />
 
-  <androidx.appcompat.widget.AppCompatImageButton
-      android:id="@+id/googleImageButton"
+  <com.google.android.gms.common.SignInButton
+      android:id="@+id/google_sign_in_button"
       android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center"
-      android:layout_marginTop="10sp"/>
+      android:layout_height="wrap_content" />
 
 </LinearLayout>
