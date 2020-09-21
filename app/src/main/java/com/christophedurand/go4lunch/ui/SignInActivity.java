@@ -1,4 +1,4 @@
-package com.christophedurand.go4lunch;
+package com.christophedurand.go4lunch.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,6 +10,7 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.christophedurand.go4lunch.R;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -23,7 +24,6 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 public class SignInActivity extends AppCompatActivity {
@@ -137,6 +137,10 @@ public class SignInActivity extends AppCompatActivity {
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+
+        Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
+        startActivity(intent);
+
     }
 
 
@@ -162,6 +166,7 @@ public class SignInActivity extends AppCompatActivity {
 
             // Signed in successfully, show authenticated UI.
             updateUI(account);
+
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
