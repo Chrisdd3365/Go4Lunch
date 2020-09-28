@@ -14,4 +14,11 @@
     <string name="map_view_title">Map View</string>
     <string name="list_view_title">List View</string>
     <string name="workmates_view_title">Workmates</string>
+
+    // OTHERS
+    <string name="button_allow">Allow</string>
+    <string name="button_deny">Deny</string>
+    <string name="permission_location_rationale">permission location rationale</string>
+    <string name="permission_location_denied">permission location denied</string>
+    <string name="permission_location_neverask">permission location never ask</string>
 </resources>

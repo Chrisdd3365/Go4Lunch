@@ -1,17 +1,33 @@
 package com.christophedurand.go4lunch.ui;
 
+import android.Manifest;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.christophedurand.go4lunch.R;
+import com.christophedurand.go4lunch.ui.mapView.MapFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnNeverAskAgain;
+import permissions.dispatcher.OnPermissionDenied;
+import permissions.dispatcher.OnShowRationale;
+import permissions.dispatcher.PermissionRequest;
+import permissions.dispatcher.RuntimePermissions;
+
+
+@RuntimePermissions
 public class HomeActivity extends AppCompatActivity {
+
+    //-- PROPERTIES
 
 
     //-- VIEW LIFE CYCLE
@@ -30,9 +46,46 @@ public class HomeActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
+
+        HomeActivityPermissionsDispatcher.showCameraWithPermissionCheck(this);
+
     }
 
 
+    //-- METHODS
+    // HANDLE PERMISSIONS
+    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+    void showCamera() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.map, MapFragment.newInstance())
+                .addToBackStack("location")
+                .commitAllowingStateLoss();
+    }
 
+    @OnShowRationale(Manifest.permission.ACCESS_FINE_LOCATION)
+    void showRationaleForCamera(final PermissionRequest request) {
+        new AlertDialog.Builder(this)
+                .setMessage(R.string.permission_location_rationale)
+                .setPositiveButton(R.string.button_allow, (dialog, button) -> request.proceed())
+                .setNegativeButton(R.string.button_deny, (dialog, button) -> request.cancel())
+                .show();
+    }
+
+    @OnPermissionDenied(Manifest.permission.ACCESS_FINE_LOCATION)
+    void showDeniedForCamera() {
+        Toast.makeText(this, R.string.permission_location_denied, Toast.LENGTH_SHORT).show();
+    }
+
+    @OnNeverAskAgain(Manifest.permission.ACCESS_FINE_LOCATION)
+    void showNeverAskForCamera() {
+        Toast.makeText(this, R.string.permission_location_neverask, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        //super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // NOTE: delegate the permission handling to generated method
+        HomeActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
 
 }

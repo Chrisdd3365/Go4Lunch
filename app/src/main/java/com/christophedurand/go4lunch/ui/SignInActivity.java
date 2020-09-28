@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.Task;
 
 import java.util.Objects;
 
+
 public class SignInActivity extends AppCompatActivity {
 
     // -- PROPERTIES
@@ -56,7 +57,7 @@ public class SignInActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).hide(); // will hide the title bar
 
         // INIT LAYOUT
-        setContentView(R.layout.sign_in_activity);
+        setContentView(R.layout.activity_sign_in);
 
         // FACEBOOK INIT CALLBACK MANAGER
         callbackManager = CallbackManager.Factory.create();
