@@ -10,10 +10,14 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -30,15 +34,18 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.net.FetchPhotoRequest;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,17 +55,9 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
 
     //-- PROPERTIES
-    String apiKey = "AIzaSyC8HszJq_OD87OQUdjiqv5c67k-uw5B1bg";
-
-    PlacesClient placesClient;
-    // Use fields to define the data types to return.
-    List<Place.Field> placeFields = Collections.singletonList(Place.Field.TYPES);
-    // Use the builder to create a FindCurrentPlaceRequest.
-    FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFields);
-
+    private PlacesClient placesClient;
     private FusedLocationProviderClient fusedLocationClient;
     private GoogleMap mMap;
-
     private Context context;
 
 
@@ -87,8 +86,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         context = view.getContext();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
 
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
@@ -96,6 +94,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
         // Initialize the SDK
+        //-- PROPERTIES
+        String apiKey = "AIzaSyC8HszJq_OD87OQUdjiqv5c67k-uw5B1bg";
         Places.initialize(context.getApplicationContext(), apiKey);
 
         // Create a new PlacesClient instance
@@ -170,10 +170,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     private void getRestaurants(GoogleMap googleMap) {
         // Use fields to define the data types to return.
-        List<Place.Field> placeFields = Arrays.asList(
-                Place.Field.NAME, Place.Field.ID,
-                Place.Field.LAT_LNG, Place.Field.TYPES
-        );
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.LAT_LNG, Place.Field.TYPES);
 
         // Use the builder to create a FindCurrentPlaceRequest.
         FindCurrentPlaceRequest request =
@@ -187,32 +184,119 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                     Place place = placeLikelihood.getPlace();
 
                     if (Objects.requireNonNull(place.getTypes()).contains(Place.Type.RESTAURANT)) {
-                        String restaurantName = place.getName();
-                        //String restaurantId = place.getId();
                         LatLng restaurantLatLng = place.getLatLng();
 
                         assert restaurantLatLng != null;
-                        googleMap.addMarker(new MarkerOptions()
+                        Marker marker = googleMap.addMarker(new MarkerOptions()
                                 .position(restaurantLatLng)
                                 .icon(bitmapDescriptorFromVector(requireActivity(), R.drawable.ic_restaurant_red_marker))
-                                .title(restaurantName)
-                                .snippet("test details snippet") );
+                        );
 
+                        marker.setTag(place.getId());
+
+                        mMap.setInfoWindowAdapter(new RestaurantInfoAdapter());
                     }
                 }
             })).addOnFailureListener((exception) -> {
                 if (exception instanceof ApiException) {
                     ApiException apiException = (ApiException) exception;
-                    Log.e("TAG Place not found", "Place not found: " + apiException.getStatusCode());
+                    Log.e("TAG", "Place not found: " + apiException.getStatusCode());
                 }
             });
         }
-//        else {
-//            // A local method to request required permissions;
-//            // See https://developer.android.com/training/permissions/requesting
-//            //getLocationPermission();
-//        }
+
     }
+
+    private class RestaurantInfoAdapter implements GoogleMap.InfoWindowAdapter {
+        private View mRestaurantInfoView;
+
+        public RestaurantInfoAdapter() {
+            mRestaurantInfoView = requireActivity().getLayoutInflater().inflate(R.layout.info_window_restaurant, null);
+        }
+
+        @Override
+        public View getInfoWindow(Marker marker) {
+            // Define a Place ID.
+            String placeId = (String) marker.getTag();
+
+            // Specify the fields to return.
+            List<Place.Field> placeFieldsById = Arrays.asList(
+                    Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS,
+                    Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI, Place.Field.BUSINESS_STATUS,
+                    Place.Field.RATING, Place.Field.PHOTO_METADATAS
+            );
+
+            // Construct a request object, passing the place ID and fields array.
+            assert placeId != null;
+            FetchPlaceRequest requestId = FetchPlaceRequest.builder(Objects.requireNonNull(placeId), placeFieldsById).build();
+
+            // Init Card View UI
+            TextView nameTextView = (TextView) mRestaurantInfoView.findViewById(R.id.name_text_view);
+            TextView descriptionTextView = (TextView) mRestaurantInfoView.findViewById(R.id.address_text_view);
+            ImageView imageView = (ImageView) mRestaurantInfoView.findViewById(R.id.image_view);
+            ProgressBar progressBar = (ProgressBar) mRestaurantInfoView.findViewById(R.id.progressBar);
+            progressBar.setIndeterminate(true);
+            progressBar.setVisibility(View.VISIBLE);
+
+            final Handler handler = new Handler();
+            handler.postDelayed((Runnable) () -> {
+                // FETCH RESTAURANT DETAILS BY ID
+                // Add a listener to handle the response.
+                placesClient.fetchPlace(requestId).addOnSuccessListener((response) -> {
+
+                    Place place = response.getPlace();
+
+                    Log.i("TAG", "Place found: " + place.getId());
+                    Log.i("TAG", "Place found: " + place.getName());
+                    Log.i("TAG", "Place found: " + place.getAddress());
+
+                    nameTextView.setText(place.getName());
+                    descriptionTextView.setText(place.getAddress());
+
+                    // Get the photo metadata.
+                    PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
+
+                    // Create a FetchPhotoRequest.
+                    FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
+                            .setMaxWidth(500) // Optional.
+                            .setMaxHeight(300) // Optional.
+                            .build();
+
+                    // FETCH RESTAURANT PHOTO
+                    placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
+
+                        Bitmap bitmap = fetchPhotoResponse.getBitmap();
+                        imageView.setImageBitmap(bitmap);
+
+                        progressBar.setVisibility(View.GONE);
+
+                    }).addOnFailureListener((exception) -> {
+                        if (exception instanceof ApiException) {
+                            Log.e("TAG", "Place not found: " + exception.getMessage());
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    });
+
+                }).addOnFailureListener((exception) -> {
+                    if (exception instanceof ApiException) {
+                        Log.e("TAG", "Place not found: " + exception.getMessage());
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
+            }, 3000);
+
+            return mRestaurantInfoView;
+        }
+
+
+        @Override
+        public View getInfoContents(Marker marker) {
+            return null;
+        }
+
+
+    }
+
 
     //-- HELPER'S METHODS
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
@@ -228,7 +312,5 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
-
-
 
 }

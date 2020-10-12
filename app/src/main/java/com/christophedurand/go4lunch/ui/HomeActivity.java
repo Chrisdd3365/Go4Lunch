@@ -2,6 +2,7 @@ package com.christophedurand.go4lunch.ui;
 
 import android.Manifest;
 import android.os.Bundle;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.christophedurand.go4lunch.R;
@@ -47,10 +48,11 @@ public class HomeActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
+
+
         HomeActivityPermissionsDispatcher.showCameraWithPermissionCheck(this);
 
     }
-
 
     //-- METHODS
     // HANDLE PERMISSIONS
