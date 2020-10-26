@@ -21,14 +21,14 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB8G6oFNA-nM5rPVKk6VqPiqCOu1gFEdZY"
+          "current_key": "AIzaSyD6FndQ_yMQLDPOYVzaeLt1rIuJ72Ntg_M"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "486167789733-k1q374tgm3f05eo8qmubo3vm70tceqos.apps.googleusercontent.com",
+              "client_id": "486167789733-2rl135v22f81uc1t9r0402g33f2f6di4.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
