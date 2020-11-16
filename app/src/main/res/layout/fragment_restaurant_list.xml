@@ -10,4 +10,4 @@
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context=".ui.listView.ListViewFragment"
-    tools:listitem="@layout/item_restaurant" />
+    tools:listitem="@layout/restaurant_item" />

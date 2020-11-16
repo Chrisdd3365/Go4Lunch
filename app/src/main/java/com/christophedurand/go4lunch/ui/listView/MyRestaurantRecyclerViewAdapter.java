@@ -1,64 +1,75 @@
 package com.christophedurand.go4lunch.ui.listView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.ui.listView.dummy.RestaurantContent.Restaurant;
+import com.google.android.libraries.places.api.model.PlaceLikelihood;
 
 import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Restaurant}.
  */
-public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder> {
+public class MyRestaurantRecyclerViewAdapter extends RecyclerView.Adapter<MyRestaurantRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Restaurant> mRestaurantsList;
+    private final List<PlaceLikelihood> mRestaurants;
+    private final ListRestaurantsInterface mListener;
 
-    public MyItemRecyclerViewAdapter(List<Restaurant> items) {
-        mRestaurantsList = items;
+
+    public MyRestaurantRecyclerViewAdapter(List<PlaceLikelihood> items, ListRestaurantsInterface listener) {
+        mRestaurants = items;
+        mListener = listener;
     }
 
+
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_restaurant, parent, false);
+                .inflate(R.layout.restaurant_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mRestaurantItem = mRestaurantsList.get(position);
-        holder.mRestaurantNameTextView.setText(mRestaurantsList.get(position).name);
-        holder.mRestaurantAddressTextView.setText(mRestaurantsList.get(position).address);
-        holder.mRestaurantBusinessStatus.setText(mRestaurantsList.get(position).businessStatus);
+        Log.d("MyRestaurantRVA", "onBindViewHolder called");
+
+        PlaceLikelihood restaurant = mRestaurants.get(position);
+
+        holder.mRestaurantNameTextView.setText(restaurant.getPlace().getName());
+        holder.mRestaurantAddressTextView.setText(restaurant.getPlace().getAddress());
+        holder.mRestaurantBusinessStatus.setText(String.valueOf(restaurant.getPlace().getBusinessStatus()));
+
+        holder.itemView.setOnClickListener((v -> {
+            mListener.onClickRestaurant(restaurant);
+        }));
     }
 
     @Override
     public int getItemCount() {
-        return mRestaurantsList.size();
+        return mRestaurants.size();
     }
 
+
     public class ViewHolder extends RecyclerView.ViewHolder {
+
         public final TextView mRestaurantNameTextView;
         public final TextView mRestaurantAddressTextView;
         public final TextView mRestaurantBusinessStatus;
-        public Restaurant mRestaurantItem;
 
         public ViewHolder(View view) {
             super(view);
+
             mRestaurantNameTextView = view.findViewById(R.id.restaurant_name);
             mRestaurantAddressTextView = view.findViewById(R.id.restaurant_address);
             mRestaurantBusinessStatus = view.findViewById(R.id.restaurant_business_status);
         }
-
-//        @Override
-//        public String toString() {
-//            return super.toString() + " '" + mContentView.getText() + "'";
-//        }
     }
 }

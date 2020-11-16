@@ -29,7 +29,8 @@ import permissions.dispatcher.RuntimePermissions;
 public class HomeActivity extends AppCompatActivity {
 
     //-- PROPERTIES
-
+    // START ACTIVITY FOR RESULT
+    public static final int LAUNCH_SECOND_ACTIVITY = 0;
 
     //-- VIEW LIFE CYCLE
     @Override

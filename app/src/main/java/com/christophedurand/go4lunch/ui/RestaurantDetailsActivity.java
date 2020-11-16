@@ -1,4 +1,6 @@
 package com.christophedurand.go4lunch.ui;
 
-class RestaurantDetailsActivity {
+public class RestaurantDetailsActivity {
+
+    public static final String BUNDLE_EXTRA_RESTAURANT = "BUNDLE_EXTRA_RESTAURANT";
 }
