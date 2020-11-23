@@ -1,14 +1,13 @@
 package com.christophedurand.go4lunch.ui.listView;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,14 +17,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.ui.RestaurantDetailsActivity;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.OpeningHours;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
@@ -35,8 +36,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static com.christophedurand.go4lunch.ui.HomeActivity.LAUNCH_SECOND_ACTIVITY;
-import static com.christophedurand.go4lunch.ui.RestaurantDetailsActivity.BUNDLE_EXTRA_RESTAURANT;
 
 /**
  * A fragment representing a list of Restaurants.
@@ -87,7 +86,7 @@ public class ListViewFragment extends Fragment implements ListRestaurantsInterfa
 
         mRecyclerView = (RecyclerView) view;
 
-        initList();
+        getRestaurantsInfo();
 
         return view;
     }
@@ -95,31 +94,29 @@ public class ListViewFragment extends Fragment implements ListRestaurantsInterfa
     @Override
     public void onResume() {
         super.onResume();
-        initList();
+        getRestaurantsInfo();
     }
 
 
     //-- METHODS
-    /**
-     * Init the List of restaurants
-     */
-    private void initList() {
-        getRestaurants();
-
-    }
-
     public void updateList(List<PlaceLikelihood> restaurants) {
         mRestaurants = restaurants;
         myRestaurantRecyclerViewAdapter.notifyDataSetChanged();
     }
 
-    private void getRestaurants() {
+    private void getRestaurantsInfo() {
         // Use fields to define the data types to return.
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.BUSINESS_STATUS, Place.Field.TYPES);
+        List<Place.Field> placeFields = Arrays.asList(
+                Place.Field.ID, Place.Field.NAME,
+                Place.Field.ADDRESS, Place.Field.RATING,
+                Place.Field.LAT_LNG, Place.Field.PHOTO_METADATAS,
+                Place.Field.TYPES
+        );
 
         // Use the builder to create a FindCurrentPlaceRequest.
         FindCurrentPlaceRequest request =
                 FindCurrentPlaceRequest.builder(placeFields).build();
+
 
         // Call findCurrentPlace and handle the response (first check that the user has granted permission).
         if (ContextCompat.checkSelfPermission(context, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -130,11 +127,6 @@ public class ListViewFragment extends Fragment implements ListRestaurantsInterfa
                     Place place = placeLikelihood.getPlace();
 
                     if (Objects.requireNonNull(place.getTypes()).contains(Place.Type.RESTAURANT)) {
-//                        String restaurantId = place.getId();
-//                        String restaurantName = place.getName();
-//                        String restaurantAddress = place.getAddress();
-//                        String restaurantBusinessStatus = String.valueOf(place.getBusinessStatus());
-
                         mRestaurants.add(placeLikelihood);
                     }
                 }
