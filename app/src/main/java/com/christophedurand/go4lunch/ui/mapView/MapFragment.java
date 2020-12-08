@@ -9,15 +9,11 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -37,11 +33,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
-import com.google.android.libraries.places.api.net.FetchPhotoRequest;
-import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
@@ -59,6 +52,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private FusedLocationProviderClient fusedLocationClient;
     private GoogleMap mMap;
     private Context context;
+    private Marker marker;
+    private String placeId;
 
 
     //-- INIT
@@ -120,7 +115,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                     // Got last known location. In some rare situations this can be null.
                     if (location != null) {
                         // Logic to handle location object
-                        LatLng currentLocation = new LatLng( location.getLatitude(), location.getLongitude() );
+                        LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
                         // Display a blue dot to represent the current user location
                         mMap.setMyLocationEnabled(true);
@@ -142,7 +137,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
                         // Display all restaurants near current user location
                         getRestaurants(mMap);
-
                     }
                 });
     }
@@ -186,14 +180,17 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                         LatLng restaurantLatLng = place.getLatLng();
 
                         assert restaurantLatLng != null;
-                        Marker marker = googleMap.addMarker(new MarkerOptions()
+                        marker = googleMap.addMarker(new MarkerOptions()
                                 .position(restaurantLatLng)
                                 .icon(bitmapDescriptorFromVector(requireActivity(), R.drawable.ic_restaurant_red_marker))
                         );
 
                         marker.setTag(place.getId());
 
-                        mMap.setInfoWindowAdapter(new RestaurantInfoAdapter());
+                        mMap.setInfoWindowAdapter(new RestaurantInfoAdapter(
+                                requireActivity().getLayoutInflater().inflate(R.layout.info_window_restaurant,
+                                        null), placeId, placesClient, place)
+                        );
                     }
                 }
             })).addOnFailureListener((exception) -> {
@@ -202,94 +199,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                     Log.e("TAG", "Place not found: " + apiException.getStatusCode());
                 }
             });
-        }
-
-    }
-
-    private class RestaurantInfoAdapter implements GoogleMap.InfoWindowAdapter {
-
-        private final View mRestaurantInfoView;
-
-
-        public RestaurantInfoAdapter() {
-            mRestaurantInfoView = requireActivity().getLayoutInflater().inflate(R.layout.info_window_restaurant, null);
-        }
-
-
-        @Override
-        public View getInfoWindow(Marker marker) {
-            // Define a Place ID.
-            String placeId = (String) marker.getTag();
-
-            // Specify the fields to return.
-            List<Place.Field> placeFieldsById = Arrays.asList(
-                    Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS,
-                    Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI, Place.Field.BUSINESS_STATUS,
-                    Place.Field.RATING, Place.Field.PHOTO_METADATAS
-            );
-
-            // Construct a request object, passing the place ID and fields array.
-            assert placeId != null;
-            FetchPlaceRequest requestId = FetchPlaceRequest.builder(Objects.requireNonNull(placeId), placeFieldsById).build();
-
-            // Init Card View UI
-            TextView nameTextView = mRestaurantInfoView.findViewById(R.id.name_text_view);
-            TextView descriptionTextView = mRestaurantInfoView.findViewById(R.id.address_text_view);
-            ImageView imageView = mRestaurantInfoView.findViewById(R.id.restaurant_image_view);
-            ProgressBar progressBar = mRestaurantInfoView.findViewById(R.id.progress_bar);
-
-            // FETCH RESTAURANT DETAILS BY ID
-            // Add a listener to handle the response.
-            placesClient.fetchPlace(requestId).addOnSuccessListener((response) -> {
-
-                Place place = response.getPlace();
-
-                Log.i("TAG", "Place found: " + place.getId());
-                Log.i("TAG", "Place found: " + place.getName());
-                Log.i("TAG", "Place found: " + place.getAddress());
-
-                nameTextView.setText(place.getName());
-                descriptionTextView.setText(place.getAddress());
-
-                // Get the photo metadata.
-                PhotoMetadata photoMetadata = Objects.requireNonNull(place.getPhotoMetadatas()).get(0);
-
-                // Create a FetchPhotoRequest.
-                FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
-                        .setMaxWidth(500) // Optional.
-                        .setMaxHeight(300) // Optional.
-                        .build();
-
-                // FETCH RESTAURANT PHOTO
-                placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
-
-                    Bitmap bitmap = fetchPhotoResponse.getBitmap();
-                    imageView.setImageBitmap(bitmap);
-
-                    progressBar.setVisibility(View.GONE);
-
-                }).addOnFailureListener((exception) -> {
-                    if (exception instanceof ApiException) {
-                        Log.e("TAG", "Place not found: " + exception.getMessage());
-                        progressBar.setVisibility(View.VISIBLE);
-                    }
-                });
-
-            }).addOnFailureListener((exception) -> {
-                if (exception instanceof ApiException) {
-                    Log.e("TAG", "Place not found: " + exception.getMessage());
-                    progressBar.setVisibility(View.VISIBLE);
-                }
-            });
-
-
-            return mRestaurantInfoView;
-        }
-
-
-        @Override
-        public View getInfoContents(Marker marker) {
-            return null;
         }
 
     }

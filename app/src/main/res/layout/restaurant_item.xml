@@ -26,8 +26,6 @@
 
         <TextView
             android:id="@+id/restaurant_name"
-            app:drawableStartCompat="@drawable/ic_star"
-            android:drawableTint="@color/colorOrange"
             android:drawablePadding="10dp"
             android:layout_width="match_parent"
             android:layout_height="25dp"
@@ -71,6 +69,8 @@
             android:layout_width="match_parent"
             android:layout_height="25dp"
             android:layout_margin="10dp"
+            app:drawableStartCompat="@drawable/ic_star"
+            android:drawableTint="@color/colorOrange"
             android:textAppearance="?attr/textAppearanceListItem" />
 
     </LinearLayout>

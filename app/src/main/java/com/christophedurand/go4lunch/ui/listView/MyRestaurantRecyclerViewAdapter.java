@@ -15,6 +15,7 @@ import com.christophedurand.go4lunch.R;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.List;
 public class MyRestaurantRecyclerViewAdapter extends RecyclerView.Adapter<MyRestaurantRecyclerViewAdapter.ViewHolder> {
 
     private final List<PlaceLikelihood> mRestaurants;
+    private final List<Float> distancesList = new ArrayList<>();
     private final ListRestaurantsInterface mListener;
 
 
@@ -48,6 +50,7 @@ public class MyRestaurantRecyclerViewAdapter extends RecyclerView.Adapter<MyRest
 
         PlaceLikelihood restaurant = mRestaurants.get(position);
 
+
         //holder.mRestaurantImageView.setImageBitmap(restaurant.getPlace().getImage());
         holder.mRestaurantNameTextView.setText(restaurant.getPlace().getName());
         holder.mRestaurantAddressTextView.setText(restaurant.getPlace().getAddress());
@@ -56,7 +59,10 @@ public class MyRestaurantRecyclerViewAdapter extends RecyclerView.Adapter<MyRest
             holder.mRestaurantIsOpenTextView.setText(placeOpeningHours);
         }
         holder.mRestaurantRatingTextView.setText(String.valueOf(restaurant.getPlace().getRating()));
-        holder.mRestaurantDistanceTextView.setText(getDistanceFromLastKnownLocation(restaurant));
+
+        for (int i = 0; i<distancesList.size(); i++) {
+            holder.mRestaurantDistanceTextView.setText(getDistanceFromLastKnownUserLocation());
+        }
 
         holder.itemView.setOnClickListener((v -> {
             mListener.onClickRestaurant(restaurant);
@@ -76,18 +82,25 @@ public class MyRestaurantRecyclerViewAdapter extends RecyclerView.Adapter<MyRest
         return dayOfWeek;
     }
 
-    private String getDistanceFromLastKnownLocation(PlaceLikelihood restaurant) {
+    private String getDistanceFromLastKnownUserLocation() {
         Location currentLocation = new Location("user current location");
         currentLocation.setLatitude(currentLocation.getLatitude());
         currentLocation.setLongitude(currentLocation.getLongitude());
 
         Location restaurantLocation = new Location("restaurant location");
-        restaurantLocation.setLatitude(restaurant.getPlace().getLatLng().latitude);
-        restaurantLocation.setLongitude(restaurant.getPlace().getLatLng().longitude);
+        for (int i = 0; i<mRestaurants.size(); i++) {
+            restaurantLocation.setLatitude(mRestaurants.get(i).getPlace().getLatLng().latitude);
+            restaurantLocation.setLongitude(mRestaurants.get(i).getPlace().getLatLng().longitude);
 
-        float distance = currentLocation.distanceTo(restaurantLocation);
+            float distance = currentLocation.distanceTo(restaurantLocation);
+            Log.d("TAG", "get distance between = " + distance);
 
-        return (int)distance + "m";
+            distancesList.add(distance);
+
+            return (int)distance + "m";
+        }
+
+        return null;
     }
 
 
