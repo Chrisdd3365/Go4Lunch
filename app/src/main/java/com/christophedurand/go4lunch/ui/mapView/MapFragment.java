@@ -53,7 +53,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     private GoogleMap mMap;
     private Context context;
     private Marker marker;
-    private String placeId;
 
 
     //-- INIT
@@ -136,7 +135,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
                         // Display all restaurants near current user location
-                        getRestaurants(mMap);
+                        getRestaurants();
                     }
                 });
     }
@@ -161,7 +160,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     }
 
-    private void getRestaurants(GoogleMap googleMap) {
+    private void getRestaurants() {
         // Use fields to define the data types to return.
         List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.LAT_LNG, Place.Field.TYPES);
 
@@ -180,7 +179,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                         LatLng restaurantLatLng = place.getLatLng();
 
                         assert restaurantLatLng != null;
-                        marker = googleMap.addMarker(new MarkerOptions()
+                        marker = mMap.addMarker(new MarkerOptions()
                                 .position(restaurantLatLng)
                                 .icon(bitmapDescriptorFromVector(requireActivity(), R.drawable.ic_restaurant_red_marker))
                         );
@@ -189,7 +188,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
                         mMap.setInfoWindowAdapter(new RestaurantInfoAdapter(
                                 requireActivity().getLayoutInflater().inflate(R.layout.info_window_restaurant,
-                                        null), placeId, placesClient, place)
+                                        null), placesClient)
                         );
                     }
                 }
