@@ -1,6 +1,8 @@
 package com.christophedurand.go4lunch.ui.listView;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.christophedurand.go4lunch.R;
+import com.christophedurand.go4lunch.ui.RestaurantDetailsActivity;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -32,6 +35,8 @@ import java.util.List;
 import java.util.Objects;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static com.christophedurand.go4lunch.ui.HomeActivity.LAUNCH_SECOND_ACTIVITY;
+import static com.christophedurand.go4lunch.ui.RestaurantDetailsActivity.BUNDLE_EXTRA_RESTAURANT;
 
 
 /**
@@ -101,17 +106,18 @@ public class ListViewFragment extends Fragment implements ListRestaurantsInterfa
 
     @Override
     public void onClickRestaurant(PlaceLikelihood restaurant) {
-//        Intent intent = new Intent(getActivity(), RestaurantDetailsActivity.class);
-//
-//        intent.putExtra(BUNDLE_EXTRA_RESTAURANT, restaurant);
-//
-//        if (getActivity() != null)
-//            getActivity().startActivityForResult(intent, LAUNCH_SECOND_ACTIVITY);
+        Intent intent = new Intent(getActivity(), RestaurantDetailsActivity.class);
+
+        intent.putExtra(BUNDLE_EXTRA_RESTAURANT, restaurant);
+        Log.d("BUNDLE EXTRA RESTAU", "bundle extra restaurant is : " + restaurant);
+
+
+        if (getActivity() != null)
+            getActivity().startActivityForResult(intent, LAUNCH_SECOND_ACTIVITY);
 
     }
 
     private class NearbyRestaurantDataAsyncTask extends AsyncTask<Void, Void, Void> {
-
 
         //-- METHODS
         @Override
@@ -142,10 +148,18 @@ public class ListViewFragment extends Fragment implements ListRestaurantsInterfa
                             mRestaurants.add(placeLikelihood);
                         }
                     }
-                    myRestaurantRecyclerViewAdapter = new MyRestaurantRecyclerViewAdapter(mRestaurants, ListViewFragment.this);
-                    mRecyclerView.setAdapter(myRestaurantRecyclerViewAdapter);
-                    mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-                    mRecyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
+                    fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+                    fusedLocationClient.getLastLocation()
+                            .addOnSuccessListener((Activity) context, location -> {
+                                // Got last known location. In some rare situations this can be null.
+                                if (location != null) {
+                                    // Logic to handle location object
+                                    myRestaurantRecyclerViewAdapter = new MyRestaurantRecyclerViewAdapter(mRestaurants, ListViewFragment.this, placesClient, location);
+                                    mRecyclerView.setAdapter(myRestaurantRecyclerViewAdapter);
+                                    mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+                                    mRecyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
+                                }
+                            });
 
                 })).addOnFailureListener((exception) -> {
                     if (exception instanceof ApiException) {

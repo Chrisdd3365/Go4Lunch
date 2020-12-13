@@ -16,14 +16,17 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
+            android:id="@+id/restaurant_image_view"
             android:layout_width="match_parent"
             android:layout_height="200dp" />
 
         <TextView
+            android:id="@+id/restaurant_name_text_view"
             android:layout_width="match_parent"
             android:layout_height="30dp" />
 
         <TextView
+            android:id="@+id/restaurant_address_text_view"
             android:layout_width="match_parent"
             android:layout_height="30dp" />
 
@@ -42,21 +45,33 @@
         android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="100dp"
+        android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" >
 
-        <Button
+        <ImageButton
+            android:id="@+id/call_image_button"
             android:layout_width="70dp"
-            android:layout_height="70dp" />
+            android:layout_height="70dp"
+            android:background="@drawable/ic_call"
+            android:backgroundTint="@color/colorOrange" />
 
-        <Button
+        <ImageButton
+            android:id="@+id/like_image_button"
             android:layout_width="70dp"
-            android:layout_height="70dp" />
+            android:layout_height="70dp"
+            android:layout_marginStart="20dp"
+            android:background="@drawable/ic_star"
+            android:backgroundTint="@color/colorOrange" />
 
-        <Button
+        <ImageButton
+            android:id="@+id/website_image_button"
             android:layout_width="70dp"
-            android:layout_height="70dp" />
+            android:layout_height="70dp"
+            android:layout_marginStart="20dp"
+            android:background="@drawable/ic_website"
+            android:backgroundTint="@color/colorOrange" />
 
     </LinearLayout>
 
