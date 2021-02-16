@@ -1,6 +1,7 @@
 package com.christophedurand.go4lunch.ui.mapView;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -10,18 +11,16 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.christophedurand.go4lunch.R;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -33,14 +32,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.PlaceLikelihood;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
-import com.google.android.libraries.places.api.net.PlacesClient;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+
+import model.pojo.NearbyRestaurantsResponse;
+import model.pojo.Restaurant;
+import viewModel.NearbyRestaurantsViewModel;
+import viewModel.ViewModelFactory;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
@@ -48,14 +46,13 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
 
     //-- PROPERTIES
-    private PlacesClient placesClient;
-    private FusedLocationProviderClient fusedLocationClient;
+    private final String apiKey = "AIzaSyD6FndQ_yMQLDPOYVzaeLt1rIuJ72Ntg_M";
     private GoogleMap mMap;
     private Context context;
-    private Marker marker;
-
+    private NearbyRestaurantsViewModel mNearbyRestaurantsViewModel;
 
     //-- INIT
+
     /**
      * Create and return a new instance
      * @return @{@link MapFragment}
@@ -79,20 +76,14 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         context = view.getContext();
 
+        configureViewModel();
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
-
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-
-        // Initialize the SDK
-        String apiKey = "AIzaSyD6FndQ_yMQLDPOYVzaeLt1rIuJ72Ntg_M";
         Places.initialize(context.getApplicationContext(), apiKey);
-
-        // Create a new PlacesClient instance
-        placesClient = Places.createClient(requireActivity());
 
         return view;
     }
@@ -109,35 +100,46 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener((Activity) context, location -> {
-                    // Got last known location. In some rare situations this can be null.
-                    if (location != null) {
-                        // Logic to handle location object
-                        LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+        mNearbyRestaurantsViewModel.setOnMapReady(mMap, apiKey, getContext(), getActivity(), this);
 
-                        // Display a blue dot to represent the current user location
-                        mMap.setMyLocationEnabled(true);
+//        String radius = "1000";
+//        String type = "restaurant";
+//
+//        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(context,
+//                Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//            fusedLocationClient.getLastLocation()
+//                    .addOnSuccessListener((Activity) context, location -> {
+//                        // Got last known location. In some rare situations this can be null.
+//                        if (location != null) {
+//                            // Logic to handle location object
+//                            LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+//
+//                            // Display a blue dot to represent the current user location
+//                            mMap.setMyLocationEnabled(true);
+//
+//                            // Move the camera instantly to current location with a zoom of 15.
+//                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
+//
+//                            // Zoom in, animating the camera.
+//                            mMap.animateCamera(CameraUpdateFactory.zoomIn());
+//
+//                            // Construct a CameraPosition focusing on the view and animate the camera to that position.
+//                            CameraPosition cameraPosition = new CameraPosition.Builder()
+//                                    .target(currentLocation)    // Sets the center of the map to current Location
+//                                    .zoom(17)                   // Sets the zoom
+//                                    .bearing(90)                // Sets the orientation of the camera to east
+//                                    .tilt(0)                    // Sets the tilt of the camera to 0 degree
+//                                    .build();                   // Creates a CameraPosition from the builder
+//                            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//
+//                            // Display all restaurants near current user location
+//                            mNearbyRestaurantsViewModel.getNearbyRestaurantsRepository(type,
+//                                    currentLocation.latitude + "," + currentLocation.longitude, radius, apiKey).
+//                                    observe(getViewLifecycleOwner(), this::markNearbyRestaurant);
+//                        }
+//                    });
+//        }
 
-                        // Move the camera instantly to current location with a zoom of 15.
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
-
-                        // Zoom in, animating the camera.
-                        mMap.animateCamera(CameraUpdateFactory.zoomIn());
-
-                        // Construct a CameraPosition focusing on the view and animate the camera to that position.
-                        CameraPosition cameraPosition = new CameraPosition.Builder()
-                                .target(currentLocation)    // Sets the center of the map to current Location
-                                .zoom(17)                   // Sets the zoom
-                                .bearing(90)                // Sets the orientation of the camera to east
-                                .tilt(0)                    // Sets the tilt of the camera to 0 degree
-                                .build();                   // Creates a CameraPosition from the builder
-                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-                        // Display all restaurants near current user location
-                        getRestaurants();
-                    }
-                });
     }
 
     @Override
@@ -160,62 +162,49 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     }
 
-    private void getRestaurants() {
-        // Use fields to define the data types to return.
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.LAT_LNG, Place.Field.TYPES);
-
-        // Use the builder to create a FindCurrentPlaceRequest.
-        FindCurrentPlaceRequest request =
-                FindCurrentPlaceRequest.builder(placeFields).build();
-
-        // Call findCurrentPlace and handle the response (first check that the user has granted permission).
-        if (ContextCompat.checkSelfPermission(context, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            placesClient.findCurrentPlace(request).addOnSuccessListener(((response) -> {
-                for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-
-                    Place place = placeLikelihood.getPlace();
-
-                    if (Objects.requireNonNull(place.getTypes()).contains(Place.Type.RESTAURANT)) {
-                        LatLng restaurantLatLng = place.getLatLng();
-
-                        assert restaurantLatLng != null;
-                        marker = mMap.addMarker(new MarkerOptions()
-                                .position(restaurantLatLng)
-                                .icon(bitmapDescriptorFromVector(requireActivity(), R.drawable.ic_restaurant_red_marker))
-                        );
-
-                        marker.setTag(place.getId());
-
-                        mMap.setInfoWindowAdapter(new RestaurantInfoAdapter(
-                                requireActivity().getLayoutInflater().inflate(R.layout.info_window_restaurant,
-                                        null), placesClient)
-                        );
-                    }
-                }
-            })).addOnFailureListener((exception) -> {
-                if (exception instanceof ApiException) {
-                    ApiException apiException = (ApiException) exception;
-                    Log.e("TAG", "Place not found: " + apiException.getStatusCode());
-                }
-            });
-        }
-
+    private void configureViewModel() {
+        ViewModelFactory mViewModelFactory = ViewModelFactory.getInstance();
+        mNearbyRestaurantsViewModel = new ViewModelProvider(this, mViewModelFactory).get(NearbyRestaurantsViewModel.class);
     }
 
-
-    //-- HELPER'S METHODS
-    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
-        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
-
-        assert vectorDrawable != null;
-        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
-
-        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-
-        vectorDrawable.draw(canvas);
-
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
-    }
+//    private void markNearbyRestaurant(NearbyRestaurantsResponse nearbyRestaurantResponse) {
+//        if (ContextCompat.checkSelfPermission(context, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//            List<Restaurant> mNearbyRestaurantsList = nearbyRestaurantResponse.getResults();
+//            for (Restaurant nearbyRestaurant : mNearbyRestaurantsList) {
+//                LatLng restaurantLatLng = new LatLng(nearbyRestaurant.getGeometry().getLocation().lat,
+//                        nearbyRestaurant.getGeometry().getLocation().lng);
+//                Marker marker = mMap.addMarker(new MarkerOptions()
+//                        .position(restaurantLatLng)
+//                        .icon(bitmapDescriptorFromVector(requireActivity(),
+//                                R.drawable.ic_restaurant_red_marker))
+//                );
+//                marker.setTag(nearbyRestaurant.getPlaceId());
+//
+//                setNearbyRestaurantInfoWindowAdapter();
+//            }
+//        }
+//    }
+//
+//    private void setNearbyRestaurantInfoWindowAdapter() {
+//        mMap.setInfoWindowAdapter(new RestaurantInfoAdapter(
+//                requireActivity().getLayoutInflater().inflate(R.layout.info_window_restaurant,
+//                        null), apiKey, getViewLifecycleOwner()));
+//    }
+//
+//
+//    //-- HELPER'S METHODS
+//    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
+//        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+//
+//        assert vectorDrawable != null;
+//        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+//
+//        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+//        Canvas canvas = new Canvas(bitmap);
+//
+//        vectorDrawable.draw(canvas);
+//
+//        return BitmapDescriptorFactory.fromBitmap(bitmap);
+//    }
 
 }

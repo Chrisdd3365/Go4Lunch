@@ -2,6 +2,7 @@ package com.christophedurand.go4lunch.ui.listView;
 
 
 class Restaurant {
+
     private String id;
     private String name;
     private String address;

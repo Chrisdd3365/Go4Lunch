@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 
-public class NearbyRestaurantResponse {
+public class NearbyRestaurantsResponse {
 
     //-- PROPERTIES
     @SerializedName("results")
@@ -13,7 +13,7 @@ public class NearbyRestaurantResponse {
 
 
     //-- CONSTRUCTOR
-    public NearbyRestaurantResponse(List<Restaurant> results) {
+    public NearbyRestaurantsResponse(List<Restaurant> results) {
         this.results = results;
     }
 
@@ -31,7 +31,7 @@ public class NearbyRestaurantResponse {
     //-- METHODS
     @Override
     public String toString() {
-        return "NearbyRestaurantResponse{" +
+        return "NearbyRestaurantsResponse{" +
                 "results=" + results +
                 '}';
     }

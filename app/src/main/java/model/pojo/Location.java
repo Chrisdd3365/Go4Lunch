@@ -1,4 +1,4 @@
-package model;
+package model.pojo;
 
 import com.google.gson.annotations.SerializedName;
 

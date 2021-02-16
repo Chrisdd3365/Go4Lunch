@@ -90,8 +90,8 @@ public class MyRestaurantRecyclerViewAdapter extends RecyclerView.Adapter<MyRest
         holder.mRestaurantRatingTextView.setText(String.valueOf(restaurant.getPlace().getRating()));
         holder.mRestaurantDistanceTextView.setText(getDistanceFromLastKnownUserLocation(mCurrentUserLocation, position));
 
-        setRestaurantIsOpen(restaurant.getPlace().getId(), holder.mRestaurantIsOpenTextView, position);
-        setBitmapRestaurant(restaurant.getPlace().getId(), holder.mRestaurantImageView);
+        //setRestaurantIsOpen(restaurant.getPlace().getId(), holder.mRestaurantIsOpenTextView, position);
+        //setBitmapRestaurant(restaurant.getPlace().getId(), holder.mRestaurantImageView);
 
         holder.itemView.setOnClickListener((v -> {
             mListener.onClickRestaurant(restaurant);

@@ -154,7 +154,8 @@ public class ListViewFragment extends Fragment implements ListRestaurantsInterfa
                                 // Got last known location. In some rare situations this can be null.
                                 if (location != null) {
                                     // Logic to handle location object
-                                    myRestaurantRecyclerViewAdapter = new MyRestaurantRecyclerViewAdapter(mRestaurants, ListViewFragment.this, placesClient, location);
+                                    myRestaurantRecyclerViewAdapter = new MyRestaurantRecyclerViewAdapter(
+                                            mRestaurants, ListViewFragment.this, placesClient, location);
                                     mRecyclerView.setAdapter(myRestaurantRecyclerViewAdapter);
                                     mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
                                     mRecyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));

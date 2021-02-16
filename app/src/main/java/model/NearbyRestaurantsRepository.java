@@ -1,44 +1,45 @@
 package model;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import model.pojo.NearbyRestaurantsResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class NearbyRestaurantRepository {
+public class NearbyRestaurantsRepository {
 
     private static GooglePlacesAPIService mGooglePlacesAPIService = null;
-    private final MutableLiveData<Result> mNearbyRestaurantsList = new MutableLiveData<>();
-    private static NearbyRestaurantRepository nearbyRestaurantRepository;
+    private final MutableLiveData<NearbyRestaurantsResponse> mNearbyRestaurantsList = new MutableLiveData<>();
+    private static NearbyRestaurantsRepository mNearbyRestaurantsRepository;
 
-    public static NearbyRestaurantRepository getInstance() {
-        if (nearbyRestaurantRepository == null){
-            nearbyRestaurantRepository = new NearbyRestaurantRepository();
+    public static NearbyRestaurantsRepository getInstance() {
+        if (mNearbyRestaurantsRepository == null){
+            mNearbyRestaurantsRepository = new NearbyRestaurantsRepository();
         }
-        return nearbyRestaurantRepository;
+        return mNearbyRestaurantsRepository;
     }
 
-    public NearbyRestaurantRepository() {
-        mGooglePlacesAPIService = RetrofitService.getGooglePlacesAPIService();
+    private NearbyRestaurantsRepository() {
+        mGooglePlacesAPIService = RetrofitService.getInstance().getGooglePlacesAPIService();
     }
 
-    public MutableLiveData<Result> getListOfNearbyRestaurants(String query, String location, String radius, String apiKey) {
-        Call<Result> listOfMovieOut = mGooglePlacesAPIService.getNearbyPlaces(query, location, radius, apiKey);
-        listOfMovieOut.enqueue(new Callback<Result>() {
+    public LiveData<NearbyRestaurantsResponse> getListOfNearbyRestaurants(String type, String location, String radius, String apiKey) {
+        Call<NearbyRestaurantsResponse> nearbyRestaurantsList = mGooglePlacesAPIService.getNearbyPlaces(type, location, radius, apiKey);
+        nearbyRestaurantsList.enqueue(new Callback<NearbyRestaurantsResponse>() {
             @Override
-            public void onResponse(@NonNull Call<Result> call, @NonNull Response<Result> response) {
+            public void onResponse(@NonNull Call<NearbyRestaurantsResponse> call, @NonNull Response<NearbyRestaurantsResponse> response) {
                 mNearbyRestaurantsList.setValue(response.body());
             }
 
             @Override
-            public void onFailure(@NonNull Call<Result> call, @NonNull Throwable t) {
-                mNearbyRestaurantsList.postValue(null);
-            }
+            public void onFailure(@NonNull Call<NearbyRestaurantsResponse> call, @NonNull Throwable t) { }
         });
 
         return mNearbyRestaurantsList;
     }
+
 }

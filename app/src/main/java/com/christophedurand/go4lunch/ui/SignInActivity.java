@@ -129,7 +129,7 @@ public class SignInActivity extends AppCompatActivity {
             callbackManager.onActivityResult(requestCode, resultCode, data);
 
         // GOOGLE
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        // NearbyRestaurantsResponse returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             // The Task returned from this call is always completed, no need to attach
             // a listener.
@@ -171,7 +171,7 @@ public class SignInActivity extends AppCompatActivity {
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w("Sign In Result", "signInResult: failed code= " + e.getStatusCode());
+            Log.w("Sign In NearbyRestaurantsResponse", "signInResult: failed code= " + e.getStatusCode());
             updateUI(null);
         }
     }

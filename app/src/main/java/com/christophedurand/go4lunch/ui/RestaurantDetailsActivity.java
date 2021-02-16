@@ -1,6 +1,8 @@
 package com.christophedurand.go4lunch.ui;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,9 +12,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.christophedurand.go4lunch.R;
-import com.facebook.internal.LockOnGetVariable;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
@@ -77,11 +80,10 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
             restaurantAddressTextView = findViewById(R.id.restaurant_address_text_view);
             restaurantAddressTextView.setText(address);
 
+            // SET ON CLICK LISTENER
             callImageButton = findViewById(R.id.call_image_button);
             callImageButton.setOnClickListener(v -> {
-                Intent intent = new Intent(Intent.ACTION_CALL);
-                setPhoneNumber(id, placesClient, intent);
-                startActivity(intent);
+                setPhoneNumber(id, placesClient);
             });
 
             likeImageButton = findViewById(R.id.like_image_button);
@@ -91,9 +93,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
 
             websiteImageButton = findViewById(R.id.website_image_button);
             websiteImageButton.setOnClickListener(v -> {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                setWebsite(id, placesClient, intent);
-                startActivity(intent);
+                setWebsite(id, placesClient);
             });
         }
     }
@@ -101,10 +101,9 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
 
     //-- METHODS
     private void setPhoneNumber(String placeId,
-                                             PlacesClient placesClient,
-                                             Intent intentPhoneNumber) {
+                                             PlacesClient placesClient) {
         // Specify the fields to return.
-        List<Place.Field> placeFieldsById = Arrays.asList(Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI);
+        List<Place.Field> placeFieldsById = Arrays.asList(Place.Field.PHONE_NUMBER);
 
         // Construct a request object, passing the place ID and fields array.
         assert placeId != null;
@@ -115,7 +114,8 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
         placesClient.fetchPlace(requestId).addOnSuccessListener((response) -> {
 
             Place place = response.getPlace();
-            intentPhoneNumber.setData(Uri.parse(place.getPhoneNumber()));
+            Uri phoneNumber = Uri.parse("tel:" + place.getPhoneNumber());
+            call(phoneNumber);
 
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
@@ -125,10 +125,9 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     }
 
     private void setWebsite(String placeId,
-                                PlacesClient placesClient,
-                                Intent intentWebsite) {
+                                PlacesClient placesClient) {
         // Specify the fields to return.
-        List<Place.Field> placeFieldsById = Arrays.asList(Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI);
+        List<Place.Field> placeFieldsById = Arrays.asList(Place.Field.WEBSITE_URI);
 
         // Construct a request object, passing the place ID and fields array.
         assert placeId != null;
@@ -139,7 +138,8 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
         placesClient.fetchPlace(requestId).addOnSuccessListener((response) -> {
 
             Place place = response.getPlace();
-            intentWebsite.setData(place.getWebsiteUri());
+            Uri placeUri = place.getWebsiteUri();
+            openWebURL(placeUri);
 
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
@@ -188,4 +188,21 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
             }
         });
     }
+
+    public void call(Uri phoneNumber) {
+//        Intent dial = new Intent(Intent.ACTION_CALL, phoneNumber);
+//
+//        if (ContextCompat.checkSelfPermission(RestaurantDetailsActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(RestaurantDetailsActivity.this, new String[]{Manifest.permission.CALL_PHONE}, REQUEST_PHONE_CALL);
+//        }
+//        else {
+//            startActivity(dial);
+//        }
+    }
+
+    public void openWebURL(Uri inURL) {
+        Intent browse = new Intent(Intent.ACTION_VIEW , inURL);
+        startActivity(browse);
+    }
+
 }

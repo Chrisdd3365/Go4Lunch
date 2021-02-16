@@ -2,10 +2,7 @@ package model.pojo;
 
 import com.google.gson.annotations.SerializedName;
 
-import model.pojo.Geometry;
-import model.pojo.OpeningHours;
-
-public class Restaurant {
+public class RestaurantDetails {
 
     //-- PROPERTIES
     @SerializedName("formatted_address")
@@ -16,6 +13,9 @@ public class Restaurant {
 
     @SerializedName("icon")
     public String icon;
+
+    @SerializedName("international_phone_number")
+    public String internationalPhoneNumber;
 
     @SerializedName("name")
     public String name;
@@ -29,17 +29,29 @@ public class Restaurant {
     @SerializedName("rating")
     public double rating;
 
+    @SerializedName("reference")
+    public String reference;
+
+    @SerializedName("url")
+    public String url;
+
+    @SerializedName("website")
+    public String website;
+
 
     //-- CONSTRUCTOR
-    public Restaurant(String formattedAddress, Geometry geometry, String icon, String name,
-                      OpeningHours openingHours, String placeId, double rating) {
+    public RestaurantDetails(String formattedAddress, Geometry geometry, String icon, String internationalPhoneNumber,
+                             String name, OpeningHours openingHours, String placeId, double rating, String url, String website) {
         this.formattedAddress = formattedAddress;
         this.geometry = geometry;
         this.icon = icon;
+        this.internationalPhoneNumber = internationalPhoneNumber;
         this.name = name;
         this.openingHours = openingHours;
         this.placeId = placeId;
         this.rating = rating;
+        this.url = url;
+        this.website = website;
     }
 
 
@@ -66,6 +78,14 @@ public class Restaurant {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public String getInternationalPhoneNumber() {
+        return internationalPhoneNumber;
+    }
+
+    public void setInternationalPhoneNumber(String internationalPhoneNumber) {
+        this.internationalPhoneNumber = internationalPhoneNumber;
     }
 
     public String getName() {
@@ -100,18 +120,38 @@ public class Restaurant {
         this.rating = rating;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
 
     //-- METHODS
     @Override
     public String toString() {
-        return "Restaurant{" +
+        return "RestaurantDetails{" +
                 "formattedAddress='" + formattedAddress + '\'' +
                 ", geometry=" + geometry +
                 ", icon='" + icon + '\'' +
+                ", internationalPhoneNumber='" + internationalPhoneNumber + '\'' +
                 ", name='" + name + '\'' +
                 ", openingHours=" + openingHours +
                 ", placeId='" + placeId + '\'' +
                 ", rating=" + rating +
+                ", url='" + url + '\'' +
+                ", website='" + website + '\'' +
                 '}';
     }
+
 }
