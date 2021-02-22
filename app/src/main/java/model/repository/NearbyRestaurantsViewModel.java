@@ -1,4 +1,4 @@
-package viewModel;
+package model.repository;
 
 import android.Manifest;
 import android.app.Activity;
@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -33,27 +34,32 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.List;
 
 import model.pojo.NearbyRestaurantsResponse;
-import model.NearbyRestaurantsRepository;
 import model.pojo.Restaurant;
 
+import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 
+//TODO: rename class when refactoring
 public class NearbyRestaurantsViewModel extends AndroidViewModel {
 
     private final NearbyRestaurantsRepository mNearbyRestaurantsRepository;
-    private CurrentLocationRepository mCurrentLocationRepository;
+    private final CurrentLocationRepository mCurrentLocationRepository;
     @SuppressWarnings({"FieldCanBeLocal"})
+    //TODO: refactoring
     private LiveData<NearbyRestaurantsResponse> mNearbyRestaurantsList = new MutableLiveData<>();
+    private LiveData<List<Marker>> mMarkersListLiveData = new MutableLiveData<>();
 
 
     public NearbyRestaurantsViewModel(@NonNull Application application, CurrentLocationRepository currentLocationRepository) {
         super(application);
-        mNearbyRestaurantsRepository = NearbyRestaurantsRepository.getInstance();
+        this.mNearbyRestaurantsRepository = NearbyRestaurantsRepository.getInstance();
         this.mCurrentLocationRepository = currentLocationRepository;
     }
 
 
-    public LiveData<NearbyRestaurantsResponse> getNearbyRestaurantsRepository(String type, String location, String radius, String apiKey) {
-        mNearbyRestaurantsList = loadNearbyRestaurantsData(type, location, radius, apiKey);
+    public LiveData<NearbyRestaurantsResponse> getNearbyRestaurantsRepository(String type, String radius, String apiKey) {
+        Location location = mCurrentLocationRepository.getCurrentLocationLiveData().getValue();
+        mNearbyRestaurantsList = loadNearbyRestaurantsData(type,
+                location.getLatitude() + "," + location.getLongitude(), radius, apiKey);
         return mNearbyRestaurantsList;
     }
 
@@ -70,6 +76,7 @@ public class NearbyRestaurantsViewModel extends AndroidViewModel {
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
             mCurrentLocationRepository.initCurrentLocationUpdate();
+            //TODO: use MediatorLiveData
             Location location = mCurrentLocationRepository.getCurrentLocationLiveData().getValue();
             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
@@ -92,9 +99,8 @@ public class NearbyRestaurantsViewModel extends AndroidViewModel {
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
             // Display all restaurants near current user location
-            getNearbyRestaurantsRepository(type,
-                    currentLocation.latitude + "," + currentLocation.longitude, radius, apiKey).
-                    observe(fragment.getViewLifecycleOwner(), nearbyRestaurantsResponse -> {
+            getNearbyRestaurantsRepository(type, radius, apiKey)
+                    .observe(fragment.getViewLifecycleOwner(), nearbyRestaurantsResponse -> {
                     markNearbyRestaurant(nearbyRestaurantsResponse,mMap,apiKey,activity, fragment);
                     });
         }
@@ -136,6 +142,21 @@ public class NearbyRestaurantsViewModel extends AndroidViewModel {
         vectorDrawable.draw(canvas);
 
         return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    public String getDistanceFromLastKnownUserLocation(int position) {
+        Restaurant restaurant = getNearbyRestaurantsRepository("restaurant", "1000", apiKey)
+                .getValue().results.get(position);
+
+        Location restaurantLocation = new Location("restaurant location");
+        restaurantLocation.setLatitude(restaurant.geometry.location.lat);
+        restaurantLocation.setLongitude(restaurant.geometry.location.lng);
+
+        Location currentLocation = mCurrentLocationRepository.getCurrentLocationLiveData().getValue();
+        float distance = currentLocation.distanceTo(restaurantLocation);
+        Log.d("DISTANCE", "distance is : " + distance);
+
+        return (int)distance + "m";
     }
 
 }

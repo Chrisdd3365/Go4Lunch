@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.christophedurand.go4lunch.MainApplication;
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
+import model.repository.NearbyRestaurantsViewModel;
 import com.google.android.gms.location.LocationServices;
 
 public class ViewModelFactory implements ViewModelProvider.Factory {

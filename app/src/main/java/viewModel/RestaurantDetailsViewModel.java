@@ -7,7 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import model.RestaurantDetailsRepository;
+import model.repository.RestaurantDetailsRepository;
 import model.pojo.RestaurantDetailsResponse;
 
 public class RestaurantDetailsViewModel extends AndroidViewModel  {

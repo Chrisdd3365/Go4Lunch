@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.ui.mapView.MapFragment;
+import com.google.android.libraries.places.api.Places;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
@@ -16,29 +17,26 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import java.util.List;
-
-import model.pojo.NearbyRestaurantsResponse;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
 import permissions.dispatcher.OnPermissionDenied;
 import permissions.dispatcher.OnShowRationale;
 import permissions.dispatcher.PermissionRequest;
 import permissions.dispatcher.RuntimePermissions;
-import viewModel.NearbyRestaurantsViewModel;
 
 
 @RuntimePermissions
 public class HomeActivity extends AppCompatActivity {
 
-    //-- PROPERTIES
-    // START ACTIVITY FOR RESULT
     public static final int LAUNCH_SECOND_ACTIVITY = 0;
+    public static final String apiKey = "AIzaSyD6FndQ_yMQLDPOYVzaeLt1rIuJ72Ntg_M";
 
 
-    //-- VIEW LIFE CYCLE
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Initialize the SDK
+        Places.initialize(getApplication(), apiKey);
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_home);
@@ -56,8 +54,7 @@ public class HomeActivity extends AppCompatActivity {
         HomeActivityPermissionsDispatcher.showCameraWithPermissionCheck(this);
     }
 
-    //-- METHODS
-    // HANDLE PERMISSIONS
+
     @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     void showCamera() {
         getSupportFragmentManager().beginTransaction()

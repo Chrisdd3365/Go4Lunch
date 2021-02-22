@@ -8,7 +8,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 
-interface GooglePlacesAPIService {
+public interface GooglePlacesAPIService {
     @GET("maps/api/place/nearbysearch/json")
     Call<NearbyRestaurantsResponse> getNearbyPlaces(@Query("type") String type,
                                                     @Query("location") String location,

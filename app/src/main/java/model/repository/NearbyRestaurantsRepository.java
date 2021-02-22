@@ -1,9 +1,11 @@
-package model;
+package model.repository;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import model.GooglePlacesAPIService;
+import model.RetrofitService;
 import model.pojo.NearbyRestaurantsResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
