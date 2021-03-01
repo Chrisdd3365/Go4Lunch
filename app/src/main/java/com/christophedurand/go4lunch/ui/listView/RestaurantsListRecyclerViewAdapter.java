@@ -17,7 +17,7 @@ import com.christophedurand.go4lunch.R;
 import java.util.List;
 
 import model.pojo.Restaurant;
-import model.repository.NearbyRestaurantsViewModel;
+import viewModel.NearbyRestaurantsViewModel;
 
 
 public class RestaurantsListRecyclerViewAdapter
@@ -26,14 +26,16 @@ public class RestaurantsListRecyclerViewAdapter
     private final List<Restaurant> mRestaurants;
     private final RestaurantsListInterface mListener;
     private final NearbyRestaurantsViewModel mViewModel;
-
+    private final Location mLocation;
 
     public RestaurantsListRecyclerViewAdapter(List<Restaurant> items,
                                               RestaurantsListInterface listener,
-                                              NearbyRestaurantsViewModel viewModel) {
+                                              NearbyRestaurantsViewModel viewModel,
+                                              Location location) {
         mRestaurants = items;
         mListener = listener;
         mViewModel = viewModel;
+        mLocation = location;
     }
 
 
@@ -86,18 +88,18 @@ public class RestaurantsListRecyclerViewAdapter
             String address = restaurant.formattedAddress;
             mRestaurantAddressTextView.setText(address);
 
-            boolean isOpen = restaurant.openingHours.openNow;
-            if (isOpen) {
-                String openString = "Ouvert";
-                mRestaurantIsOpenTextView.setText(openString);
-                mRestaurantIsOpenTextView.setTextColor(itemView.getResources().getColor(R.color.colorRed));
-            } else {
-                String closeString = "Fermé";
-                mRestaurantIsOpenTextView.setText(closeString);
-                mRestaurantIsOpenTextView.setTextColor(itemView.getResources().getColor(R.color.colorGreen));
-            }
+//            boolean isOpen = restaurant.openingHours.isOpenNow();
+//            if (isOpen) {
+//                String openString = "Ouvert";
+//                mRestaurantIsOpenTextView.setText(openString);
+//                mRestaurantIsOpenTextView.setTextColor(itemView.getResources().getColor(R.color.colorRed));
+//            } else {
+//                String closeString = "Fermé";
+//                mRestaurantIsOpenTextView.setText(closeString);
+//                mRestaurantIsOpenTextView.setTextColor(itemView.getResources().getColor(R.color.colorGreen));
+//            }
 
-            String distanceFromUser = mViewModel.getDistanceFromLastKnownUserLocation(position);
+            String distanceFromUser = mViewModel.getDistanceFromLastKnownUserLocation(position, mLocation);
             mRestaurantDistanceTextView.setText(distanceFromUser);
 
             double rating = restaurant.rating;

@@ -2,6 +2,7 @@ package com.christophedurand.go4lunch.ui.listView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -17,9 +18,11 @@ import android.view.ViewGroup;
 
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.ui.RestaurantDetailsActivity;
-import model.repository.NearbyRestaurantsViewModel;
+import viewModel.NearbyRestaurantsViewModel;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import model.pojo.Restaurant;
 import viewModel.ViewModelFactory;
@@ -41,8 +44,14 @@ public class RestaurantsListFragment extends Fragment implements RestaurantsList
     private NearbyRestaurantsViewModel mNearbyRestaurantsViewModel;
 
 
-    public static RestaurantsListFragment newInstance() {
-        return new RestaurantsListFragment();
+    public static RestaurantsListFragment newInstance(Location location) {
+        RestaurantsListFragment fragment = new RestaurantsListFragment();
+
+        Bundle args = new Bundle();
+        args.putSerializable("location", (Serializable) location);
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
 
@@ -61,15 +70,20 @@ public class RestaurantsListFragment extends Fragment implements RestaurantsList
 
         ViewModelFactory mViewModelFactory = ViewModelFactory.getInstance();
         mNearbyRestaurantsViewModel = new ViewModelProvider(this, mViewModelFactory).get(NearbyRestaurantsViewModel.class);
-        mRestaurants = mNearbyRestaurantsViewModel.getNearbyRestaurantsRepository(
-                "restaurant","1000", apiKey).getValue().results;
 
-        mRecyclerView = (RecyclerView) view;
-        restaurantsListRecyclerViewAdapter = new RestaurantsListRecyclerViewAdapter(
-                                            mRestaurants, RestaurantsListFragment.this, mNearbyRestaurantsViewModel);
-        mRecyclerView.setAdapter(restaurantsListRecyclerViewAdapter);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
+        androidx.lifecycle.Observer<Location> locationObserver = location ->
+                mNearbyRestaurantsViewModel.getNearbyRestaurantsRepository("restaurant", location, "1000", apiKey)
+                        .observe(this.getViewLifecycleOwner(), nearbyRestaurantsResponse -> {
+
+                            mRecyclerView = (RecyclerView) view;
+                            mRestaurants = nearbyRestaurantsResponse.getResults();
+                            restaurantsListRecyclerViewAdapter = new RestaurantsListRecyclerViewAdapter(mRestaurants,
+                                    RestaurantsListFragment.this, mNearbyRestaurantsViewModel, location);
+                            mRecyclerView.setAdapter(restaurantsListRecyclerViewAdapter);
+                            mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+                            mRecyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
+                        });
+        mNearbyRestaurantsViewModel.locationMediatorLiveData.observe(this.getViewLifecycleOwner(), locationObserver);
 
         return view;
     }

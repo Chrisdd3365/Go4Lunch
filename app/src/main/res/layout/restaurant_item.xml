@@ -67,11 +67,11 @@
         <TextView
             android:id="@+id/restaurant_rating"
             android:layout_width="match_parent"
-            android:layout_height="25dp"
+            android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            app:drawableEndCompat="@drawable/ic_star"
             android:drawableTint="@color/colorOrange"
-            android:textAppearance="?attr/textAppearanceListItem" />
+            android:textAppearance="?attr/textAppearanceListItem"
+            app:drawableEndCompat="@drawable/ic_star" />
 
     </LinearLayout>
 
