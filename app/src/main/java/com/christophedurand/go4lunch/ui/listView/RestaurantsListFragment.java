@@ -7,8 +7,6 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Parcelable;
@@ -18,17 +16,15 @@ import android.view.ViewGroup;
 
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.ui.RestaurantDetailsActivity;
-import viewModel.NearbyRestaurantsViewModel;
+import com.christophedurand.go4lunch.ui.mapView.MapViewModel;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 
 import model.pojo.Restaurant;
 import viewModel.ViewModelFactory;
 
 import static com.christophedurand.go4lunch.ui.HomeActivity.LAUNCH_SECOND_ACTIVITY;
-import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 import static com.christophedurand.go4lunch.ui.RestaurantDetailsActivity.BUNDLE_EXTRA_RESTAURANT;
 
 
@@ -41,7 +37,7 @@ public class RestaurantsListFragment extends Fragment implements RestaurantsList
     private RecyclerView mRecyclerView;
     private RestaurantsListRecyclerViewAdapter restaurantsListRecyclerViewAdapter;
     private Context context;
-    private NearbyRestaurantsViewModel mNearbyRestaurantsViewModel;
+    private MapViewModel mMapViewModel;
 
 
     public static RestaurantsListFragment newInstance(Location location) {
@@ -69,21 +65,21 @@ public class RestaurantsListFragment extends Fragment implements RestaurantsList
         context = view.getContext();
 
         ViewModelFactory mViewModelFactory = ViewModelFactory.getInstance();
-        mNearbyRestaurantsViewModel = new ViewModelProvider(this, mViewModelFactory).get(NearbyRestaurantsViewModel.class);
+        mMapViewModel = new ViewModelProvider(this, mViewModelFactory).get(MapViewModel.class);
 
-        androidx.lifecycle.Observer<Location> locationObserver = location ->
-                mNearbyRestaurantsViewModel.getNearbyRestaurantsRepository("restaurant", location, "1000", apiKey)
-                        .observe(this.getViewLifecycleOwner(), nearbyRestaurantsResponse -> {
-
-                            mRecyclerView = (RecyclerView) view;
-                            mRestaurants = nearbyRestaurantsResponse.getResults();
-                            restaurantsListRecyclerViewAdapter = new RestaurantsListRecyclerViewAdapter(mRestaurants,
-                                    RestaurantsListFragment.this, mNearbyRestaurantsViewModel, location);
-                            mRecyclerView.setAdapter(restaurantsListRecyclerViewAdapter);
-                            mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-                            mRecyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
-                        });
-        mNearbyRestaurantsViewModel.locationMediatorLiveData.observe(this.getViewLifecycleOwner(), locationObserver);
+//        androidx.lifecycle.Observer<Location> locationObserver = location ->
+//                mMapViewModel.getNearbyRestaurantsRepository("restaurant", location,"1000", apiKey)
+//                        .observe(this.getViewLifecycleOwner(), nearbyRestaurantsResponse -> {
+//
+//                            mRecyclerView = (RecyclerView) view;
+//                            mRestaurants = nearbyRestaurantsResponse.getResults();
+//                            restaurantsListRecyclerViewAdapter = new RestaurantsListRecyclerViewAdapter(mRestaurants,
+//                                    RestaurantsListFragment.this, mMapViewModel, location);
+//                            mRecyclerView.setAdapter(restaurantsListRecyclerViewAdapter);
+//                            mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+//                            mRecyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
+//                        });
+//        mMapViewModel.locationLiveData.observe(this.getViewLifecycleOwner(), locationObserver);
 
         return view;
     }

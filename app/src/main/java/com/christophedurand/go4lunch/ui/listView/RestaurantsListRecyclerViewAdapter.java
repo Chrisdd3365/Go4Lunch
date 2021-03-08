@@ -17,7 +17,8 @@ import com.christophedurand.go4lunch.R;
 import java.util.List;
 
 import model.pojo.Restaurant;
-import viewModel.NearbyRestaurantsViewModel;
+
+import com.christophedurand.go4lunch.ui.mapView.MapViewModel;
 
 
 public class RestaurantsListRecyclerViewAdapter
@@ -25,12 +26,12 @@ public class RestaurantsListRecyclerViewAdapter
 
     private final List<Restaurant> mRestaurants;
     private final RestaurantsListInterface mListener;
-    private final NearbyRestaurantsViewModel mViewModel;
+    private final MapViewModel mViewModel;
     private final Location mLocation;
 
     public RestaurantsListRecyclerViewAdapter(List<Restaurant> items,
                                               RestaurantsListInterface listener,
-                                              NearbyRestaurantsViewModel viewModel,
+                                              MapViewModel viewModel,
                                               Location location) {
         mRestaurants = items;
         mListener = listener;
@@ -99,8 +100,8 @@ public class RestaurantsListRecyclerViewAdapter
 //                mRestaurantIsOpenTextView.setTextColor(itemView.getResources().getColor(R.color.colorGreen));
 //            }
 
-            String distanceFromUser = mViewModel.getDistanceFromLastKnownUserLocation(position, mLocation);
-            mRestaurantDistanceTextView.setText(distanceFromUser);
+//            String distanceFromUser = mViewModel.getDistanceFromLastKnownUserLocation(position, mLocation);
+//            mRestaurantDistanceTextView.setText(distanceFromUser);
 
             double rating = restaurant.rating;
             mRestaurantRatingTextView.setText(String.valueOf(rating));
