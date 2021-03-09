@@ -13,9 +13,9 @@ import com.christophedurand.go4lunch.R;
 
 import java.util.List;
 
-import model.pojo.Restaurant;
+import com.christophedurand.go4lunch.model.pojo.Restaurant;
 
-public class RestaurantsItemViewHolder extends RecyclerView.ViewHolder {
+public class ItemViewHolder extends RecyclerView.ViewHolder {
 
     public final ImageView mRestaurantImageView;
     public final TextView mRestaurantNameTextView;
@@ -24,7 +24,7 @@ public class RestaurantsItemViewHolder extends RecyclerView.ViewHolder {
     public final TextView mRestaurantDistanceTextView;
     public final TextView mRestaurantRatingTextView;
 
-    public RestaurantsItemViewHolder(View view) {
+    public ItemViewHolder(View view) {
         super(view);
 
         mRestaurantImageView = view.findViewById(R.id.restaurant_image_view);
@@ -35,7 +35,7 @@ public class RestaurantsItemViewHolder extends RecyclerView.ViewHolder {
         mRestaurantRatingTextView = view.findViewById(R.id.restaurant_rating);
     }
 
-    public void bind(List<Restaurant> restaurantsList, int position, RestaurantsListInterface mListener, Location currentLocation) {
+    public void bind(List<Restaurant> restaurantsList, int position, ListInterface mListener, Location currentLocation) {
         Restaurant restaurant = restaurantsList.get(position);
 
         Glide.with(itemView.getContext()).load(restaurant.icon).into(mRestaurantImageView);

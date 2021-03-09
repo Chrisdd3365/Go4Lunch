@@ -21,8 +21,8 @@ import com.christophedurand.go4lunch.ui.mapView.MapViewModel;
 import java.io.Serializable;
 import java.util.List;
 
-import model.pojo.Restaurant;
-import viewModel.ViewModelFactory;
+import com.christophedurand.go4lunch.model.pojo.Restaurant;
+import com.christophedurand.go4lunch.model.ViewModelFactory;
 
 import static com.christophedurand.go4lunch.ui.HomeActivity.LAUNCH_SECOND_ACTIVITY;
 import static com.christophedurand.go4lunch.ui.RestaurantDetailsActivity.BUNDLE_EXTRA_RESTAURANT;
@@ -31,17 +31,17 @@ import static com.christophedurand.go4lunch.ui.RestaurantDetailsActivity.BUNDLE_
 /**
  * A fragment representing a list of Restaurants.
  */
-public class RestaurantsListFragment extends Fragment implements RestaurantsListInterface {
+public class ListFragment extends Fragment implements ListInterface {
 
     private List<Restaurant> mRestaurants;
     private RecyclerView mRecyclerView;
-    private RestaurantsListRecyclerViewAdapter restaurantsListRecyclerViewAdapter;
+    private ListRecyclerViewAdapter listRecyclerViewAdapter;
     private Context context;
     private MapViewModel mMapViewModel;
 
 
-    public static RestaurantsListFragment newInstance(Location location) {
-        RestaurantsListFragment fragment = new RestaurantsListFragment();
+    public static ListFragment newInstance(Location location) {
+        ListFragment fragment = new ListFragment();
 
         Bundle args = new Bundle();
         args.putSerializable("location", (Serializable) location);
@@ -73,9 +73,9 @@ public class RestaurantsListFragment extends Fragment implements RestaurantsList
 //
 //                            mRecyclerView = (RecyclerView) view;
 //                            mRestaurants = nearbyRestaurantsResponse.getResults();
-//                            restaurantsListRecyclerViewAdapter = new RestaurantsListRecyclerViewAdapter(mRestaurants,
-//                                    RestaurantsListFragment.this, mMapViewModel, location);
-//                            mRecyclerView.setAdapter(restaurantsListRecyclerViewAdapter);
+//                            listRecyclerViewAdapter = new ListRecyclerViewAdapter(mRestaurants,
+//                                    ListFragment.this, mMapViewModel, location);
+//                            mRecyclerView.setAdapter(listRecyclerViewAdapter);
 //                            mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
 //                            mRecyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
 //                        });
@@ -94,7 +94,7 @@ public class RestaurantsListFragment extends Fragment implements RestaurantsList
     //-- METHODS
     public void updateList(List<Restaurant> restaurants) {
         mRestaurants = restaurants;
-        restaurantsListRecyclerViewAdapter.notifyDataSetChanged();
+        listRecyclerViewAdapter.notifyDataSetChanged();
     }
 
     @Override

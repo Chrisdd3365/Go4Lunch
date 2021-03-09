@@ -1,8 +1,8 @@
-package model;
+package com.christophedurand.go4lunch.model;
 
 
-import model.pojo.NearbyRestaurantsResponse;
-import model.pojo.RestaurantDetailsResponse;
+import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
+import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;

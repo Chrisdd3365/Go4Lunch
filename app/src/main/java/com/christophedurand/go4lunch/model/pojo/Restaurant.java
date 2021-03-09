@@ -1,9 +1,6 @@
-package model.pojo;
+package com.christophedurand.go4lunch.model.pojo;
 
 import com.google.gson.annotations.SerializedName;
-
-import model.pojo.Geometry;
-import model.pojo.OpeningHours;
 
 public class Restaurant {
 

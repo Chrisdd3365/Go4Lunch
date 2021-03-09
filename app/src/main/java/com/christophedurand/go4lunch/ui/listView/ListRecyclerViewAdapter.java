@@ -16,23 +16,23 @@ import com.christophedurand.go4lunch.R;
 
 import java.util.List;
 
-import model.pojo.Restaurant;
+import com.christophedurand.go4lunch.model.pojo.Restaurant;
 
 import com.christophedurand.go4lunch.ui.mapView.MapViewModel;
 
 
-public class RestaurantsListRecyclerViewAdapter
-        extends RecyclerView.Adapter<RestaurantsListRecyclerViewAdapter.RestaurantsItemViewHolder> {
+public class ListRecyclerViewAdapter
+        extends RecyclerView.Adapter<ListRecyclerViewAdapter.RestaurantsItemViewHolder> {
 
     private final List<Restaurant> mRestaurants;
-    private final RestaurantsListInterface mListener;
+    private final ListInterface mListener;
     private final MapViewModel mViewModel;
     private final Location mLocation;
 
-    public RestaurantsListRecyclerViewAdapter(List<Restaurant> items,
-                                              RestaurantsListInterface listener,
-                                              MapViewModel viewModel,
-                                              Location location) {
+    public ListRecyclerViewAdapter(List<Restaurant> items,
+                                   ListInterface listener,
+                                   MapViewModel viewModel,
+                                   Location location) {
         mRestaurants = items;
         mListener = listener;
         mViewModel = viewModel;
@@ -42,14 +42,14 @@ public class RestaurantsListRecyclerViewAdapter
 
     @NonNull
     @Override
-    public RestaurantsListRecyclerViewAdapter.RestaurantsItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ListRecyclerViewAdapter.RestaurantsItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.restaurant_item, parent, false);
-        return new RestaurantsListRecyclerViewAdapter.RestaurantsItemViewHolder(view);
+        return new ListRecyclerViewAdapter.RestaurantsItemViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RestaurantsListRecyclerViewAdapter.RestaurantsItemViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ListRecyclerViewAdapter.RestaurantsItemViewHolder holder, int position) {
         holder.bind(position, mListener);
     }
 
@@ -78,7 +78,7 @@ public class RestaurantsListRecyclerViewAdapter
             mRestaurantRatingTextView = view.findViewById(R.id.restaurant_rating);
         }
 
-        public void bind(int position, RestaurantsListInterface mListener) {
+        public void bind(int position, ListInterface mListener) {
             Restaurant restaurant = mRestaurants.get(position);
 
             Glide.with(itemView.getContext()).load(restaurant.icon).into(mRestaurantImageView);

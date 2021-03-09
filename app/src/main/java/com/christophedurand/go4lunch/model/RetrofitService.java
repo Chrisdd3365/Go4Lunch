@@ -1,4 +1,4 @@
-package model;
+package com.christophedurand.go4lunch.model;
 
 
 import retrofit2.Retrofit;

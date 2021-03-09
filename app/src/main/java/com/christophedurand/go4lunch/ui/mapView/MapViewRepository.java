@@ -1,31 +1,31 @@
-package model.repository;
+package com.christophedurand.go4lunch.ui.mapView;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import model.GooglePlacesAPIService;
-import model.RetrofitService;
-import model.pojo.NearbyRestaurantsResponse;
+import com.christophedurand.go4lunch.model.GooglePlacesAPIService;
+import com.christophedurand.go4lunch.model.RetrofitService;
+import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class NearbyRestaurantsRepository {
+public class MapViewRepository {
 
     private static GooglePlacesAPIService mGooglePlacesAPIService = null;
     private final MutableLiveData<NearbyRestaurantsResponse> mNearbyRestaurantsList = new MutableLiveData<>();
-    private static NearbyRestaurantsRepository mNearbyRestaurantsRepository;
+    private static MapViewRepository mMapViewRepository;
 
-    public static NearbyRestaurantsRepository getInstance() {
-        if (mNearbyRestaurantsRepository == null){
-            mNearbyRestaurantsRepository = new NearbyRestaurantsRepository();
+    public static MapViewRepository getInstance() {
+        if (mMapViewRepository == null){
+            mMapViewRepository = new MapViewRepository();
         }
-        return mNearbyRestaurantsRepository;
+        return mMapViewRepository;
     }
 
-    private NearbyRestaurantsRepository() {
+    private MapViewRepository() {
         mGooglePlacesAPIService = RetrofitService.getInstance().getGooglePlacesAPIService();
     }
 

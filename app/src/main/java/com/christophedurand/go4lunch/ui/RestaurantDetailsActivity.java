@@ -1,35 +1,17 @@
 package com.christophedurand.go4lunch.ui;
 
-import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.christophedurand.go4lunch.R;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.PhotoMetadata;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.PlaceLikelihood;
-import com.google.android.libraries.places.api.net.FetchPhotoRequest;
-import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-
-import model.pojo.Restaurant;
+import com.christophedurand.go4lunch.model.pojo.Restaurant;
 
 public class RestaurantDetailsActivity extends AppCompatActivity {
 

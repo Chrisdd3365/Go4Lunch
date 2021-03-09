@@ -11,23 +11,27 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Transformations;
 
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
+import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
 
-import model.pojo.NearbyRestaurantsResponse;
-import model.repository.NearbyRestaurantsRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 
 
 public class MapViewModel extends AndroidViewModel {
 
-    private final MediatorLiveData<MapViewState> mNearbyRestaurantsListMediatorLiveData = new MediatorLiveData<>();
+    private final MediatorLiveData<MapViewState> mMapViewStateMediatorLiveData = new MediatorLiveData<>();
+    private final MediatorLiveData<MapViewState.MapMarker> mMapMarkerMediatorLiveData = new MediatorLiveData<>();
 
     public LiveData<MapViewState> getViewStateLiveData() {
-        return mNearbyRestaurantsListMediatorLiveData;
+        return mMapViewStateMediatorLiveData;
     }
 
+
     public MapViewModel(@NonNull Application application,
-                        NearbyRestaurantsRepository nearbyRestaurantsRepository,
+                        MapViewRepository mapViewRepository,
                         CurrentLocationRepository currentLocationRepository) {
         super(application);
 
@@ -38,27 +42,61 @@ public class MapViewModel extends AndroidViewModel {
         LiveData<NearbyRestaurantsResponse> nearbyRestaurantsResponseLiveData =
                 Transformations.switchMap(
                         locationLiveData,
-                        location -> nearbyRestaurantsRepository.getListOfNearbyRestaurants(
+                        location -> mapViewRepository.getListOfNearbyRestaurants(
                         "restaurant",
                         location.getLatitude() + "," + location.getLongitude(),
                         "1000",
                         apiKey));
 
-        mNearbyRestaurantsListMediatorLiveData.addSource(nearbyRestaurantsResponseLiveData, response ->
-                combine(response, locationLiveData.getValue()));
+        LiveData<List<MapViewState.MapMarker>> mapMarkersListLiveData =
+                Transformations.map(
+                        nearbyRestaurantsResponseLiveData,
+                        response -> {
+                            List<MapViewState.MapMarker> mapMarkersList = new ArrayList<>();
+                            for (int i=0; i<response.results.size(); i++) {
+                                String placeId = response.results.get(i).placeId;
+                                String name = response.results.get(i).name;
+                                String address = response.results.get(i).formattedAddress;
+                                mapMarkersList.add(new MapViewState.MapMarker(placeId, name, address));
+                            }
+                            return mapMarkersList;
+                        });
 
-        mNearbyRestaurantsListMediatorLiveData.addSource(locationLiveData, location ->
-                combine(nearbyRestaurantsResponseLiveData.getValue(), location));
+        mMapMarkerMediatorLiveData.addSource(mapMarkersListLiveData, list -> {
+            for(int i=0; i<list.size(); i++) {
+                combine(list.get(i));
+            }
+        });
+
+        mMapViewStateMediatorLiveData.addSource(nearbyRestaurantsResponseLiveData, response ->
+                combine(response, locationLiveData.getValue(), mMapMarkerMediatorLiveData.getValue()));
+
+        mMapViewStateMediatorLiveData.addSource(locationLiveData, location ->
+                combine(nearbyRestaurantsResponseLiveData.getValue(), location, mMapMarkerMediatorLiveData.getValue()));
+
+        mMapViewStateMediatorLiveData.addSource(mMapMarkerMediatorLiveData, marker ->
+                combine(nearbyRestaurantsResponseLiveData.getValue(), locationLiveData.getValue(), marker));
 
     }
 
-    private void combine(@Nullable NearbyRestaurantsResponse response, @Nullable Location location) {
+    private void combine(@NonNull MapViewState.MapMarker mapMarker) {
+        mMapMarkerMediatorLiveData.setValue(mapMarker);
+    }
+
+    private void combine(@Nullable NearbyRestaurantsResponse response,
+                         @Nullable Location location,
+                         @NonNull MapViewState.MapMarker mapMarker) {
         if (location == null) {
             return;
         }
 
-        mNearbyRestaurantsListMediatorLiveData.setValue(new MapViewState(location, response == null ? null : response.results));
-
+        mMapViewStateMediatorLiveData.setValue(
+                new MapViewState(
+                        location,
+                        response == null ? null : response.results,
+                        mapMarker
+                )
+        );
     }
 
 

@@ -1,30 +1,30 @@
-package model.repository;
+package com.christophedurand.go4lunch.ui.listView;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import model.GooglePlacesAPIService;
-import model.RetrofitService;
-import model.pojo.RestaurantDetailsResponse;
+import com.christophedurand.go4lunch.model.GooglePlacesAPIService;
+import com.christophedurand.go4lunch.model.RetrofitService;
+import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class RestaurantDetailsRepository {
+public class ListViewRepository {
 
     private static GooglePlacesAPIService mGooglePlacesAPIService = null;
     private final MutableLiveData<RestaurantDetailsResponse> mRestaurantDetails = new MutableLiveData<>();
-    private static RestaurantDetailsRepository mRestaurantDetailsRepository;
+    private static ListViewRepository mListViewRepository;
 
-    public static RestaurantDetailsRepository getInstance() {
-        if (mRestaurantDetailsRepository == null){
-            mRestaurantDetailsRepository = new RestaurantDetailsRepository();
+    public static ListViewRepository getInstance() {
+        if (mListViewRepository == null){
+            mListViewRepository = new ListViewRepository();
         }
-        return mRestaurantDetailsRepository;
+        return mListViewRepository;
     }
 
-    private RestaurantDetailsRepository() {
+    private ListViewRepository() {
         mGooglePlacesAPIService = RetrofitService.getInstance().getGooglePlacesAPIService();
     }
 

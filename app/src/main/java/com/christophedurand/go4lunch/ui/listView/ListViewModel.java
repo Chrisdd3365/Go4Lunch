@@ -1,4 +1,4 @@
-package viewModel;
+package com.christophedurand.go4lunch.ui.listView;
 
 import android.app.Application;
 
@@ -7,18 +7,17 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import model.repository.RestaurantDetailsRepository;
-import model.pojo.RestaurantDetailsResponse;
+import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 
-public class RestaurantDetailsViewModel extends AndroidViewModel  {
+public class ListViewModel extends AndroidViewModel  {
 
-    private final RestaurantDetailsRepository mRestaurantDetailsRepository;
+    private final ListViewRepository mListViewRepository;
     @SuppressWarnings({"FieldCanBeLocal"})
     private LiveData<RestaurantDetailsResponse> mRestaurantDetails = new MutableLiveData<>();
 
-    public RestaurantDetailsViewModel(@NonNull Application application) {
+    public ListViewModel(@NonNull Application application) {
         super(application);
-        mRestaurantDetailsRepository = RestaurantDetailsRepository.getInstance();
+        mListViewRepository = ListViewRepository.getInstance();
     }
 
     public LiveData<RestaurantDetailsResponse> getRestaurantDetailsRepository(String placeId, String apiKey) {
@@ -27,7 +26,7 @@ public class RestaurantDetailsViewModel extends AndroidViewModel  {
     }
 
     private LiveData<RestaurantDetailsResponse> loadRestaurantDetailsData(String placeId, String apiKey) {
-        return mRestaurantDetailsRepository.getRestaurantDetails(placeId, apiKey);
+        return mListViewRepository.getRestaurantDetails(placeId, apiKey);
     }
 }
 

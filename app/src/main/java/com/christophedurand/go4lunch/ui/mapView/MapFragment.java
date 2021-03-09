@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -26,13 +25,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.List;
-
-import model.pojo.NearbyRestaurantsResponse;
-import model.pojo.Restaurant;
-import viewModel.ViewModelFactory;
-
-import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
+import com.christophedurand.go4lunch.model.pojo.Restaurant;
+import com.christophedurand.go4lunch.model.ViewModelFactory;
 
 
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
@@ -111,6 +105,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                         Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
             mMapViewModel.getViewStateLiveData().observe(this.getViewLifecycleOwner(), mapViewState -> {
+
                 LatLng currentLocation = new LatLng(mapViewState.getLocation().getLatitude(),
                         mapViewState.getLocation().getLongitude());
 
@@ -133,32 +128,32 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
                 // Display all restaurants near current user location
-                markNearbyRestaurant(mapViewState.getRestaurantsList(), mMap);
+                markNearbyRestaurant(mapViewState, mMap);
             });
         }
     }
 
-    private void markNearbyRestaurant(@Nullable List<Restaurant> restaurantsList, GoogleMap mMap) {
-        if (restaurantsList != null) {
-            for (Restaurant nearbyRestaurant : restaurantsList) {
-                LatLng restaurantLatLng = new LatLng(nearbyRestaurant.getGeometry().getLocation().lat,
-                        nearbyRestaurant.getGeometry().getLocation().lng);
+    private void markNearbyRestaurant(MapViewState mapViewState, GoogleMap mMap) {
+        if (mapViewState.getRestaurantsList() != null) {
+            for (Restaurant restaurant : mapViewState.getRestaurantsList()) {
+                LatLng restaurantLatLng = new LatLng(restaurant.getGeometry().getLocation().lat,
+                        restaurant.getGeometry().getLocation().lng);
                 Marker marker = mMap.addMarker(new MarkerOptions()
                         .position(restaurantLatLng)
                         .icon(Utils.bitmapDescriptorFromVector(getActivity(),
                                 R.drawable.ic_restaurant_red_marker))
                 );
-                marker.setTag(nearbyRestaurant.getPlaceId());
+                marker.setTag(mapViewState.getMapMarker().getPlaceId());
 
-                setNearbyRestaurantInfoWindowAdapter(mMap);
+                setNearbyRestaurantInfoWindowAdapter(mMap, mapViewState);
             }
         }
     }
 
-    private void setNearbyRestaurantInfoWindowAdapter(GoogleMap mMap) {
+    private void setNearbyRestaurantInfoWindowAdapter(GoogleMap mMap, MapViewState mapViewState) {
         mMap.setInfoWindowAdapter(new RestaurantInfoAdapter(
                 requireActivity().getLayoutInflater().inflate(R.layout.info_window_restaurant,
-                        null), apiKey, getViewLifecycleOwner(), this));
+                        null), mapViewState));
     }
 
 }

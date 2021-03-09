@@ -1,4 +1,4 @@
-package com.christophedurand.go4lunch;
+package com.christophedurand.go4lunch.utils;
 
 import android.app.Application;
 

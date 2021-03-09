@@ -1,8 +1,8 @@
 package com.christophedurand.go4lunch.ui.listView;
 
-import model.pojo.Restaurant;
+import com.christophedurand.go4lunch.model.pojo.Restaurant;
 
-public interface RestaurantsListInterface {
+public interface ListInterface {
     void onClickRestaurant(Restaurant restaurant);
 
 }
