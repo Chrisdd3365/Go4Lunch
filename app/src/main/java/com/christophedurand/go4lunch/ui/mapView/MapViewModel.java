@@ -12,10 +12,10 @@ import androidx.lifecycle.Transformations;
 
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 
@@ -23,8 +23,6 @@ import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 public class MapViewModel extends AndroidViewModel {
 
     private final MediatorLiveData<MapViewState> mMapViewStateMediatorLiveData = new MediatorLiveData<>();
-    private final MediatorLiveData<MapViewState.MapMarker> mMapMarkerMediatorLiveData = new MediatorLiveData<>();
-
     public LiveData<MapViewState> getViewStateLiveData() {
         return mMapViewStateMediatorLiveData;
     }
@@ -42,50 +40,44 @@ public class MapViewModel extends AndroidViewModel {
         LiveData<NearbyRestaurantsResponse> nearbyRestaurantsResponseLiveData =
                 Transformations.switchMap(
                         locationLiveData,
-                        location -> mapViewRepository.getListOfNearbyRestaurants(
-                        "restaurant",
-                        location.getLatitude() + "," + location.getLongitude(),
-                        "1000",
-                        apiKey));
+                        location -> mapViewRepository.getNearbyRestaurantsResponseLiveData(
+                                "restaurant",
+                                location.getLatitude() + "," + location.getLongitude(),
+                                "1000",
+                                apiKey)
+                );
 
-        LiveData<List<MapViewState.MapMarker>> mapMarkersListLiveData =
+        LiveData<List<MapMarker>> mapMarkersListLiveData =
                 Transformations.map(
                         nearbyRestaurantsResponseLiveData,
                         response -> {
-                            List<MapViewState.MapMarker> mapMarkersList = new ArrayList<>();
+                            List<MapMarker> mapMarkersList = new ArrayList<>();
                             for (int i=0; i<response.results.size(); i++) {
                                 String placeId = response.results.get(i).placeId;
                                 String name = response.results.get(i).name;
-                                String address = response.results.get(i).formattedAddress;
-                                mapMarkersList.add(new MapViewState.MapMarker(placeId, name, address));
+                                String address = response.results.get(i).vicinity;
+                                LatLng latLng = new LatLng(response.results.get(i).geometry.location.lat, response.results.get(i).geometry.location.lng);
+                                String photoReference = response.results.get(i).getPhotos().get(0).getPhotoReference();
+
+                                mapMarkersList.add(new MapMarker(placeId, name, address, latLng, photoReference));
                             }
                             return mapMarkersList;
-                        });
-
-        mMapMarkerMediatorLiveData.addSource(mapMarkersListLiveData, list -> {
-            for(int i=0; i<list.size(); i++) {
-                combine(list.get(i));
-            }
-        });
-
-        mMapViewStateMediatorLiveData.addSource(nearbyRestaurantsResponseLiveData, response ->
-                combine(response, locationLiveData.getValue(), mMapMarkerMediatorLiveData.getValue()));
+                        }
+                );
 
         mMapViewStateMediatorLiveData.addSource(locationLiveData, location ->
-                combine(nearbyRestaurantsResponseLiveData.getValue(), location, mMapMarkerMediatorLiveData.getValue()));
+                combine(nearbyRestaurantsResponseLiveData.getValue(), location, mapMarkersListLiveData.getValue()));
 
-        mMapViewStateMediatorLiveData.addSource(mMapMarkerMediatorLiveData, marker ->
-                combine(nearbyRestaurantsResponseLiveData.getValue(), locationLiveData.getValue(), marker));
+        mMapViewStateMediatorLiveData.addSource(nearbyRestaurantsResponseLiveData, response ->
+                combine(response, locationLiveData.getValue(), mapMarkersListLiveData.getValue()));
 
-    }
-
-    private void combine(@NonNull MapViewState.MapMarker mapMarker) {
-        mMapMarkerMediatorLiveData.setValue(mapMarker);
+        mMapViewStateMediatorLiveData.addSource(mapMarkersListLiveData, markersList ->
+                combine(nearbyRestaurantsResponseLiveData.getValue(), locationLiveData.getValue(), markersList));
     }
 
     private void combine(@Nullable NearbyRestaurantsResponse response,
                          @Nullable Location location,
-                         @NonNull MapViewState.MapMarker mapMarker) {
+                         List<MapMarker> mapMarkersList) {
         if (location == null) {
             return;
         }
@@ -94,28 +86,9 @@ public class MapViewModel extends AndroidViewModel {
                 new MapViewState(
                         location,
                         response == null ? null : response.results,
-                        mapMarker
+                        mapMarkersList
                 )
         );
     }
-
-
-//    public String getDistanceFromLastKnownUserLocation(int position, Location location) {
-//        Restaurant restaurant = Objects.requireNonNull(
-//                loadNearbyRestaurantsData(location)
-//                        .getValue()
-//        ).results.get(position);
-//
-//        Location restaurantLocation = new Location("restaurant location");
-//        restaurantLocation.setLatitude(restaurant.geometry.location.lat);
-//        restaurantLocation.setLongitude(restaurant.geometry.location.lng);
-//
-//        Location currentLocation = locationLiveData.getValue();
-//        assert currentLocation != null;
-//        float distance = currentLocation.distanceTo(restaurantLocation);
-//        Log.d("DISTANCE", "distance is : " + distance);
-//
-//        return (int) distance + "m";
-//    }
 
 }

@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.christophedurand.go4lunch.R;
+import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.christophedurand.go4lunch.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,8 +26,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import com.christophedurand.go4lunch.model.pojo.Restaurant;
-import com.christophedurand.go4lunch.model.ViewModelFactory;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
@@ -94,8 +96,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
 
     private void configureViewModel() {
-        ViewModelFactory mViewModelFactory = ViewModelFactory.getInstance();
-        mMapViewModel = new ViewModelProvider(this, mViewModelFactory).get(MapViewModel.class);
+        MapViewModelFactory mMapViewModelFactory = MapViewModelFactory.getInstance();
+        mMapViewModel = new ViewModelProvider(this, mMapViewModelFactory).get(MapViewModel.class);
     }
 
     private void setOnMapReady(GoogleMap mMap) {
@@ -134,26 +136,37 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     }
 
     private void markNearbyRestaurant(MapViewState mapViewState, GoogleMap mMap) {
-        if (mapViewState.getRestaurantsList() != null) {
-            for (Restaurant restaurant : mapViewState.getRestaurantsList()) {
-                LatLng restaurantLatLng = new LatLng(restaurant.getGeometry().getLocation().lat,
-                        restaurant.getGeometry().getLocation().lng);
-                Marker marker = mMap.addMarker(new MarkerOptions()
-                        .position(restaurantLatLng)
-                        .icon(Utils.bitmapDescriptorFromVector(getActivity(),
-                                R.drawable.ic_restaurant_red_marker))
+        if (mapViewState.getMapMarkersList() != null) {
+            Map<Object, MapMarker> markerHashMap = new HashMap<>();
+            for (MapMarker mapMarker : mapViewState.getMapMarkersList()) {
+                LatLng restaurantLatLng = mapMarker.getLatLng();
+                Marker marker = mMap.addMarker(
+                        new MarkerOptions()
+                                .position(restaurantLatLng)
+                                .icon(Utils.bitmapDescriptorFromVector(getActivity(), R.drawable.ic_restaurant_red_marker))
                 );
-                marker.setTag(mapViewState.getMapMarker().getPlaceId());
-
-                setNearbyRestaurantInfoWindowAdapter(mMap, mapViewState);
+                marker.setTag(mapMarker.getPlaceId());
+                markerHashMap.put(marker.getTag(), mapMarker);
             }
+            setNearbyRestaurantInfoWindowAdapter(mMap, markerHashMap);
         }
     }
 
-    private void setNearbyRestaurantInfoWindowAdapter(GoogleMap mMap, MapViewState mapViewState) {
-        mMap.setInfoWindowAdapter(new RestaurantInfoAdapter(
-                requireActivity().getLayoutInflater().inflate(R.layout.info_window_restaurant,
-                        null), mapViewState));
+    private void setNearbyRestaurantInfoWindowAdapter(GoogleMap mMap, Map<Object, MapMarker> markerMap) {
+        mMap.setInfoWindowAdapter(
+                new RestaurantInfoAdapter(
+                        requireActivity().getLayoutInflater().inflate(R.layout.info_window_restaurant, null),
+                        markerMap
+                )
+        );
+
+        mMap.setOnInfoWindowClickListener(marker ->
+                RestaurantDetailsActivity.startActivity(
+                        requireActivity(),
+                        Objects.requireNonNull(
+                                markerMap.get(marker.getTag())).getPlaceId()
+                )
+        );
     }
 
 }

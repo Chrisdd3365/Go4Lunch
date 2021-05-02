@@ -2,11 +2,12 @@ package com.christophedurand.go4lunch.model.pojo;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class Restaurant {
 
-    //-- PROPERTIES
-    @SerializedName("formatted_address")
-    public String formattedAddress;
+    @SerializedName("vicinity")
+    public String vicinity;
 
     @SerializedName("geometry")
     public Geometry geometry;
@@ -26,27 +27,29 @@ public class Restaurant {
     @SerializedName("rating")
     public double rating;
 
+    @SerializedName("photos")
+    private List<Photo> photos;
 
-    //-- CONSTRUCTOR
-    public Restaurant(String formattedAddress, Geometry geometry, String icon, String name,
-                      OpeningHours openingHours, String placeId, double rating) {
-        this.formattedAddress = formattedAddress;
+
+    public Restaurant(String vicinity, Geometry geometry, String icon, String name,
+                      OpeningHours openingHours, String placeId, double rating, List<Photo> photos) {
+        this.vicinity = vicinity;
         this.geometry = geometry;
         this.icon = icon;
         this.name = name;
         this.openingHours = openingHours;
         this.placeId = placeId;
         this.rating = rating;
+        this.photos = photos;
     }
 
 
-    //-- GETTERS && SETTERS
-    public String getFormattedAddress() {
-        return formattedAddress;
+    public String getVicinity() {
+        return vicinity;
     }
 
-    public void setFormattedAddress(String formattedAddress) {
-        this.formattedAddress = formattedAddress;
+    public void setVicinity(String vicinity) {
+        this.vicinity = vicinity;
     }
 
     public Geometry getGeometry() {
@@ -97,18 +100,27 @@ public class Restaurant {
         this.rating = rating;
     }
 
+    public List<Photo> getPhotos() {
+        return photos;
+    }
 
-    //-- METHODS
+    public void setPhotos(List<Photo> photos) {
+        this.photos = photos;
+    }
+
+
     @Override
     public String toString() {
         return "Restaurant{" +
-                "formattedAddress='" + formattedAddress + '\'' +
+                "vicinity='" + vicinity + '\'' +
                 ", geometry=" + geometry +
                 ", icon='" + icon + '\'' +
                 ", name='" + name + '\'' +
                 ", openingHours=" + openingHours +
                 ", placeId='" + placeId + '\'' +
                 ", rating=" + rating +
+                ", photos=" + photos +
                 '}';
     }
+
 }

@@ -1,4 +1,5 @@
-package com.christophedurand.go4lunch.ui.listView;
+package com.christophedurand.go4lunch.ui.detailsView;
+
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -7,43 +8,48 @@ import androidx.lifecycle.MutableLiveData;
 import com.christophedurand.go4lunch.model.GooglePlacesAPIService;
 import com.christophedurand.go4lunch.model.RetrofitService;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ListViewRepository {
+import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
+
+
+public class RestaurantDetailsRepository {
 
     private static GooglePlacesAPIService mGooglePlacesAPIService = null;
-    private final MutableLiveData<RestaurantDetailsResponse> mRestaurantDetails = new MutableLiveData<>();
-    private static ListViewRepository mListViewRepository;
+    private final MutableLiveData<RestaurantDetailsResponse> restaurantDetailsMutableLiveData = new MutableLiveData<>();
+    private static RestaurantDetailsRepository restaurantDetailsRepository;
 
-    public static ListViewRepository getInstance() {
-        if (mListViewRepository == null){
-            mListViewRepository = new ListViewRepository();
+
+    public static RestaurantDetailsRepository getInstance() {
+        if (restaurantDetailsRepository == null) {
+            restaurantDetailsRepository = new RestaurantDetailsRepository();
         }
-        return mListViewRepository;
+        return restaurantDetailsRepository;
     }
 
-    private ListViewRepository() {
+    private RestaurantDetailsRepository() {
         mGooglePlacesAPIService = RetrofitService.getInstance().getGooglePlacesAPIService();
     }
 
-    public LiveData<RestaurantDetailsResponse> getRestaurantDetails(String placeId, String apiKey) {
+
+    public LiveData<RestaurantDetailsResponse> getRestaurantDetailsMutableLiveData(String placeId) {
         Call<RestaurantDetailsResponse> restaurantDetails = mGooglePlacesAPIService.getPlaceDetails(placeId, apiKey);
         restaurantDetails.enqueue(new Callback<RestaurantDetailsResponse>() {
             @Override
             public void onResponse(@NonNull Call<RestaurantDetailsResponse> call,
                                    @NonNull Response<RestaurantDetailsResponse> response) {
-                mRestaurantDetails.setValue(response.body());
+                restaurantDetailsMutableLiveData.setValue(response.body());
             }
 
             @Override
             public void onFailure(@NonNull Call<RestaurantDetailsResponse> call, @NonNull Throwable t) { }
 
-            });
+        });
 
-        return mRestaurantDetails;
+        return restaurantDetailsMutableLiveData;
     }
 
 }
-

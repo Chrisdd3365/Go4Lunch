@@ -1,28 +1,26 @@
-package com.christophedurand.go4lunch.ui.mapView;
+package com.christophedurand.go4lunch.ui.listView;
 
 import android.location.Location;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.List;
-
 import com.christophedurand.go4lunch.model.pojo.Restaurant;
 
+import java.util.List;
 
-class MapViewState {
+
+class ListViewState {
 
     @NonNull
     private final Location location;
     @Nullable
     private final List<Restaurant> restaurantsList;
-    private final List<MapMarker> mapMarkersList;
 
 
-    public MapViewState(@NonNull Location location, @Nullable List<Restaurant> restaurantsList, List<MapMarker> mapMarkersList) {
+    public ListViewState(@NonNull Location location, @Nullable List<Restaurant> restaurantsList) {
         this.location = location;
         this.restaurantsList = restaurantsList;
-        this.mapMarkersList = mapMarkersList;
     }
 
 
@@ -36,8 +34,13 @@ class MapViewState {
         return restaurantsList;
     }
 
-    public List<MapMarker> getMapMarkersList() {
-        return mapMarkersList;
+
+    @Override
+    public String toString() {
+        return "ListViewState{" +
+                "location=" + location +
+                ", restaurantsList=" + restaurantsList +
+                '}';
     }
 
 }

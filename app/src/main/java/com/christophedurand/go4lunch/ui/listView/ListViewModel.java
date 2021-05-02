@@ -1,33 +1,98 @@
 package com.christophedurand.go4lunch.ui.listView;
 
 import android.app.Application;
+import android.location.Location;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.Transformations;
 
-import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
+import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
+import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
+import com.christophedurand.go4lunch.ui.mapView.MapViewRepository;
+
+import java.util.Objects;
+
+import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
+
 
 public class ListViewModel extends AndroidViewModel  {
 
-    private final ListViewRepository mListViewRepository;
-    @SuppressWarnings({"FieldCanBeLocal"})
-    private LiveData<RestaurantDetailsResponse> mRestaurantDetails = new MutableLiveData<>();
+    private final MediatorLiveData<ListViewState> listViewStateMediatorLiveData = new MediatorLiveData<>();
 
-    public ListViewModel(@NonNull Application application) {
+
+    public ListViewModel(@NonNull Application application,
+                         CurrentLocationRepository currentLocationRepository,
+                         MapViewRepository mapViewRepository) {
+
         super(application);
-        mListViewRepository = ListViewRepository.getInstance();
+
+        currentLocationRepository.initCurrentLocationUpdate();
+        LiveData<Location> locationLiveData = currentLocationRepository.getCurrentLocationLiveData();
+
+        LiveData<NearbyRestaurantsResponse> nearbyRestaurantsResponseLiveData =
+                Transformations.switchMap(
+                        locationLiveData,
+                        location -> mapViewRepository.getNearbyRestaurantsResponseLiveData(
+                                "restaurant",
+                                location.getLatitude() + "," + location.getLongitude(),
+                                "1000",
+                                apiKey)
+                );
+
+        listViewStateMediatorLiveData.addSource(locationLiveData, location ->
+                combine(location, nearbyRestaurantsResponseLiveData.getValue())
+        );
+
+        listViewStateMediatorLiveData.addSource(nearbyRestaurantsResponseLiveData, nearbyRestaurantsResponse ->
+                combine(locationLiveData.getValue(), nearbyRestaurantsResponse)
+        );
+
     }
 
-    public LiveData<RestaurantDetailsResponse> getRestaurantDetailsRepository(String placeId, String apiKey) {
-        mRestaurantDetails = loadRestaurantDetailsData(placeId, apiKey);
-        return mRestaurantDetails;
+
+    public LiveData<ListViewState> getListViewStateMediatorLiveData() {
+        return listViewStateMediatorLiveData;
     }
 
-    private LiveData<RestaurantDetailsResponse> loadRestaurantDetailsData(String placeId, String apiKey) {
-        return mListViewRepository.getRestaurantDetails(placeId, apiKey);
+
+    private void combine(@Nullable Location location,
+                         @Nullable NearbyRestaurantsResponse response) {
+
+        if (location == null) {
+            return;
+        }
+
+        listViewStateMediatorLiveData.setValue(
+                new ListViewState(
+                        location,
+                        response == null ? null : response.results
+                )
+        );
+
     }
+
+//    public static String getDistanceFromLastKnownUserLocation(Location currentLocation, Location restaurantLocation) {
+//        Restaurant restaurant = Objects.requireNonNull(
+//                loadNearbyRestaurantsData(location)
+//                        .getValue()
+//        ).results.get(position);
+//
+//        Location restaurantLocation = new Location("restaurant location");
+//        restaurantLocation.setLatitude(restaurant.geometry.location.lat);
+//        restaurantLocation.setLongitude(restaurant.geometry.location.lng);
+//
+//        Location currentLocation = locationLiveData.getValue();
+//        assert currentLocation != null;
+//        float distance = currentLocation.distanceTo(restaurantLocation);
+//        Log.d("DISTANCE", "distance is : " + distance);
+//
+//        return (int) distance + "m";
+//    }
+
 }
 
 

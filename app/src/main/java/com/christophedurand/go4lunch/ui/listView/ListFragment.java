@@ -1,53 +1,33 @@
 package com.christophedurand.go4lunch.ui.listView;
 
-import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.ui.RestaurantDetailsActivity;
-import com.christophedurand.go4lunch.ui.mapView.MapViewModel;
+import com.christophedurand.go4lunch.model.pojo.Restaurant;
 
-import java.io.Serializable;
 import java.util.List;
 
-import com.christophedurand.go4lunch.model.pojo.Restaurant;
-import com.christophedurand.go4lunch.model.ViewModelFactory;
 
-import static com.christophedurand.go4lunch.ui.HomeActivity.LAUNCH_SECOND_ACTIVITY;
-import static com.christophedurand.go4lunch.ui.RestaurantDetailsActivity.BUNDLE_EXTRA_RESTAURANT;
+public class ListFragment extends Fragment {
 
+    private RecyclerView listRecyclerView;
 
-/**
- * A fragment representing a list of Restaurants.
- */
-public class ListFragment extends Fragment implements ListInterface {
-
-    private List<Restaurant> mRestaurants;
-    private RecyclerView mRecyclerView;
-    private ListRecyclerViewAdapter listRecyclerViewAdapter;
-    private Context context;
-    private MapViewModel mMapViewModel;
+    private ListViewModel listViewModel;
 
 
-    public static ListFragment newInstance(Location location) {
-        ListFragment fragment = new ListFragment();
-
-        Bundle args = new Bundle();
-        args.putSerializable("location", (Serializable) location);
-        fragment.setArguments(args);
-
-        return fragment;
+    public static ListFragment newInstance() {
+        return new ListFragment();
     }
 
 
@@ -60,26 +40,15 @@ public class ListFragment extends Fragment implements ListInterface {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_restaurant_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_restaurants_list, container, false);
 
-        context = view.getContext();
+        listRecyclerView = view.findViewById(R.id.restaurants_list_recycler_view);
 
-        ViewModelFactory mViewModelFactory = ViewModelFactory.getInstance();
-        mMapViewModel = new ViewModelProvider(this, mViewModelFactory).get(MapViewModel.class);
+        configureViewModel();
 
-//        androidx.lifecycle.Observer<Location> locationObserver = location ->
-//                mMapViewModel.getNearbyRestaurantsRepository("restaurant", location,"1000", apiKey)
-//                        .observe(this.getViewLifecycleOwner(), nearbyRestaurantsResponse -> {
-//
-//                            mRecyclerView = (RecyclerView) view;
-//                            mRestaurants = nearbyRestaurantsResponse.getResults();
-//                            listRecyclerViewAdapter = new ListRecyclerViewAdapter(mRestaurants,
-//                                    ListFragment.this, mMapViewModel, location);
-//                            mRecyclerView.setAdapter(listRecyclerViewAdapter);
-//                            mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-//                            mRecyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
-//                        });
-//        mMapViewModel.locationLiveData.observe(this.getViewLifecycleOwner(), locationObserver);
+        listViewModel.getListViewStateMediatorLiveData().observe(getViewLifecycleOwner(), listViewState -> {
+            initRecyclerView(listViewState.getLocation(), listViewState.getRestaurantsList());
+        });
 
         return view;
     }
@@ -91,20 +60,23 @@ public class ListFragment extends Fragment implements ListInterface {
     }
 
 
-    //-- METHODS
-    public void updateList(List<Restaurant> restaurants) {
-        mRestaurants = restaurants;
-        listRecyclerViewAdapter.notifyDataSetChanged();
+    private void configureViewModel() {
+        ListViewModelFactory listViewModelFactory = ListViewModelFactory.getInstance();
+        listViewModel = new ViewModelProvider(this, listViewModelFactory).get(ListViewModel.class);
     }
 
-    @Override
-    public void onClickRestaurant(Restaurant restaurant) {
-        Intent intent = new Intent(getActivity(), RestaurantDetailsActivity.class);
-        intent.putExtra(BUNDLE_EXTRA_RESTAURANT, (Parcelable) restaurant);
+    private void initRecyclerView(Location currentLocation, List<Restaurant> restaurantsList) {
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
+        listRecyclerView.setLayoutManager(layoutManager);
+        listRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        listRecyclerView.setClickable(true);
 
-        if (getActivity() != null) {
-            getActivity().startActivityForResult(intent, LAUNCH_SECOND_ACTIVITY);
-        }
+        ListRecyclerViewAdapter listRecyclerViewAdapter = new ListRecyclerViewAdapter(
+                requireActivity(),
+                currentLocation,
+                restaurantsList);
+        listRecyclerView.setAdapter(listRecyclerViewAdapter);
+
     }
 
 }

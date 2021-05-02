@@ -2,6 +2,8 @@ package com.christophedurand.go4lunch.model.pojo;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class RestaurantDetails {
 
     //-- PROPERTIES
@@ -38,10 +40,16 @@ public class RestaurantDetails {
     @SerializedName("website")
     public String website;
 
+    @SerializedName("photos")
+    public List<Photo> photos;
 
-    //-- CONSTRUCTOR
-    public RestaurantDetails(String formattedAddress, Geometry geometry, String icon, String internationalPhoneNumber,
-                             String name, OpeningHours openingHours, String placeId, double rating, String url, String website) {
+
+    public RestaurantDetails(String formattedAddress, Geometry geometry,
+                             String icon, String internationalPhoneNumber,
+                             String name, OpeningHours openingHours,
+                             String placeId, double rating,
+                             String reference, String url,
+                             String website, List<Photo> photos) {
         this.formattedAddress = formattedAddress;
         this.geometry = geometry;
         this.icon = icon;
@@ -50,12 +58,13 @@ public class RestaurantDetails {
         this.openingHours = openingHours;
         this.placeId = placeId;
         this.rating = rating;
+        this.reference = reference;
         this.url = url;
         this.website = website;
+        this.photos = photos;
     }
 
 
-    //-- GETTERS && SETTERS
     public String getFormattedAddress() {
         return formattedAddress;
     }
@@ -136,8 +145,23 @@ public class RestaurantDetails {
         this.website = website;
     }
 
+    public String getReference() {
+        return reference;
+    }
 
-    //-- METHODS
+    public void setReference(String reference) {
+        this.reference = reference;
+    }
+
+    public List<Photo> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<Photo> photos) {
+        this.photos = photos;
+    }
+
+
     @Override
     public String toString() {
         return "RestaurantDetails{" +
@@ -149,8 +173,10 @@ public class RestaurantDetails {
                 ", openingHours=" + openingHours +
                 ", placeId='" + placeId + '\'' +
                 ", rating=" + rating +
+                ", reference='" + reference + '\'' +
                 ", url='" + url + '\'' +
                 ", website='" + website + '\'' +
+                ", photos=" + photos +
                 '}';
     }
 

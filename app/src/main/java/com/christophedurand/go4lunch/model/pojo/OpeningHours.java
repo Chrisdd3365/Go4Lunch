@@ -2,6 +2,7 @@ package com.christophedurand.go4lunch.model.pojo;
 
 import com.google.gson.annotations.SerializedName;
 
+
 public class OpeningHours {
 
     //-- PROPERTIES
