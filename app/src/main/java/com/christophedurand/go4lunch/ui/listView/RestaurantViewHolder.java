@@ -49,30 +49,32 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
         String vicinity = restaurant.vicinity;
         mRestaurantAddressTextView.setText(vicinity);
 
-        boolean isOpen = restaurant.openingHours.openNow;
-        if (isOpen) {
-            String openString = "Ouvert";
-            mRestaurantIsOpenTextView.setText(openString);
-            mRestaurantIsOpenTextView.setTextColor(itemView.getResources().getColor(R.color.colorRed));
-        } else {
-            String closeString = "Fermé";
-            mRestaurantIsOpenTextView.setText(closeString);
-            mRestaurantIsOpenTextView.setTextColor(itemView.getResources().getColor(R.color.colorGreen));
+        if (restaurant.openingHours != null) {
+            boolean isOpen = restaurant.openingHours.openNow;
+            if (isOpen) {
+                String openString = "Ouvert";
+                mRestaurantIsOpenTextView.setText(openString);
+                mRestaurantIsOpenTextView.setTextColor(itemView.getResources().getColor(R.color.colorGreen));
+            } else {
+                String closeString = "Fermé";
+                mRestaurantIsOpenTextView.setText(closeString);
+                mRestaurantIsOpenTextView.setTextColor(itemView.getResources().getColor(R.color.colorRed));
+            }
         }
 
 //        com.christophedurand.go4lunch.model.pojo.Location restaurantLocation = restaurant.geometry.location;
 //        String distanceFromUser = ListViewModel.getDistanceFromLastKnownUserLocation(currentLocation, restaurantLocation);
 //        mRestaurantDistanceTextView.setText(distanceFromUser);
 
-        double rating = restaurant.rating;
-        mRestaurantRatingTextView.setText(String.valueOf(rating));
+            double rating = restaurant.rating;
+            mRestaurantRatingTextView.setText(String.valueOf(rating));
 
-        itemView.setOnClickListener(v -> {
-            RestaurantDetailsActivity.startActivity(
-                    activity,
-                    restaurant.placeId
-            );
-        });
+            itemView.setOnClickListener(v -> {
+                RestaurantDetailsActivity.startActivity(
+                        activity,
+                        restaurant.placeId
+                );
+            });
+        }
+
     }
-
-}

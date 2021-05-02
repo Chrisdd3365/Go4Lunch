@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -66,10 +67,14 @@ public class ListFragment extends Fragment {
     }
 
     private void initRecyclerView(Location currentLocation, List<Restaurant> restaurantsList) {
+
         final LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
         listRecyclerView.setLayoutManager(layoutManager);
         listRecyclerView.setItemAnimator(new DefaultItemAnimator());
         listRecyclerView.setClickable(true);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL);
+        listRecyclerView.addItemDecoration(dividerItemDecoration);
 
         ListRecyclerViewAdapter listRecyclerViewAdapter = new ListRecyclerViewAdapter(
                 requireActivity(),

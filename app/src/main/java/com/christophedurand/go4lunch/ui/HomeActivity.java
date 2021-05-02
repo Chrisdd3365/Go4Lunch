@@ -2,6 +2,7 @@ package com.christophedurand.go4lunch.ui;
 
 import android.Manifest;
 import android.os.Bundle;
+import android.view.Window;
 import android.widget.Toast;
 
 import com.christophedurand.go4lunch.R;
@@ -16,6 +17,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+
+import java.util.Objects;
 
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
@@ -40,6 +43,8 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_home);
+
+        Objects.requireNonNull(getSupportActionBar()).hide(); // will hide the title bar
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
