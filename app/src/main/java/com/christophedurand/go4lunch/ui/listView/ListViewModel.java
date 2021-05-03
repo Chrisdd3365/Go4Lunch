@@ -14,7 +14,6 @@ import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
 import com.christophedurand.go4lunch.ui.mapView.MapViewRepository;
 
-import java.util.Objects;
 
 import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 

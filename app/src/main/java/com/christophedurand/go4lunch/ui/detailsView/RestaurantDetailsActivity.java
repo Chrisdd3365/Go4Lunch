@@ -65,24 +65,17 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
                 String formattedAddress = detailsUiModel.getRestaurantDetails().formattedAddress;
                 restaurantAddressTextView.setText(formattedAddress);
 
+                //TODO: refactoring into VIEW MODEL
                 if (detailsUiModel.getRestaurantDetails().internationalPhoneNumber != null) {
                     callImageButton.setOnClickListener(v -> {
-                        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE);
-                        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-                            ActivityCompat.requestPermissions(
-                                    this,
-                                    new String[]{Manifest.permission.CALL_PHONE},
-                                    123);
-                        } else {
-                            Intent callIntent = new Intent(Intent.ACTION_CALL);
-                            callIntent.setData(
-                                    Uri.parse(
-                                            "tel:" + detailsUiModel.getRestaurantDetails().getInternationalPhoneNumber()
-                                    )
-                            );
-                            callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(callIntent);
-                        }
+                        Intent callIntent = new Intent(Intent.ACTION_CALL);
+                        callIntent.setData(
+                                Uri.parse(
+                                        "tel:" + detailsUiModel.getRestaurantDetails().getInternationalPhoneNumber()
+                                )
+                        );
+                        callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(callIntent);
                     });
                 } else {
                     Toast.makeText(getApplicationContext(), "Numéro de téléphone indisponible", Toast.LENGTH_SHORT).show();
@@ -93,7 +86,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
                     //like restaurant
                 });
 
-
+                //TODO: refactoring into VIEW MODEL
                 if (detailsUiModel.getRestaurantDetails().website != null) {
                     websiteImageButton.setOnClickListener(v -> {
                         Uri websiteUri = Uri.parse(detailsUiModel.getRestaurantDetails().website);
