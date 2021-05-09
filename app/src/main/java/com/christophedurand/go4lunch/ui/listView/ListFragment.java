@@ -4,6 +4,7 @@ import android.location.Location;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -16,8 +17,11 @@ import android.view.ViewGroup;
 
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.model.pojo.Restaurant;
+import com.christophedurand.go4lunch.model.pojo.RestaurantDetails;
+import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 
 import java.util.List;
+import java.util.Map;
 
 
 public class ListFragment extends Fragment {
@@ -48,7 +52,7 @@ public class ListFragment extends Fragment {
         configureViewModel();
 
         listViewModel.getListViewStateMediatorLiveData().observe(getViewLifecycleOwner(), listViewState -> {
-            initRecyclerView(listViewState.getLocation(), listViewState.getRestaurantsList());
+            initRecyclerView(listViewState.getLocation(), listViewState.getRestaurantsList(), listViewState.getMap());
         });
 
         return view;
@@ -66,7 +70,9 @@ public class ListFragment extends Fragment {
         listViewModel = new ViewModelProvider(this, listViewModelFactory).get(ListViewModel.class);
     }
 
-    private void initRecyclerView(Location currentLocation, List<Restaurant> restaurantsList) {
+    private void initRecyclerView(Location currentLocation,
+                                  List<Restaurant> restaurantsList,
+                                  Map<String, LiveData<RestaurantDetailsResponse>> map) {
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
         listRecyclerView.setLayoutManager(layoutManager);
@@ -79,7 +85,9 @@ public class ListFragment extends Fragment {
         ListRecyclerViewAdapter listRecyclerViewAdapter = new ListRecyclerViewAdapter(
                 requireActivity(),
                 currentLocation,
-                restaurantsList);
+                restaurantsList,
+                map
+        );
         listRecyclerView.setAdapter(listRecyclerViewAdapter);
 
     }

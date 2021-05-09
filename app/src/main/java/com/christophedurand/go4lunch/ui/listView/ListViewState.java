@@ -4,10 +4,13 @@ import android.location.Location;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
 
 import com.christophedurand.go4lunch.model.pojo.Restaurant;
+import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 
 import java.util.List;
+import java.util.Map;
 
 
 class ListViewState {
@@ -16,11 +19,16 @@ class ListViewState {
     private final Location location;
     @Nullable
     private final List<Restaurant> restaurantsList;
+    @Nullable
+    private final Map<String, LiveData<RestaurantDetailsResponse>> map;
 
 
-    public ListViewState(@NonNull Location location, @Nullable List<Restaurant> restaurantsList) {
+    public ListViewState(@NonNull Location location,
+                         @Nullable List<Restaurant> restaurantsList,
+                         @Nullable Map<String, LiveData<RestaurantDetailsResponse>> map) {
         this.location = location;
         this.restaurantsList = restaurantsList;
+        this.map = map;
     }
 
 
@@ -34,12 +42,18 @@ class ListViewState {
         return restaurantsList;
     }
 
+    @Nullable
+    public Map<String, LiveData<RestaurantDetailsResponse>> getMap() {
+        return map;
+    }
+
 
     @Override
     public String toString() {
         return "ListViewState{" +
                 "location=" + location +
                 ", restaurantsList=" + restaurantsList +
+                ", map=" + map +
                 '}';
     }
 

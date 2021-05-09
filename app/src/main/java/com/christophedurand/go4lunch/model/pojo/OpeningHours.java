@@ -2,21 +2,26 @@ package com.christophedurand.go4lunch.model.pojo;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 
 public class OpeningHours {
 
-    //-- PROPERTIES
     @SerializedName("open_now")
     public boolean openNow;
+    @SerializedName("periods")
+    private List<Period> periods;
+    @SerializedName("weekday_text")
+    private List<String> weekdayText;
 
 
-    //-- CONSTRUCTOR
-    public OpeningHours(boolean openNow) {
+    public OpeningHours(boolean openNow, List<Period> periods, List<String> weekdayText) {
         this.openNow = openNow;
+        this.periods = periods;
+        this.weekdayText = weekdayText;
     }
 
 
-    //-- GETTERS && SETTERS
     public boolean isOpenNow() {
         return openNow;
     }
@@ -25,12 +30,30 @@ public class OpeningHours {
         this.openNow = openNow;
     }
 
+    public List<Period> getPeriods() {
+        return periods;
+    }
 
-    //-- METHODS
+    public void setPeriods(List<Period> periods) {
+        this.periods = periods;
+    }
+
+    public List<String> getWeekdayText() {
+        return weekdayText;
+    }
+
+    public void setWeekdayText(List<String> weekdayText) {
+        this.weekdayText = weekdayText;
+    }
+
+
     @Override
     public String toString() {
         return "OpeningHours{" +
                 "openNow=" + openNow +
+                ", periods=" + periods +
+                ", weekdayText=" + weekdayText +
                 '}';
     }
+
 }

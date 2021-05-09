@@ -12,8 +12,14 @@ import androidx.lifecycle.Transformations;
 
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
+import com.christophedurand.go4lunch.model.pojo.RestaurantDetails;
+import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
+import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsRepository;
 import com.christophedurand.go4lunch.ui.mapView.MapViewRepository;
 
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 
@@ -25,11 +31,13 @@ public class ListViewModel extends AndroidViewModel  {
 
     public ListViewModel(@NonNull Application application,
                          CurrentLocationRepository currentLocationRepository,
-                         MapViewRepository mapViewRepository) {
+                         MapViewRepository mapViewRepository,
+                         RestaurantDetailsRepository restaurantDetailsRepository) {
 
         super(application);
 
         currentLocationRepository.initCurrentLocationUpdate();
+
         LiveData<Location> locationLiveData = currentLocationRepository.getCurrentLocationLiveData();
 
         LiveData<NearbyRestaurantsResponse> nearbyRestaurantsResponseLiveData =
@@ -42,12 +50,36 @@ public class ListViewModel extends AndroidViewModel  {
                                 apiKey)
                 );
 
+        LiveData
+
+        LiveData<Map<String, LiveData<RestaurantDetailsResponse>>> mapStringRestaurantDetailsLiveData =
+                Transformations.map(
+                        nearbyRestaurantsResponseLiveData,
+                        response -> {
+                            Map<String, LiveData<RestaurantDetailsResponse>> hashMap = new HashMap<>();
+                            for (int i = 0; i<response.results.size(); i++) {
+                                hashMap.put(
+                                        response.results.get(i).placeId,
+                                        restaurantDetailsRepository.getRestaurantDetailsMutableLiveData(
+                                                response.results.get(i).placeId
+                                        )
+                                );
+                            }
+                            return hashMap;
+                        }
+                );
+
+
         listViewStateMediatorLiveData.addSource(locationLiveData, location ->
-                combine(location, nearbyRestaurantsResponseLiveData.getValue())
+                combine(location, nearbyRestaurantsResponseLiveData.getValue(), mapStringRestaurantDetailsLiveData.getValue())
         );
 
         listViewStateMediatorLiveData.addSource(nearbyRestaurantsResponseLiveData, nearbyRestaurantsResponse ->
-                combine(locationLiveData.getValue(), nearbyRestaurantsResponse)
+                combine(locationLiveData.getValue(), nearbyRestaurantsResponse, mapStringRestaurantDetailsLiveData.getValue())
+        );
+
+        listViewStateMediatorLiveData.addSource(mapStringRestaurantDetailsLiveData, map ->
+                combine(locationLiveData.getValue(), nearbyRestaurantsResponseLiveData.getValue(), map)
         );
 
     }
@@ -59,7 +91,8 @@ public class ListViewModel extends AndroidViewModel  {
 
 
     private void combine(@Nullable Location location,
-                         @Nullable NearbyRestaurantsResponse response) {
+                         @Nullable NearbyRestaurantsResponse response,
+                         @Nullable Map<String, LiveData<RestaurantDetailsResponse>> map) {
 
         if (location == null) {
             return;
@@ -68,7 +101,8 @@ public class ListViewModel extends AndroidViewModel  {
         listViewStateMediatorLiveData.setValue(
                 new ListViewState(
                         location,
-                        response == null ? null : response.results
+                        response == null ? null : response.results,
+                        map
                 )
         );
 

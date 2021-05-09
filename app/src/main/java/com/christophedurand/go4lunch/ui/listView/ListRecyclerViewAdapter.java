@@ -1,6 +1,7 @@
 package com.christophedurand.go4lunch.ui.listView;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
@@ -12,8 +13,11 @@ import android.view.ViewGroup;
 import com.christophedurand.go4lunch.R;
 
 import java.util.List;
+import java.util.Map;
 
 import com.christophedurand.go4lunch.model.pojo.Restaurant;
+import com.christophedurand.go4lunch.model.pojo.RestaurantDetails;
+import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 
 
 public class ListRecyclerViewAdapter extends RecyclerView.Adapter<RestaurantViewHolder> {
@@ -21,12 +25,17 @@ public class ListRecyclerViewAdapter extends RecyclerView.Adapter<RestaurantView
     private final Activity activity;
     private final Location currentLocation;
     private final List<Restaurant> dataSet;
+    private final Map<String, LiveData<RestaurantDetailsResponse>> map;
 
 
-    public ListRecyclerViewAdapter(Activity activity, Location currentLocation, List<Restaurant> dataSet) {
+    public ListRecyclerViewAdapter(Activity activity,
+                                   Location currentLocation,
+                                   List<Restaurant> dataSet,
+                                   Map<String, LiveData<RestaurantDetailsResponse>> map) {
         this.activity = activity;
         this.currentLocation = currentLocation;
         this.dataSet = dataSet;
+        this.map = map;
     }
 
 
@@ -41,7 +50,8 @@ public class ListRecyclerViewAdapter extends RecyclerView.Adapter<RestaurantView
     @Override
     public void onBindViewHolder(@NonNull RestaurantViewHolder holder, int position) {
         Restaurant restaurant = dataSet.get(position);
-        holder.bind(activity, currentLocation, restaurant);
+        LiveData<RestaurantDetailsResponse> restaurantDetailsResponseLiveData = map.get(restaurant.placeId);
+        holder.bind(activity, currentLocation, restaurant, restaurantDetailsResponseLiveData);
     }
 
     @Override

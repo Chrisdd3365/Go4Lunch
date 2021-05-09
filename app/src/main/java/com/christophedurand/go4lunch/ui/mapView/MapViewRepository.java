@@ -36,7 +36,6 @@ public class MapViewRepository {
         nearbyRestaurantsList.enqueue(new Callback<NearbyRestaurantsResponse>() {
             @Override
             public void onResponse(@NonNull Call<NearbyRestaurantsResponse> call, @NonNull Response<NearbyRestaurantsResponse> response) {
-                Log.d("coucou", "coucou" +  response.body().toString());
                 nearbyRestaurantsResponseMutableLiveData.setValue(response.body());
             }
 
