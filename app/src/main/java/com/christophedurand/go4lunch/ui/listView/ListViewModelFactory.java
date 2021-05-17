@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsRepository;
-import com.christophedurand.go4lunch.ui.mapView.MapViewRepository;
+import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
 import com.christophedurand.go4lunch.utils.MainApplication;
 import com.google.android.gms.location.LocationServices;
 
@@ -18,7 +18,7 @@ class ListViewModelFactory implements ViewModelProvider.Factory {
     private static ListViewModelFactory sInstance;
     private final Application application;
     private final CurrentLocationRepository currentLocationRepository;
-    private final MapViewRepository mapViewRepository;
+    private final NearbyRepository mNearbyRepository;
     private final RestaurantDetailsRepository restaurantDetailsRepository;
 
 
@@ -32,7 +32,7 @@ class ListViewModelFactory implements ViewModelProvider.Factory {
     private ListViewModelFactory() {
         this.application = MainApplication.getApplication();
         this.currentLocationRepository = new CurrentLocationRepository(LocationServices.getFusedLocationProviderClient(application));
-        this.mapViewRepository = MapViewRepository.getInstance();
+        this.mNearbyRepository = NearbyRepository.getInstance();
         this.restaurantDetailsRepository = RestaurantDetailsRepository.getInstance();
     }
 
@@ -44,7 +44,7 @@ class ListViewModelFactory implements ViewModelProvider.Factory {
             return (T) new ListViewModel(
                     application,
                     currentLocationRepository,
-                    mapViewRepository,
+                mNearbyRepository,
                     restaurantDetailsRepository
             );
         }

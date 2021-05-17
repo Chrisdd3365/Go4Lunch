@@ -18,6 +18,7 @@ class ListViewState {
     @NonNull
     private final Location location;
     @Nullable
+    // TODO !!! Ca doit être un ViewState
     private final List<Restaurant> restaurantsList;
     @Nullable
     private final Map<String, RestaurantDetailsResponse> map;
