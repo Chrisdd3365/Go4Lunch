@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.christophedurand.go4lunch.R;
@@ -44,7 +43,7 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
     public void bind(Activity activity,
                      Location currentLocation,
                      Restaurant restaurant,
-                     LiveData<RestaurantDetailsResponse> restaurantDetailsResponseLiveData) {
+                     RestaurantDetailsResponse restaurantDetailsResponse) {
 
         String photoReference = restaurant.getPhotos().get(0).getPhotoReference();
         ImageUtils.loadGooglePhoto(itemView.getContext(), mRestaurantImageView, photoReference);
@@ -55,40 +54,25 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
         String vicinity = restaurant.vicinity;
         mRestaurantAddressTextView.setText(vicinity);
 
-//        if (restaurant.openingHours != null) {
-//            boolean isOpen = restaurant.openingHours.openNow;
-//            if (isOpen) {
-//                String openString = "Ouvert";
-//                mRestaurantIsOpenTextView.setText(openString);
-//                mRestaurantIsOpenTextView.setTextColor(itemView.getResources().getColor(R.color.colorGreen));
-//            } else {
-//                String closeString = "Fermé";
-//                mRestaurantIsOpenTextView.setText(closeString);
-//                mRestaurantIsOpenTextView.setTextColor(itemView.getResources().getColor(R.color.colorRed));
-//            }
-//        }
-
-        restaurantDetailsResponseLiveData.observe(, restaurantDetailsResponse -> {
-            RestaurantDetails restaurantDetails = restaurantDetailsResponse.result;
-            int openIndex = restaurantDetails.openingHours.getPeriods().get(0).getOpen().getDay();
-            String openString = restaurantDetails.openingHours.getWeekdayText().get(openIndex);
-            mRestaurantIsOpenTextView.setText(openString);
-        });
+        RestaurantDetails restaurantDetails = restaurantDetailsResponse.result;
+        int openIndex = restaurantDetails.openingHours.getPeriods().get(0).getOpen().getDay();
+        String openString = restaurantDetails.openingHours.getWeekdayText().get(openIndex);
+        mRestaurantIsOpenTextView.setText(openString);
 
 
 //        com.christophedurand.go4lunch.model.pojo.Location restaurantLocation = restaurant.geometry.location;
 //        String distanceFromUser = ListViewModel.getDistanceFromLastKnownUserLocation(currentLocation, restaurantLocation);
 //        mRestaurantDistanceTextView.setText(distanceFromUser);
 
-            double rating = restaurant.rating;
-            mRestaurantRatingTextView.setText(String.valueOf(rating));
+        double rating = restaurant.rating;
+        mRestaurantRatingTextView.setText(String.valueOf(rating));
 
-            itemView.setOnClickListener(v -> {
-                RestaurantDetailsActivity.startActivity(
-                        activity,
-                        restaurant.placeId
-                );
-            });
-        }
-
+        itemView.setOnClickListener(v -> {
+            RestaurantDetailsActivity.startActivity(
+                    activity,
+                    restaurant.placeId
+            );
+        });
     }
+
+}

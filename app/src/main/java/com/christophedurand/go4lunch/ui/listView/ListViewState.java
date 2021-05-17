@@ -20,12 +20,12 @@ class ListViewState {
     @Nullable
     private final List<Restaurant> restaurantsList;
     @Nullable
-    private final Map<String, LiveData<RestaurantDetailsResponse>> map;
+    private final Map<String, RestaurantDetailsResponse> map;
 
 
     public ListViewState(@NonNull Location location,
                          @Nullable List<Restaurant> restaurantsList,
-                         @Nullable Map<String, LiveData<RestaurantDetailsResponse>> map) {
+                         @Nullable Map<String, RestaurantDetailsResponse> map) {
         this.location = location;
         this.restaurantsList = restaurantsList;
         this.map = map;
@@ -43,7 +43,7 @@ class ListViewState {
     }
 
     @Nullable
-    public Map<String, LiveData<RestaurantDetailsResponse>> getMap() {
+    public Map<String, RestaurantDetailsResponse> getMap() {
         return map;
     }
 

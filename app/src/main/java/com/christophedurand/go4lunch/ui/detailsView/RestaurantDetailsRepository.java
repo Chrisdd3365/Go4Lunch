@@ -1,6 +1,8 @@
 package com.christophedurand.go4lunch.ui.detailsView;
 
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -9,6 +11,7 @@ import com.christophedurand.go4lunch.model.GooglePlacesAPIService;
 import com.christophedurand.go4lunch.model.RetrofitService;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 
+import io.reactivex.disposables.Disposable;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -45,7 +48,9 @@ public class RestaurantDetailsRepository {
             }
 
             @Override
-            public void onFailure(@NonNull Call<RestaurantDetailsResponse> call, @NonNull Throwable t) { }
+            public void onFailure(@NonNull Call<RestaurantDetailsResponse> call, @NonNull Throwable t) {
+                Log.d("onFailure called", "Restaurant details  response is null");
+            }
 
         });
 

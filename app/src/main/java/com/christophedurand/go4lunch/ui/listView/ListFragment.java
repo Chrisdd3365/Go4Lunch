@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,10 @@ import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 
 import java.util.List;
 import java.util.Map;
+
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 
 
 public class ListFragment extends Fragment {
@@ -72,7 +77,7 @@ public class ListFragment extends Fragment {
 
     private void initRecyclerView(Location currentLocation,
                                   List<Restaurant> restaurantsList,
-                                  Map<String, LiveData<RestaurantDetailsResponse>> map) {
+                                  Map<String, RestaurantDetailsResponse> map) {
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
         listRecyclerView.setLayoutManager(layoutManager);
@@ -89,7 +94,6 @@ public class ListFragment extends Fragment {
                 map
         );
         listRecyclerView.setAdapter(listRecyclerViewAdapter);
-
     }
 
 }

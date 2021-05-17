@@ -2,6 +2,7 @@ package com.christophedurand.go4lunch.ui.listView;
 
 import android.app.Application;
 import android.location.Location;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,7 +13,6 @@ import androidx.lifecycle.Transformations;
 
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
-import com.christophedurand.go4lunch.model.pojo.RestaurantDetails;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsRepository;
 import com.christophedurand.go4lunch.ui.mapView.MapViewRepository;
@@ -50,19 +50,17 @@ public class ListViewModel extends AndroidViewModel  {
                                 apiKey)
                 );
 
-        LiveData
-
-        LiveData<Map<String, LiveData<RestaurantDetailsResponse>>> mapStringRestaurantDetailsLiveData =
+        LiveData<Map<String, RestaurantDetailsResponse>> mapStringRestaurantDetailsLiveData =
                 Transformations.map(
                         nearbyRestaurantsResponseLiveData,
                         response -> {
-                            Map<String, LiveData<RestaurantDetailsResponse>> hashMap = new HashMap<>();
+                            Map<String, RestaurantDetailsResponse> hashMap = new HashMap<>();
                             for (int i = 0; i<response.results.size(); i++) {
+                                String placeId = response.results.get(i).placeId;
+                                RestaurantDetailsResponse restaurantDetailsResponse = restaurantDetailsRepository.getRestaurantDetailsMutableLiveData(placeId).getValue();
                                 hashMap.put(
-                                        response.results.get(i).placeId,
-                                        restaurantDetailsRepository.getRestaurantDetailsMutableLiveData(
-                                                response.results.get(i).placeId
-                                        )
+                                        placeId,
+                                        restaurantDetailsResponse
                                 );
                             }
                             return hashMap;
@@ -92,7 +90,7 @@ public class ListViewModel extends AndroidViewModel  {
 
     private void combine(@Nullable Location location,
                          @Nullable NearbyRestaurantsResponse response,
-                         @Nullable Map<String, LiveData<RestaurantDetailsResponse>> map) {
+                         @Nullable Map<String, RestaurantDetailsResponse> map) {
 
         if (location == null) {
             return;

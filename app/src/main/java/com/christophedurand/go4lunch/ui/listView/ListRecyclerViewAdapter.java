@@ -25,13 +25,13 @@ public class ListRecyclerViewAdapter extends RecyclerView.Adapter<RestaurantView
     private final Activity activity;
     private final Location currentLocation;
     private final List<Restaurant> dataSet;
-    private final Map<String, LiveData<RestaurantDetailsResponse>> map;
+    private final Map<String, RestaurantDetailsResponse> map;
 
 
     public ListRecyclerViewAdapter(Activity activity,
                                    Location currentLocation,
                                    List<Restaurant> dataSet,
-                                   Map<String, LiveData<RestaurantDetailsResponse>> map) {
+                                   Map<String, RestaurantDetailsResponse> map) {
         this.activity = activity;
         this.currentLocation = currentLocation;
         this.dataSet = dataSet;
@@ -50,8 +50,9 @@ public class ListRecyclerViewAdapter extends RecyclerView.Adapter<RestaurantView
     @Override
     public void onBindViewHolder(@NonNull RestaurantViewHolder holder, int position) {
         Restaurant restaurant = dataSet.get(position);
-        LiveData<RestaurantDetailsResponse> restaurantDetailsResponseLiveData = map.get(restaurant.placeId);
-        holder.bind(activity, currentLocation, restaurant, restaurantDetailsResponseLiveData);
+        String restaurantId = restaurant.getPlaceId();
+        RestaurantDetailsResponse restaurantDetailsResponse = map.get(restaurantId);
+        holder.bind(activity, currentLocation, restaurant, restaurantDetailsResponse);
     }
 
     @Override
