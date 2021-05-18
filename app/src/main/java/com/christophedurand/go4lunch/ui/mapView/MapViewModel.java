@@ -11,6 +11,7 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Transformations;
 
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
+import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -29,7 +30,7 @@ public class MapViewModel extends AndroidViewModel {
 
 
     public MapViewModel(@NonNull Application application,
-                        MapViewRepository mapViewRepository,
+                        NearbyRepository nearbyRepository,
                         CurrentLocationRepository currentLocationRepository) {
         super(application);
 
@@ -40,7 +41,7 @@ public class MapViewModel extends AndroidViewModel {
         LiveData<NearbyRestaurantsResponse> nearbyRestaurantsResponseLiveData =
                 Transformations.switchMap(
                         locationLiveData,
-                        location -> mapViewRepository.getNearbyRestaurantsResponseLiveData(
+                        location -> nearbyRepository.getNearbyRestaurantsResponseByRadiusLiveData(
                                 "restaurant",
                                 location.getLatitude() + "," + location.getLongitude(),
                                 "1000",

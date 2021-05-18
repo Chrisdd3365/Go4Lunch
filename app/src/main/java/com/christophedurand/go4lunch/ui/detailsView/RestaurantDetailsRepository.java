@@ -11,6 +11,9 @@ import com.christophedurand.go4lunch.model.GooglePlacesAPIService;
 import com.christophedurand.go4lunch.model.RetrofitService;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.reactivex.disposables.Disposable;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -22,9 +25,9 @@ import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 public class RestaurantDetailsRepository {
 
     private static GooglePlacesAPIService mGooglePlacesAPIService = null;
-    private final MutableLiveData<RestaurantDetailsResponse> restaurantDetailsMutableLiveData = new MutableLiveData<>();
     private static RestaurantDetailsRepository restaurantDetailsRepository;
 
+    private Map<String, MutableLiveData<RestaurantDetailsResponse>> cache = new HashMap<>();
 
     public static RestaurantDetailsRepository getInstance() {
         if (restaurantDetailsRepository == null) {
@@ -37,22 +40,29 @@ public class RestaurantDetailsRepository {
         mGooglePlacesAPIService = RetrofitService.getInstance().getGooglePlacesAPIService();
     }
 
-
+    // TODO merge / split with nearby repo
     public LiveData<RestaurantDetailsResponse> getRestaurantDetailsMutableLiveData(String placeId) {
-        Call<RestaurantDetailsResponse> restaurantDetails = mGooglePlacesAPIService.getPlaceDetails(placeId, apiKey);
-        restaurantDetails.enqueue(new Callback<RestaurantDetailsResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<RestaurantDetailsResponse> call,
-                                   @NonNull Response<RestaurantDetailsResponse> response) {
-                restaurantDetailsMutableLiveData.setValue(response.body());
-            }
+        MutableLiveData<RestaurantDetailsResponse> restaurantDetailsMutableLiveData = cache.get(placeId);
+        if (restaurantDetailsMutableLiveData == null) {
+            restaurantDetailsMutableLiveData = new MutableLiveData<>();
+            // TODO caching à finir
+            cache.put(placeId, restaurantDetailsMutableLiveData);
 
-            @Override
-            public void onFailure(@NonNull Call<RestaurantDetailsResponse> call, @NonNull Throwable t) {
-                Log.d("onFailure called", "Restaurant details  response is null");
-            }
+            Call<RestaurantDetailsResponse> restaurantDetails = mGooglePlacesAPIService.getPlaceDetails(placeId, apiKey);
+            restaurantDetails.enqueue(new Callback<RestaurantDetailsResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<RestaurantDetailsResponse> call,
+                                       @NonNull Response<RestaurantDetailsResponse> response) {
+                    restaurantDetailsMutableLiveData.setValue(response.body());
+                }
 
-        });
+                @Override
+                public void onFailure(@NonNull Call<RestaurantDetailsResponse> call, @NonNull Throwable t) {
+                    Log.d("onFailure called", "Restaurant details  response is null");
+                }
+
+            });
+        }
 
         return restaurantDetailsMutableLiveData;
     }

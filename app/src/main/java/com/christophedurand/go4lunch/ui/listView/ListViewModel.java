@@ -2,20 +2,21 @@ package com.christophedurand.go4lunch.ui.listView;
 
 import android.app.Application;
 import android.location.Location;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.Transformations;
 
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
+import com.christophedurand.go4lunch.model.pojo.Restaurant;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsRepository;
-import com.christophedurand.go4lunch.ui.mapView.MapViewRepository;
+import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
 
 
 import java.util.HashMap;
@@ -26,15 +27,22 @@ import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 
 public class ListViewModel extends AndroidViewModel  {
 
+    private final RestaurantDetailsRepository mRestaurantDetailsRepository;
+
+    // "Final product"
     private final MediatorLiveData<ListViewState> listViewStateMediatorLiveData = new MediatorLiveData<>();
 
+    // DetailResponse aggregator
+    private final MediatorLiveData<Map<String, RestaurantDetailsResponse>> placeIdRestaurantDetailsMapLiveData = new MediatorLiveData<>();
 
     public ListViewModel(@NonNull Application application,
                          CurrentLocationRepository currentLocationRepository,
-                         MapViewRepository mapViewRepository,
+                         NearbyRepository nearbyRepository,
                          RestaurantDetailsRepository restaurantDetailsRepository) {
-
         super(application);
+        mRestaurantDetailsRepository = restaurantDetailsRepository;
+
+        placeIdRestaurantDetailsMapLiveData.setValue(new HashMap<>());
 
         currentLocationRepository.initCurrentLocationUpdate();
 
@@ -43,14 +51,14 @@ public class ListViewModel extends AndroidViewModel  {
         LiveData<NearbyRestaurantsResponse> nearbyRestaurantsResponseLiveData =
                 Transformations.switchMap(
                         locationLiveData,
-                        location -> mapViewRepository.getNearbyRestaurantsResponseLiveData(
+                        location -> nearbyRepository.getNearbyRestaurantsResponseByRadiusLiveData(
                                 "restaurant",
                                 location.getLatitude() + "," + location.getLongitude(),
                                 "1000",
                                 apiKey)
                 );
 
-        LiveData<Map<String, RestaurantDetailsResponse>> mapStringRestaurantDetailsLiveData =
+        MediatorLiveData<Map<String, RestaurantDetailsResponse>> mapStringRestaurantDetailsLiveData =
                 Transformations.map(
                         nearbyRestaurantsResponseLiveData,
                         response -> {
@@ -103,6 +111,33 @@ public class ListViewModel extends AndroidViewModel  {
                         map
                 )
         );
+
+        for (Restaurant restaurant : response.results) {
+            RestaurantDetailsResponse restaurantDetailsResponse = map.get(restaurant.getPlaceId());
+
+            if (restaurantDetailsResponse != null)  {
+                // TODO do work! Yay !
+            } else {
+                placeIdRestaurantDetailsMapLiveData.addSource(
+                    mRestaurantDetailsRepository.getRestaurantDetailsMutableLiveData(restaurant.getPlaceId()),
+                    new Observer<RestaurantDetailsResponse>() {
+                        @Override
+                        public void onChanged(RestaurantDetailsResponse restaurantDetailsResponse) {
+                            Map<String, RestaurantDetailsResponse> mapInstance = placeIdRestaurantDetailsMapLiveData.getValue();
+
+                            mapInstance.put(restaurant.getPlaceId(), restaurantDetailsResponse);
+
+                            placeIdRestaurantDetailsMapLiveData.setValue(mapInstance);
+                        }
+                    }
+                );
+
+                // TODO Do map, but without details (opening hours will be "closed" or "open" only
+            }
+        }
+
+        // TODO Mapper les Restaurants "Techniques" en ViewState (pour calculer openings hours par exemple)
+
 
     }
 
