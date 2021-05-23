@@ -1,3 +1,5 @@
+
+
 package com.christophedurand.go4lunch.ui.listView;
 
 import android.app.Application;
@@ -8,18 +10,19 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.Transformations;
 
+import com.christophedurand.go4lunch.data.details.DetailsRepository;
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
 import com.christophedurand.go4lunch.model.pojo.Restaurant;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
-import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsRepository;
 import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
@@ -27,7 +30,7 @@ import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 
 public class ListViewModel extends AndroidViewModel  {
 
-    private final RestaurantDetailsRepository mRestaurantDetailsRepository;
+    private final DetailsRepository detailsRepository;
 
     // "Final product"
     private final MediatorLiveData<ListViewState> listViewStateMediatorLiveData = new MediatorLiveData<>();
@@ -35,12 +38,14 @@ public class ListViewModel extends AndroidViewModel  {
     // DetailResponse aggregator
     private final MediatorLiveData<Map<String, RestaurantDetailsResponse>> placeIdRestaurantDetailsMapLiveData = new MediatorLiveData<>();
 
+
     public ListViewModel(@NonNull Application application,
                          CurrentLocationRepository currentLocationRepository,
                          NearbyRepository nearbyRepository,
-                         RestaurantDetailsRepository restaurantDetailsRepository) {
+                         DetailsRepository detailsRepository) {
         super(application);
-        mRestaurantDetailsRepository = restaurantDetailsRepository;
+
+        this.detailsRepository = detailsRepository;
 
         placeIdRestaurantDetailsMapLiveData.setValue(new HashMap<>());
 
@@ -58,33 +63,15 @@ public class ListViewModel extends AndroidViewModel  {
                                 apiKey)
                 );
 
-        MediatorLiveData<Map<String, RestaurantDetailsResponse>> mapStringRestaurantDetailsLiveData =
-                Transformations.map(
-                        nearbyRestaurantsResponseLiveData,
-                        response -> {
-                            Map<String, RestaurantDetailsResponse> hashMap = new HashMap<>();
-                            for (int i = 0; i<response.results.size(); i++) {
-                                String placeId = response.results.get(i).placeId;
-                                RestaurantDetailsResponse restaurantDetailsResponse = restaurantDetailsRepository.getRestaurantDetailsMutableLiveData(placeId).getValue();
-                                hashMap.put(
-                                        placeId,
-                                        restaurantDetailsResponse
-                                );
-                            }
-                            return hashMap;
-                        }
-                );
-
-
         listViewStateMediatorLiveData.addSource(locationLiveData, location ->
-                combine(location, nearbyRestaurantsResponseLiveData.getValue(), mapStringRestaurantDetailsLiveData.getValue())
+                combine(location, nearbyRestaurantsResponseLiveData.getValue(), placeIdRestaurantDetailsMapLiveData.getValue())
         );
 
         listViewStateMediatorLiveData.addSource(nearbyRestaurantsResponseLiveData, nearbyRestaurantsResponse ->
-                combine(locationLiveData.getValue(), nearbyRestaurantsResponse, mapStringRestaurantDetailsLiveData.getValue())
+                combine(locationLiveData.getValue(), nearbyRestaurantsResponse, placeIdRestaurantDetailsMapLiveData.getValue())
         );
 
-        listViewStateMediatorLiveData.addSource(mapStringRestaurantDetailsLiveData, map ->
+        listViewStateMediatorLiveData.addSource(placeIdRestaurantDetailsMapLiveData, map ->
                 combine(locationLiveData.getValue(), nearbyRestaurantsResponseLiveData.getValue(), map)
         );
 
@@ -104,40 +91,70 @@ public class ListViewModel extends AndroidViewModel  {
             return;
         }
 
-        listViewStateMediatorLiveData.setValue(
-                new ListViewState(
-                        location,
-                        response == null ? null : response.results,
-                        map
-                )
-        );
+        List<RestaurantViewState> restaurantViewStatesList = new ArrayList<>();
+        final OpeningHoursViewState openingHoursViewState;
 
         for (Restaurant restaurant : response.results) {
             RestaurantDetailsResponse restaurantDetailsResponse = map.get(restaurant.getPlaceId());
-
             if (restaurantDetailsResponse != null)  {
-                // TODO do work! Yay !
+                map.put(restaurant.getPlaceId(), restaurantDetailsResponse);
+                placeIdRestaurantDetailsMapLiveData.setValue(map);
+                // TODO Do map, but without details (opening hours will be "closed" or "open" only
+                Transformations.map(
+                        placeIdRestaurantDetailsMapLiveData,
+                        placeIdRestaurantDetailsMap -> {
+                            openingHoursViewState = new OpeningHoursViewState(
+                                    placeIdRestaurantDetailsMap.get(restaurant.placeId).result.getOpeningHours().isOpenNow(),
+                                    placeIdRestaurantDetailsMap.get(restaurant.placeId).result.openingHours.periods);
+                            return openingHoursViewState;
+                        }
+                );
             } else {
                 placeIdRestaurantDetailsMapLiveData.addSource(
-                    mRestaurantDetailsRepository.getRestaurantDetailsMutableLiveData(restaurant.getPlaceId()),
-                    new Observer<RestaurantDetailsResponse>() {
-                        @Override
-                        public void onChanged(RestaurantDetailsResponse restaurantDetailsResponse) {
+                        detailsRepository.getRestaurantDetailsMutableLiveData(restaurant.getPlaceId()),
+                        detailsResponse -> {
                             Map<String, RestaurantDetailsResponse> mapInstance = placeIdRestaurantDetailsMapLiveData.getValue();
-
-                            mapInstance.put(restaurant.getPlaceId(), restaurantDetailsResponse);
-
+                            mapInstance.put(restaurant.getPlaceId(), detailsResponse);
                             placeIdRestaurantDetailsMapLiveData.setValue(mapInstance);
                         }
-                    }
                 );
-
                 // TODO Do map, but without details (opening hours will be "closed" or "open" only
+                Transformations.map(
+                        placeIdRestaurantDetailsMapLiveData,
+                        placeIdRestaurantDetailsMap -> {
+                            openingHoursViewState = new OpeningHoursViewState(
+                                    placeIdRestaurantDetailsMap.get(restaurant.placeId).result.getOpeningHours().isOpenNow(),
+                                    placeIdRestaurantDetailsMap.get(restaurant.placeId).result.openingHours.periods);
+                            return openingHoursViewState;
+                        }
+                );
             }
+            // TODO Mapper les Restaurants "Techniques" en ViewState (pour calculer openings hours par exemple)
+            Transformations.map(
+                    placeIdRestaurantDetailsMapLiveData,
+                    placeIdRestaurantDetailsMap -> {
+                        RestaurantViewState restaurantViewState =
+                                new RestaurantViewState(
+                                        restaurant.vicinity,
+                                        restaurant.geometry.location,
+                                        restaurant.icon,
+                                        restaurant.name,
+                                        restaurant.placeId,
+                                        restaurant.rating,
+                                        restaurant.getPhotos(),
+                                        openingHoursViewState
+                                );
+                        restaurantViewStatesList.add(restaurantViewState);
+                        return restaurantViewStatesList;
+                    }
+            );
         }
 
-        // TODO Mapper les Restaurants "Techniques" en ViewState (pour calculer openings hours par exemple)
-
+        listViewStateMediatorLiveData.setValue(
+                new ListViewState(
+                        location,
+                        restaurantViewStatesList)
+        );
 
     }
 
@@ -160,8 +177,3 @@ public class ListViewModel extends AndroidViewModel  {
 //    }
 
 }
-
-
-
-
-

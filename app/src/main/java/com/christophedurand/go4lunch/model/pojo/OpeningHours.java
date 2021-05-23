@@ -10,9 +10,9 @@ public class OpeningHours {
     @SerializedName("open_now")
     public boolean openNow;
     @SerializedName("periods")
-    private List<Period> periods;
+    public List<Period> periods;
     @SerializedName("weekday_text")
-    private List<String> weekdayText;
+    public List<String> weekdayText;
 
 
     public OpeningHours(boolean openNow, List<Period> periods, List<String> weekdayText) {

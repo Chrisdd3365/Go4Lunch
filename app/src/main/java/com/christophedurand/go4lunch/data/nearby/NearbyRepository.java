@@ -1,7 +1,5 @@
 package com.christophedurand.go4lunch.data.nearby;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -9,13 +7,10 @@ import androidx.lifecycle.MutableLiveData;
 import com.christophedurand.go4lunch.model.GooglePlacesAPIService;
 import com.christophedurand.go4lunch.model.RetrofitService;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
-import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 
 
 public class NearbyRepository {
@@ -50,24 +45,4 @@ public class NearbyRepository {
         return nearbyRestaurantsResponseMutableLiveData;
     }
 
-    public LiveData<RestaurantDetailsResponse> getRestaurantDetailsMutableLiveData(String placeId) {
-        final MutableLiveData<RestaurantDetailsResponse> restaurantDetailsMutableLiveData = new MutableLiveData<>();
-
-        Call<RestaurantDetailsResponse> restaurantDetails = mGooglePlacesAPIService.getPlaceDetails(placeId, apiKey);
-        restaurantDetails.enqueue(new Callback<RestaurantDetailsResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<RestaurantDetailsResponse> call,
-                                   @NonNull Response<RestaurantDetailsResponse> response) {
-                restaurantDetailsMutableLiveData.setValue(response.body());
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<RestaurantDetailsResponse> call, @NonNull Throwable t) {
-                Log.d("onFailure called", "Restaurant details  response is null");
-            }
-
-        });
-
-        return restaurantDetailsMutableLiveData;
-    }
 }

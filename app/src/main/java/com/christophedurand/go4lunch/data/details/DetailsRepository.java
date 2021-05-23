@@ -1,4 +1,4 @@
-package com.christophedurand.go4lunch.ui.detailsView;
+package com.christophedurand.go4lunch.data.details;
 
 
 import android.util.Log;
@@ -14,7 +14,6 @@ import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.reactivex.disposables.Disposable;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -22,25 +21,25 @@ import retrofit2.Response;
 import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 
 
-public class RestaurantDetailsRepository {
+public class DetailsRepository {
 
     private static GooglePlacesAPIService mGooglePlacesAPIService = null;
-    private static RestaurantDetailsRepository restaurantDetailsRepository;
+    private static DetailsRepository sDetailsRepository;
 
     private Map<String, MutableLiveData<RestaurantDetailsResponse>> cache = new HashMap<>();
 
-    public static RestaurantDetailsRepository getInstance() {
-        if (restaurantDetailsRepository == null) {
-            restaurantDetailsRepository = new RestaurantDetailsRepository();
+    public static DetailsRepository getInstance() {
+        if (sDetailsRepository == null) {
+            sDetailsRepository = new DetailsRepository();
         }
-        return restaurantDetailsRepository;
+        return sDetailsRepository;
     }
 
-    private RestaurantDetailsRepository() {
+    private DetailsRepository() {
         mGooglePlacesAPIService = RetrofitService.getInstance().getGooglePlacesAPIService();
     }
 
-    // TODO merge / split with nearby repo
+
     public LiveData<RestaurantDetailsResponse> getRestaurantDetailsMutableLiveData(String placeId) {
         MutableLiveData<RestaurantDetailsResponse> restaurantDetailsMutableLiveData = cache.get(placeId);
         if (restaurantDetailsMutableLiveData == null) {
@@ -60,7 +59,6 @@ public class RestaurantDetailsRepository {
                 public void onFailure(@NonNull Call<RestaurantDetailsResponse> call, @NonNull Throwable t) {
                     Log.d("onFailure called", "Restaurant details  response is null");
                 }
-
             });
         }
 

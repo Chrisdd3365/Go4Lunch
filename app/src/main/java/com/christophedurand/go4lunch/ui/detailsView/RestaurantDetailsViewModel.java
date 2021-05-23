@@ -9,6 +9,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 
+import com.christophedurand.go4lunch.data.details.DetailsRepository;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 
 
@@ -21,12 +22,12 @@ public class RestaurantDetailsViewModel extends AndroidViewModel {
 
 
     public RestaurantDetailsViewModel(@NonNull Application application,
-                                      RestaurantDetailsRepository restaurantDetailsRepository,
+                                      DetailsRepository detailsRepository,
                                       String restaurantId) {
         super(application);
 
         LiveData<RestaurantDetailsResponse> restaurantDetailsResponseLiveData =
-                restaurantDetailsRepository.getRestaurantDetailsMutableLiveData(restaurantId);
+                detailsRepository.getRestaurantDetailsMutableLiveData(restaurantId);
 
         detailsUiModelMediatorLiveData.addSource(restaurantDetailsResponseLiveData, response ->
                 combine(response)
