@@ -2,42 +2,48 @@ package com.christophedurand.go4lunch.model.pojo;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Objects;
+
+
 public class Location {
 
-    //-- PROPERTIES
     @SerializedName("lat")
-    public double lat;
+    private final Double lat;
 
     @SerializedName("lng")
-    public double lng;
+    private final Double lng;
 
 
-    //-- CONSTRUCTOR
-    public Location(double lat, double lng) {
+    public Location(Double lat, Double lng) {
         this.lat = lat;
         this.lng = lng;
     }
 
 
-    //-- GETTERS && SETTERS
-    public double getLat() {
+    public Double getLat() {
         return lat;
     }
 
-    public void setLat(double lat) {
-        this.lat = lat;
-    }
-
-    public double getLng() {
+    public Double getLng() {
         return lng;
     }
 
-    public void setLng(double lng) {
-        this.lng = lng;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Location location = (Location) o;
+        return Double.compare(location.lat, lat) == 0 &&
+                Double.compare(location.lng, lng) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(lat, lng);
     }
 
 
-    //-- METHODS
     @Override
     public String toString() {
         return "Location{" +

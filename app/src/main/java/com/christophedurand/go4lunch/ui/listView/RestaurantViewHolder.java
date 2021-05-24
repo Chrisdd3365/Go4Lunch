@@ -1,8 +1,6 @@
 package com.christophedurand.go4lunch.ui.listView;
 
 
-import android.app.Activity;
-import android.location.Location;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -10,10 +8,6 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.model.pojo.Restaurant;
-import com.christophedurand.go4lunch.model.pojo.RestaurantDetails;
-import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
-import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.christophedurand.go4lunch.utils.ImageUtils;
 
 
@@ -40,38 +34,30 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
     }
 
 
-    public void bind(Activity activity,
-                     Location currentLocation,
-                     Restaurant restaurant,
-                     RestaurantDetailsResponse restaurantDetailsResponse) {
+    public void bind(RestaurantViewState restaurantViewState, ListInterface listener) {
 
-        String photoReference = restaurant.getPhotos().get(0).getPhotoReference();
-        ImageUtils.loadGooglePhoto(itemView.getContext(), mRestaurantImageView, photoReference);
+        String photoURL = restaurantViewState.getPhotoURL();
+        ImageUtils.loadGooglePhoto(itemView.getContext(), mRestaurantImageView, photoURL);
 
-        String name = restaurant.name;
+        String name = restaurantViewState.getName();
         mRestaurantNameTextView.setText(name);
 
-        String vicinity = restaurant.vicinity;
-        mRestaurantAddressTextView.setText(vicinity);
+        String address = restaurantViewState.getAddress();
+        mRestaurantAddressTextView.setText(address);
 
-        RestaurantDetails restaurantDetails = restaurantDetailsResponse.result;
-        int openIndex = restaurantDetails.openingHours.getPeriods().get(0).getOpen().getDay();
-        String openString = restaurantDetails.openingHours.getWeekdayText().get(openIndex);
-        mRestaurantIsOpenTextView.setText(openString);
+        String openingHoursString = restaurantViewState.getOpeningHours();
+        mRestaurantIsOpenTextView.setText(openingHoursString);
 
 
 //        com.christophedurand.go4lunch.model.pojo.Location restaurantLocation = restaurant.geometry.location;
 //        String distanceFromUser = ListViewModel.getDistanceFromLastKnownUserLocation(currentLocation, restaurantLocation);
 //        mRestaurantDistanceTextView.setText(distanceFromUser);
 
-        double rating = restaurant.rating;
+        double rating = restaurantViewState.getRating();
         mRestaurantRatingTextView.setText(String.valueOf(rating));
 
         itemView.setOnClickListener(v -> {
-            RestaurantDetailsActivity.startActivity(
-                    activity,
-                    restaurant.placeId
-            );
+            listener.onClickItemList(restaurantViewState.getPlaceId());
         });
     }
 

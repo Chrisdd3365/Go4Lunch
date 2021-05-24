@@ -3,45 +3,45 @@ package com.christophedurand.go4lunch.model.pojo;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
+import java.util.Objects;
 
 public class RestaurantDetails {
 
-    //-- PROPERTIES
     @SerializedName("formatted_address")
-    public String formattedAddress;
+    private final String formattedAddress;
 
     @SerializedName("geometry")
-    public Geometry geometry;
+    private final Geometry geometry;
 
     @SerializedName("icon")
-    public String icon;
+    private final String icon;
 
     @SerializedName("international_phone_number")
-    public String internationalPhoneNumber;
+    private final String internationalPhoneNumber;
 
     @SerializedName("name")
-    public String name;
+    private final String name;
 
     @SerializedName("opening_hours")
-    public OpeningHours openingHours;
+    private final OpeningHours openingHours;
 
     @SerializedName("place_id")
-    public String placeId;
+    private final String placeId;
 
     @SerializedName("rating")
-    public double rating;
+    private final Double rating;
 
     @SerializedName("reference")
-    public String reference;
+    private final String reference;
 
     @SerializedName("url")
-    public String url;
+    private final String url;
 
     @SerializedName("website")
-    public String website;
+    private final String website;
 
     @SerializedName("photos")
-    public List<Photo> photos;
+    private final List<Photo> photos;
 
 
     public RestaurantDetails(String formattedAddress, Geometry geometry,
@@ -69,98 +69,74 @@ public class RestaurantDetails {
         return formattedAddress;
     }
 
-    public void setFormattedAddress(String formattedAddress) {
-        this.formattedAddress = formattedAddress;
-    }
-
     public Geometry getGeometry() {
         return geometry;
-    }
-
-    public void setGeometry(Geometry geometry) {
-        this.geometry = geometry;
     }
 
     public String getIcon() {
         return icon;
     }
 
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
     public String getInternationalPhoneNumber() {
         return internationalPhoneNumber;
-    }
-
-    public void setInternationalPhoneNumber(String internationalPhoneNumber) {
-        this.internationalPhoneNumber = internationalPhoneNumber;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public OpeningHours getOpeningHours() {
         return openingHours;
-    }
-
-    public void setOpeningHours(OpeningHours openingHours) {
-        this.openingHours = openingHours;
     }
 
     public String getPlaceId() {
         return placeId;
     }
 
-    public void setPlaceId(String placeId) {
-        this.placeId = placeId;
-    }
-
-    public double getRating() {
+    public Double getRating() {
         return rating;
-    }
-
-    public void setRating(double rating) {
-        this.rating = rating;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getWebsite() {
-        return website;
-    }
-
-    public void setWebsite(String website) {
-        this.website = website;
     }
 
     public String getReference() {
         return reference;
     }
 
-    public void setReference(String reference) {
-        this.reference = reference;
+    public String getUrl() {
+        return url;
+    }
+
+    public String getWebsite() {
+        return website;
     }
 
     public List<Photo> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(List<Photo> photos) {
-        this.photos = photos;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RestaurantDetails that = (RestaurantDetails) o;
+        return Objects.equals(formattedAddress, that.formattedAddress) &&
+                Objects.equals(geometry, that.geometry) &&
+                Objects.equals(icon, that.icon) &&
+                Objects.equals(internationalPhoneNumber, that.internationalPhoneNumber) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(openingHours, that.openingHours) &&
+                Objects.equals(placeId, that.placeId) &&
+                Objects.equals(rating, that.rating) &&
+                Objects.equals(reference, that.reference) &&
+                Objects.equals(url, that.url) &&
+                Objects.equals(website, that.website) &&
+                Objects.equals(photos, that.photos);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(formattedAddress, geometry, icon, internationalPhoneNumber, name, openingHours, placeId, rating, reference, url, website, photos);
+    }
 
     @Override
     public String toString() {

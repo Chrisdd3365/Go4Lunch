@@ -3,32 +3,38 @@ package com.christophedurand.go4lunch.model.pojo;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
+import java.util.Objects;
 
 
 public class NearbyRestaurantsResponse {
 
-    //-- PROPERTIES
     @SerializedName("results")
-    public List<Restaurant> results;
+    private final List<Restaurant> results;
 
 
-    //-- CONSTRUCTOR
     public NearbyRestaurantsResponse(List<Restaurant> results) {
         this.results = results;
     }
 
 
-    //-- GETTERS && SETTERS
     public List<Restaurant> getResults() {
         return results;
     }
 
-    public void setResults(List<Restaurant> results) {
-        this.results = results;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NearbyRestaurantsResponse that = (NearbyRestaurantsResponse) o;
+        return Objects.equals(results, that.results);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(results);
+    }
 
-    //-- METHODS
     @Override
     public String toString() {
         return "NearbyRestaurantsResponse{" +

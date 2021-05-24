@@ -4,18 +4,22 @@ package com.christophedurand.go4lunch.model.pojo;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
+import java.util.Objects;
 
 
 public class Photo {
 
     @SerializedName("height")
-    private Integer height;
+    private final Integer height;
+
     @SerializedName("html_attributions")
-    private List<String> htmlAttributions;
+    private final List<String> htmlAttributions;
+
     @SerializedName("photo_reference")
-    private String photoReference;
+    private final String photoReference;
+
     @SerializedName("width")
-    private Integer width;
+    private final Integer width;
 
 
     public Photo(Integer height, List<String> htmlAttributions, String photoReference, Integer width) {
@@ -30,34 +34,34 @@ public class Photo {
         return height;
     }
 
-    public void setHeight(Integer height) {
-        this.height = height;
-    }
-
     public List<String> getHtmlAttributions() {
         return htmlAttributions;
-    }
-
-    public void setHtmlAttributions(List<String> htmlAttributions) {
-        this.htmlAttributions = htmlAttributions;
     }
 
     public String getPhotoReference() {
         return photoReference;
     }
 
-    public void setPhotoReference(String photoReference) {
-        this.photoReference = photoReference;
-    }
-
     public Integer getWidth() {
         return width;
     }
 
-    public void setWidth(Integer width) {
-        this.width = width;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Photo photo = (Photo) o;
+        return Objects.equals(height, photo.height) &&
+                Objects.equals(htmlAttributions, photo.htmlAttributions) &&
+                Objects.equals(photoReference, photo.photoReference) &&
+                Objects.equals(width, photo.width);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(height, htmlAttributions, photoReference, width);
+    }
 
     @Override
     public String toString() {

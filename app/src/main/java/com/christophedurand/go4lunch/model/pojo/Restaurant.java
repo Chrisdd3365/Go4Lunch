@@ -3,32 +3,33 @@ package com.christophedurand.go4lunch.model.pojo;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Restaurant {
 
     @SerializedName("vicinity")
-    public String vicinity;
+    private final String vicinity;
 
     @SerializedName("geometry")
-    public Geometry geometry;
+    private final Geometry geometry;
 
     @SerializedName("icon")
-    public String icon;
+    private final String icon;
 
     @SerializedName("name")
-    public String name;
+    private final String name;
 
     @SerializedName("opening_hours")
-    public OpeningHours openingHours;
+    private final OpeningHours openingHours;
 
     @SerializedName("place_id")
-    public String placeId;
+    private final String placeId;
 
     @SerializedName("rating")
-    public double rating;
+    private final double rating;
 
     @SerializedName("photos")
-    private List<Photo> photos;
+    private final List<Photo> photos;
 
 
     public Restaurant(String vicinity, Geometry geometry, String icon, String name,
@@ -48,66 +49,54 @@ public class Restaurant {
         return vicinity;
     }
 
-    public void setVicinity(String vicinity) {
-        this.vicinity = vicinity;
-    }
-
     public Geometry getGeometry() {
         return geometry;
-    }
-
-    public void setGeometry(Geometry geometry) {
-        this.geometry = geometry;
     }
 
     public String getIcon() {
         return icon;
     }
 
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public OpeningHours getOpeningHours() {
         return openingHours;
     }
 
-    public void setOpeningHours(OpeningHours openingHours) {
-        this.openingHours = openingHours;
-    }
-
     public String getPlaceId() {
         return placeId;
-    }
-
-    public void setPlaceId(String placeId) {
-        this.placeId = placeId;
     }
 
     public double getRating() {
         return rating;
     }
 
-    public void setRating(double rating) {
-        this.rating = rating;
-    }
-
     public List<Photo> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(List<Photo> photos) {
-        this.photos = photos;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Restaurant that = (Restaurant) o;
+        return Double.compare(that.rating, rating) == 0 &&
+                Objects.equals(vicinity, that.vicinity) &&
+                Objects.equals(geometry, that.geometry) &&
+                Objects.equals(icon, that.icon) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(openingHours, that.openingHours) &&
+                Objects.equals(placeId, that.placeId) &&
+                Objects.equals(photos, that.photos);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(vicinity, geometry, icon, name, openingHours, placeId, rating, photos);
+    }
 
     @Override
     public String toString() {

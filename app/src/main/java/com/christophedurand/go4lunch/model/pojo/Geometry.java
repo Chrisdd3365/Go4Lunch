@@ -2,30 +2,38 @@ package com.christophedurand.go4lunch.model.pojo;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Objects;
+
+
 public class Geometry {
 
-    //-- PROPERTIES
     @SerializedName("location")
-    public Location location;
+    private final Location location;
 
 
-    //-- CONSTRUCTOR
     public Geometry(Location location) {
         this.location = location;
     }
 
 
-    //-- GETTERS && SETTERS
     public Location getLocation() {
         return location;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Geometry geometry = (Geometry) o;
+        return Objects.equals(location, geometry.location);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(location);
+    }
 
-    //-- METHODS
     @Override
     public String toString() {
         return "Geometry{" +

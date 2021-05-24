@@ -53,12 +53,12 @@ public class MapViewModel extends AndroidViewModel {
                         nearbyRestaurantsResponseLiveData,
                         response -> {
                             List<MapMarker> mapMarkersList = new ArrayList<>();
-                            for (int i=0; i<response.results.size(); i++) {
-                                String placeId = response.results.get(i).placeId;
-                                String name = response.results.get(i).name;
-                                String address = response.results.get(i).vicinity;
-                                LatLng latLng = new LatLng(response.results.get(i).geometry.location.lat, response.results.get(i).geometry.location.lng);
-                                String photoReference = response.results.get(i).getPhotos().get(0).getPhotoReference();
+                            for (int i=0; i<response.getResults().size(); i++) {
+                                String placeId = response.getResults().get(i).getPlaceId();
+                                String name = response.getResults().get(i).getName();
+                                String address = response.getResults().get(i).getVicinity();
+                                LatLng latLng = new LatLng(response.getResults().get(i).getGeometry().getLocation().getLat(), response.getResults().get(i).getGeometry().getLocation().getLng());
+                                String photoReference = response.getResults().get(i).getPhotos().get(0).getPhotoReference();
 
                                 mapMarkersList.add(new MapMarker(placeId, name, address, latLng, photoReference));
                             }
@@ -86,7 +86,7 @@ public class MapViewModel extends AndroidViewModel {
         mMapViewStateMediatorLiveData.setValue(
                 new MapViewState(
                         location,
-                        response == null ? null : response.results,
+                        response == null ? null : response.getResults(),
                         mapMarkersList
                 )
         );

@@ -1,119 +1,89 @@
 package com.christophedurand.go4lunch.ui.listView;
 
 
-import com.christophedurand.go4lunch.model.pojo.Location;
-import com.christophedurand.go4lunch.model.pojo.Photo;
-
-import java.util.List;
+import java.util.Objects;
 
 
 class RestaurantViewState {
 
-    private String vicinity;
-    private Location location;
-    private String icon;
-    private String name;
-    private String placeId;
-    private double rating;
-    private List<Photo> photos;
-    private OpeningHoursViewState openingHoursViewState;
+    private final String address;
+    private final String distance;
+    private final String name;
+    private final String placeId;
+    private final double rating;
+    private final String photoURL;
+    private final String openingHours;
 
 
-    public RestaurantViewState(String vicinity,
-                               Location location,
-                               String icon,
-                               String name,
-                               String placeId,
-                               double rating,
-                               List<Photo> photos,
-                               OpeningHoursViewState openingHoursViewState) {
-        this.vicinity = vicinity;
-        this.location = location;
-        this.icon = icon;
+    public RestaurantViewState(String address, String distance, String name, String placeId, double rating, String photoURL, String openingHours) {
+        this.address = address;
+        this.distance = distance;
         this.name = name;
         this.placeId = placeId;
         this.rating = rating;
-        this.photos = photos;
-        this.openingHoursViewState = openingHoursViewState;
+        this.photoURL = photoURL;
+        this.openingHours = openingHours;
     }
 
-
-    public String getVicinity() {
-        return vicinity;
+    public String getAddress() {
+        return address;
     }
 
-    public void setVicinity(String vicinity) {
-        this.vicinity = vicinity;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
+    public String getDistance() {
+        return distance;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getPlaceId() {
         return placeId;
-    }
-
-    public void setPlaceId(String placeId) {
-        this.placeId = placeId;
     }
 
     public double getRating() {
         return rating;
     }
 
-    public void setRating(double rating) {
-        this.rating = rating;
+    public String getPhotoURL() {
+        return photoURL;
     }
 
-    public List<Photo> getPhotos() {
-        return photos;
+    public String getOpeningHours() {
+        return openingHours;
     }
 
-    public void setPhotos(List<Photo> photos) {
-        this.photos = photos;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RestaurantViewState that = (RestaurantViewState) o;
+        return Double.compare(that.rating, rating) == 0 &&
+                Objects.equals(address, that.address) &&
+                Objects.equals(distance, that.distance) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(placeId, that.placeId) &&
+                Objects.equals(photoURL, that.photoURL) &&
+                Objects.equals(openingHours, that.openingHours);
     }
 
-    public OpeningHoursViewState getOpeningHoursViewState() {
-        return openingHoursViewState;
-    }
-
-    public void setOpeningHoursViewState(OpeningHoursViewState openingHoursViewState) {
-        this.openingHoursViewState = openingHoursViewState;
+    @Override
+    public int hashCode() {
+        return Objects.hash(address, distance, name, placeId, rating, photoURL, openingHours);
     }
 
 
     @Override
     public String toString() {
         return "RestaurantViewState{" +
-                "vicinity='" + vicinity + '\'' +
-                ", location=" + location +
-                ", icon='" + icon + '\'' +
+                "address='" + address + '\'' +
+                ", distance='" + distance + '\'' +
                 ", name='" + name + '\'' +
                 ", placeId='" + placeId + '\'' +
                 ", rating=" + rating +
-                ", photos=" + photos +
-                ", openingHoursViewState=" + openingHoursViewState +
+                ", photoURL='" + photoURL + '\'' +
+                ", openingHours='" + openingHours + '\'' +
                 '}';
     }
 

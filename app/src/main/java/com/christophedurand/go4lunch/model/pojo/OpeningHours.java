@@ -8,42 +8,32 @@ import java.util.List;
 public class OpeningHours {
 
     @SerializedName("open_now")
-    public boolean openNow;
+    private final Boolean openNow;
+
     @SerializedName("periods")
-    public List<Period> periods;
+    private final List<Period> periods;
+
     @SerializedName("weekday_text")
-    public List<String> weekdayText;
+    private final List<String> weekdayText;
 
 
-    public OpeningHours(boolean openNow, List<Period> periods, List<String> weekdayText) {
+    public OpeningHours(Boolean openNow, List<Period> periods, List<String> weekdayText) {
         this.openNow = openNow;
         this.periods = periods;
         this.weekdayText = weekdayText;
     }
 
 
-    public boolean isOpenNow() {
+    public Boolean isOpenNow() {
         return openNow;
-    }
-
-    public void setOpenNow(boolean openNow) {
-        this.openNow = openNow;
     }
 
     public List<Period> getPeriods() {
         return periods;
     }
 
-    public void setPeriods(List<Period> periods) {
-        this.periods = periods;
-    }
-
     public List<String> getWeekdayText() {
         return weekdayText;
-    }
-
-    public void setWeekdayText(List<String> weekdayText) {
-        this.weekdayText = weekdayText;
     }
 
 

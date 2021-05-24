@@ -2,31 +2,38 @@ package com.christophedurand.go4lunch.model.pojo;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Objects;
+
 
 public class RestaurantDetailsResponse {
 
-    //-- PROPERTIES
     @SerializedName("result")
-    public RestaurantDetails result;
+    private final RestaurantDetails result;
 
 
-    //-- CONSTRUCTOR
     public RestaurantDetailsResponse(RestaurantDetails result) {
         this.result = result;
     }
 
 
-    //-- GETTERS && SETTERS
     public RestaurantDetails getResult() {
         return result;
     }
 
-    public void setResult(RestaurantDetails result) {
-        this.result = result;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RestaurantDetailsResponse that = (RestaurantDetailsResponse) o;
+        return Objects.equals(result, that.result);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(result);
+    }
 
-    //-- METHODS
     @Override
     public String toString() {
         return "RestaurantDetailsResponse{" +
