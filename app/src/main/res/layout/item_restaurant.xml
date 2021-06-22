@@ -3,6 +3,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="120dp"
     android:orientation="vertical">
@@ -11,13 +12,14 @@
         android:id="@+id/item_restaurant_image_view"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_marginEnd="15dp"
+        android:layout_marginEnd="8dp"
+        android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/restaurant_description_linear_layout"
         android:layout_width="240dp"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -29,21 +31,22 @@
             android:id="@+id/restaurant_name"
             android:drawablePadding="10dp"
             android:layout_width="match_parent"
-            android:layout_height="25dp"
+            android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:textAppearance="?attr/textAppearanceListItem" />
 
         <TextView
             android:id="@+id/restaurant_address"
             android:layout_width="match_parent"
-            android:layout_height="25dp"
+            android:layout_height="wrap_content"
             android:layout_margin="5dp"
+            tools:text="111, rue de la croix Niver, 75015 PARIS"
             android:textAppearance="?attr/textAppearanceListItem" />
 
         <TextView
-            android:id="@+id/restaurant_is_open"
+            android:id="@+id/restaurant_opening_hours_text_view"
             android:layout_width="match_parent"
-            android:layout_height="25dp"
+            android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:textAppearance="?attr/textAppearanceListItem" />
 
@@ -55,24 +58,50 @@
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/item_restaurant_image_view"
-        app:layout_constraintStart_toEndOf="@+id/linearLayout"
+        app:layout_constraintStart_toEndOf="@+id/restaurant_description_linear_layout"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/restaurant_distance"
-            android:layout_width="match_parent"
+            android:id="@+id/restaurant_distance_text_view"
+            android:layout_width="wrap_content"
             android:layout_height="25dp"
-            android:layout_margin="10dp"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center"
+            android:text="9000m"
             android:textAppearance="?attr/textAppearanceListItem" />
 
-        <TextView
-            android:id="@+id/restaurant_rating"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:drawableTint="@color/colorOrange"
-            android:textAppearance="?attr/textAppearanceListItem"
-            app:drawableEndCompat="@drawable/ic_star" />
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_people"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="12sp"
+                android:text="(2)"/>
+
+        </LinearLayout>
+
+        <RatingBar
+            android:id="@+id/restaurant_rating_bar"
+            style="@style/Widget.AppCompat.RatingBar.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:isIndicator="true"
+            android:numStars="3"
+            android:stepSize="1"
+            android:theme="@style/RatingBar"/>
 
     </LinearLayout>
 
