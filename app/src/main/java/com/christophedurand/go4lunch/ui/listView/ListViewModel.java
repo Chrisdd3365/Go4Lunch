@@ -1,9 +1,9 @@
-
-
 package com.christophedurand.go4lunch.ui.listView;
 
 import android.app.Application;
 import android.location.Location;
+import android.text.format.Time;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,9 +20,12 @@ import com.christophedurand.go4lunch.model.pojo.Photo;
 import com.christophedurand.go4lunch.model.pojo.Restaurant;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
+import com.christophedurand.go4lunch.model.pojo.RestaurantLocation;
 
-
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,59 +90,59 @@ public class ListViewModel extends AndroidViewModel  {
     }
 
 
-    private void combine(@Nullable Location location,
+    private void combine(@Nullable Location currentLocation,
                          @Nullable NearbyRestaurantsResponse response,
                          @Nullable Map<String, RestaurantDetailsResponse> map) {
 
-        if (location == null) {
+        if (currentLocation == null) {
             return;
         }
 
         List<RestaurantViewState> restaurantViewStatesList = new ArrayList<>();
 
-        for (Restaurant restaurant : response.getResults()) {
-            RestaurantDetailsResponse restaurantDetailsResponse = map.get(restaurant.getPlaceId());
-            if (restaurantDetailsResponse != null) {
-                //TODO: get distance
-                RestaurantViewState restaurantViewState = new RestaurantViewState(
-                        restaurantDetailsResponse.getResult().getFormattedAddress(),
-                        null,
-                        restaurantDetailsResponse.getResult().getName(),
-                        restaurantDetailsResponse.getResult().getPlaceId(),
-                        restaurantDetailsResponse.getResult().getRating(),
-                        getPhotoUrl(restaurantDetailsResponse.getResult().getPhotos()),
-                        getOpeningHours(restaurantDetailsResponse.getResult().getOpeningHours())
-                );
-                restaurantViewStatesList.add(restaurantViewState);
-            } else {
-                if (!alreadyQueriedPlaceIds.contains(restaurant.getPlaceId())) {
-                    alreadyQueriedPlaceIds.add(restaurant.getPlaceId());
-                    placeIdRestaurantDetailsMapLiveData.addSource(
-                            detailsRepository.getRestaurantDetailsMutableLiveData(restaurant.getPlaceId()),
-                            detailsResponse -> {
-                                Map<String, RestaurantDetailsResponse> mapInstance = placeIdRestaurantDetailsMapLiveData.getValue();
-                                mapInstance.put(restaurant.getPlaceId(), detailsResponse);
-                                placeIdRestaurantDetailsMapLiveData.setValue(mapInstance);
-                            }
+        if (response != null) {
+            for (Restaurant restaurant : response.getResults()) {
+                RestaurantDetailsResponse restaurantDetailsResponse = map.get(restaurant.getPlaceId());
+                if (restaurantDetailsResponse != null) {
+                    RestaurantViewState restaurantViewState = new RestaurantViewState(
+                            restaurantDetailsResponse.getResult().getFormattedAddress(),
+                            getDistanceFromLastKnownUserLocation(currentLocation, restaurant.getGeometry().getLocation()),
+                            restaurantDetailsResponse.getResult().getName(),
+                            restaurantDetailsResponse.getResult().getPlaceId(),
+                            getConvertedRatingWith(restaurantDetailsResponse.getResult().getRating()),
+                            getPhotoUrl(restaurantDetailsResponse.getResult().getPhotos()),
+                            getOpeningHours(restaurantDetailsResponse.getResult().getOpeningHours())
                     );
+                    restaurantViewStatesList.add(restaurantViewState);
+                } else {
+                    if (!alreadyQueriedPlaceIds.contains(restaurant.getPlaceId())) {
+                        alreadyQueriedPlaceIds.add(restaurant.getPlaceId());
+                        placeIdRestaurantDetailsMapLiveData.addSource(
+                                detailsRepository.getRestaurantDetailsMutableLiveData(restaurant.getPlaceId()),
+                                detailsResponse -> {
+                                    Map<String, RestaurantDetailsResponse> mapInstance = placeIdRestaurantDetailsMapLiveData.getValue();
+                                    mapInstance.put(restaurant.getPlaceId(), detailsResponse);
+                                    placeIdRestaurantDetailsMapLiveData.setValue(mapInstance);
+                                }
+                        );
+                    }
+                    RestaurantViewState restaurantViewState = new RestaurantViewState(
+                            restaurant.getVicinity(),
+                            getDistanceFromLastKnownUserLocation(currentLocation, restaurant.getGeometry().getLocation()),
+                            restaurant.getName(),
+                            restaurant.getPlaceId(),
+                            getConvertedRatingWith(restaurant.getRating()),
+                            getPhotoUrl(restaurant.getPhotos()),
+                            getOpeningHours(restaurant.getOpeningHours())
+                    );
+                    restaurantViewStatesList.add(restaurantViewState);
                 }
-                //TODO: get distance
-                RestaurantViewState restaurantViewState = new RestaurantViewState(
-                        restaurant.getVicinity(),
-                        null,
-                        restaurant.getName(),
-                        restaurant.getPlaceId(),
-                        restaurant.getRating(),
-                        getPhotoUrl(restaurant.getPhotos()),
-                        getOpeningHours(restaurant.getOpeningHours())
-                );
-                restaurantViewStatesList.add(restaurantViewState);
             }
         }
 
         listViewStateMediatorLiveData.setValue(
                 new ListViewState(
-                        location,
+                        currentLocation,
                         restaurantViewStatesList)
         );
     }
@@ -157,34 +160,53 @@ public class ListViewModel extends AndroidViewModel  {
 
     //TODO: build string
     private String getOpeningHours(@Nullable OpeningHours openingHours) {
+
         if (openingHours != null && openingHours.getPeriods() != null) {
-            return "toto";
+            return openingHours.getWeekdayText().get(LocalDate.now().getDayOfWeek().getValue() - 1);
+
         } else if (openingHours != null && openingHours.isOpenNow() != null) {
+
             if (openingHours.isOpenNow()) {
                 return "Open";
             } else {
                 return "Closed";
             }
+
         }
-        return "Unkwnown";
+
+        return "Opening Hours Unavailable";
     }
 
-//    public static String getDistanceFromLastKnownUserLocation(Location currentLocation, Location restaurantLocation) {
-//        Restaurant restaurant = Objects.requireNonNull(
-//                loadNearbyRestaurantsData(location)
-//                        .getValue()
-//        ).results.get(position);
-//
-//        Location restaurantLocation = new Location("restaurant location");
-//        restaurantLocation.setLatitude(restaurant.geometry.location.lat);
-//        restaurantLocation.setLongitude(restaurant.geometry.location.lng);
-//
-//        Location currentLocation = locationLiveData.getValue();
-//        assert currentLocation != null;
-//        float distance = currentLocation.distanceTo(restaurantLocation);
-//        Log.d("DISTANCE", "distance is : " + distance);
-//
-//        return (int) distance + "m";
-//    }
+    private double getConvertedRatingWith(double rating) {
+        double convertedRating;
+
+        if (rating <= 1.66) {
+            convertedRating = 1;
+            return convertedRating;
+        } else if (rating > 1.66 && rating <= 3.33) {
+            convertedRating = 2;
+            return convertedRating;
+        } else if (rating > 3.33 && rating <= 5) {
+            convertedRating = 3;
+            return convertedRating;
+        } else {
+            convertedRating = 0;
+            return convertedRating;
+        }
+    }
+
+    private String getDistanceFromLastKnownUserLocation(Location currentLocation, RestaurantLocation restaurantLocation) {
+       if (currentLocation != null) {
+
+           Location location = new Location("restaurant location");
+           location.setLatitude(restaurantLocation.getLat());
+           location.setLongitude(restaurantLocation.getLng());
+
+           float distance = currentLocation.distanceTo(location);
+           return (int) distance + "m";
+       } else {
+           return "0m";
+       }
+    }
 
 }

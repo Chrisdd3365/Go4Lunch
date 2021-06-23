@@ -1,23 +1,16 @@
 package com.christophedurand.go4lunch.ui.detailsView;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.utils.ImageUtils;
 
 
 public class RestaurantDetailsActivity extends AppCompatActivity {
@@ -54,50 +47,50 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
 
             configureViewModel();
 
-            restaurantDetailsViewModel.getDetailsUiModelLiveData().observe(this, detailsUiModel -> {
-
-                String photoReference = detailsUiModel.getRestaurantDetails().photos.get(0).getPhotoReference();
-                ImageUtils.loadGooglePhoto(this, restaurantImageView, photoReference);
-
-                String name = detailsUiModel.getRestaurantDetails().name;
-                restaurantNameTextView.setText(name);
-
-                String formattedAddress = detailsUiModel.getRestaurantDetails().formattedAddress;
-                restaurantAddressTextView.setText(formattedAddress);
-
-                //TODO: refactoring into VIEW MODEL
-                if (detailsUiModel.getRestaurantDetails().internationalPhoneNumber != null) {
-                    callImageButton.setOnClickListener(v -> {
-                        Intent callIntent = new Intent(Intent.ACTION_CALL);
-                        callIntent.setData(
-                                Uri.parse(
-                                        "tel:" + detailsUiModel.getRestaurantDetails().getInternationalPhoneNumber()
-                                )
-                        );
-                        callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(callIntent);
-                    });
-                } else {
-                    Toast.makeText(getApplicationContext(), "Numéro de téléphone indisponible", Toast.LENGTH_SHORT).show();
-                }
-
-                //TODO: create live data to manage favorite
-                likeImageButton.setOnClickListener(v -> {
-                    //like restaurant
-                });
-
-                //TODO: refactoring into VIEW MODEL
-                if (detailsUiModel.getRestaurantDetails().website != null) {
-                    websiteImageButton.setOnClickListener(v -> {
-                        Uri websiteUri = Uri.parse(detailsUiModel.getRestaurantDetails().website);
-                        Intent launchBrowser = new Intent(Intent.ACTION_VIEW, websiteUri);
-                        startActivity(launchBrowser);
-                    });
-                } else {
-                    Toast.makeText(getApplicationContext(), "Site internet indisponible", Toast.LENGTH_SHORT).show();
-                }
-
-            });
+//            restaurantDetailsViewModel.getDetailsUiModelLiveData().observe(this, detailsUiModel -> {
+//
+//                String photoReference = detailsUiModel.getRestaurantDetails().photos.get(0).getPhotoReference();
+//                ImageUtils.loadGooglePhoto(this, restaurantImageView, photoReference);
+//
+//                String name = detailsUiModel.getRestaurantDetails().name;
+//                restaurantNameTextView.setText(name);
+//
+//                String formattedAddress = detailsUiModel.getRestaurantDetails().formattedAddress;
+//                restaurantAddressTextView.setText(formattedAddress);
+//
+//                //TODO: refactoring into VIEW MODEL
+//                if (detailsUiModel.getRestaurantDetails().internationalPhoneNumber != null) {
+//                    callImageButton.setOnClickListener(v -> {
+//                        Intent callIntent = new Intent(Intent.ACTION_CALL);
+//                        callIntent.setData(
+//                                Uri.parse(
+//                                        "tel:" + detailsUiModel.getRestaurantDetails().getInternationalPhoneNumber()
+//                                )
+//                        );
+//                        callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                        startActivity(callIntent);
+//                    });
+//                } else {
+//                    Toast.makeText(getApplicationContext(), "Numéro de téléphone indisponible", Toast.LENGTH_SHORT).show();
+//                }
+//
+//                //TODO: create live data to manage favorite
+//                likeImageButton.setOnClickListener(v -> {
+//                    //like restaurant
+//                });
+//
+//                //TODO: refactoring into VIEW MODEL
+//                if (detailsUiModel.getRestaurantDetails().website != null) {
+//                    websiteImageButton.setOnClickListener(v -> {
+//                        Uri websiteUri = Uri.parse(detailsUiModel.getRestaurantDetails().website);
+//                        Intent launchBrowser = new Intent(Intent.ACTION_VIEW, websiteUri);
+//                        startActivity(launchBrowser);
+//                    });
+//                } else {
+//                    Toast.makeText(getApplicationContext(), "Site internet indisponible", Toast.LENGTH_SHORT).show();
+//                }
+//
+//            });
         }
     }
 
@@ -106,8 +99,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
                 new Intent(
                         activity,
                         RestaurantDetailsActivity.class
-                )
-                        .putExtra(RESTAURANT_ID, restaurantId)
+                ).putExtra(RESTAURANT_ID, restaurantId)
         );
     }
 

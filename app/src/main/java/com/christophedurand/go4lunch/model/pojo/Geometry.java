@@ -8,15 +8,15 @@ import java.util.Objects;
 public class Geometry {
 
     @SerializedName("location")
-    private final Location location;
+    private final RestaurantLocation location;
 
 
-    public Geometry(Location location) {
+    public Geometry(RestaurantLocation location) {
         this.location = location;
     }
 
 
-    public Location getLocation() {
+    public RestaurantLocation getLocation() {
         return location;
     }
 
@@ -37,7 +37,7 @@ public class Geometry {
     @Override
     public String toString() {
         return "Geometry{" +
-                "location=" + location +
+                "mRestaurantLocation=" + location +
                 '}';
     }
 

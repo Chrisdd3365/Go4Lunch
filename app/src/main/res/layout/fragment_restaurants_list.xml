@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <androidx.recyclerview.widget.RecyclerView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -6,7 +7,9 @@
     android:id="@+id/restaurants_list_recycler_view"
     android:name="com.christophedurand.go4lunch.ui.listView.ListViewFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     app:layoutManager="LinearLayoutManager"
+    android:fitsSystemWindows="true"
+    android:clipToPadding="false"
     tools:context=".ui.listView.ListFragment"
-    tools:listitem="@layout/restaurant_item" />
+    tools:listitem="@layout/item_restaurant" />

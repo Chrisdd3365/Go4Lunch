@@ -26,7 +26,7 @@ public class DetailsRepository {
     private static GooglePlacesAPIService mGooglePlacesAPIService = null;
     private static DetailsRepository sDetailsRepository;
 
-    private Map<String, MutableLiveData<RestaurantDetailsResponse>> cache = new HashMap<>();
+    private Map<String, RestaurantDetailsResponse> cache = new HashMap<>();
 
     public static DetailsRepository getInstance() {
         if (sDetailsRepository == null) {
@@ -41,18 +41,20 @@ public class DetailsRepository {
 
 
     public LiveData<RestaurantDetailsResponse> getRestaurantDetailsMutableLiveData(String placeId) {
-        MutableLiveData<RestaurantDetailsResponse> restaurantDetailsMutableLiveData = cache.get(placeId);
-        if (restaurantDetailsMutableLiveData == null) {
-            restaurantDetailsMutableLiveData = new MutableLiveData<>();
-            // TODO caching à finir
-            cache.put(placeId, restaurantDetailsMutableLiveData);
-
+        MutableLiveData<RestaurantDetailsResponse> restaurantDetailsMutableLiveData = new MutableLiveData<>();
+        RestaurantDetailsResponse restaurantDetailsResponse = cache.get(placeId);
+        if (restaurantDetailsResponse != null) {
+            restaurantDetailsMutableLiveData.setValue(restaurantDetailsResponse);
+        } else {
             Call<RestaurantDetailsResponse> restaurantDetails = mGooglePlacesAPIService.getPlaceDetails(placeId, apiKey);
             restaurantDetails.enqueue(new Callback<RestaurantDetailsResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<RestaurantDetailsResponse> call,
                                        @NonNull Response<RestaurantDetailsResponse> response) {
-                    restaurantDetailsMutableLiveData.setValue(response.body());
+                    if (response.body() != null) {
+                        cache.put(placeId, response.body());
+                        restaurantDetailsMutableLiveData.setValue(response.body());
+                    }
                 }
 
                 @Override

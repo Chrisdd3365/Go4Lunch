@@ -40,7 +40,11 @@ public class CurrentLocationRepository {
                 }
             };
         }
-        fusedLocationClient.requestLocationUpdates(new LocationRequest().setInterval(30_000), callback, Looper.getMainLooper());
+        fusedLocationClient.requestLocationUpdates(
+                LocationRequest.create().setInterval(30_000).setSmallestDisplacement(100),
+                callback,
+                Looper.getMainLooper()
+        );
     }
 
     public void stopLocationRequest() {

@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Objects;
 
 
-public class Location {
+public class RestaurantLocation {
 
     @SerializedName("lat")
     private final Double lat;
@@ -14,7 +14,7 @@ public class Location {
     private final Double lng;
 
 
-    public Location(Double lat, Double lng) {
+    public RestaurantLocation(Double lat, Double lng) {
         this.lat = lat;
         this.lng = lng;
     }
@@ -33,9 +33,9 @@ public class Location {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Location location = (Location) o;
-        return Double.compare(location.lat, lat) == 0 &&
-                Double.compare(location.lng, lng) == 0;
+        RestaurantLocation restaurantLocation = (RestaurantLocation) o;
+        return Double.compare(restaurantLocation.lat, lat) == 0 &&
+                Double.compare(restaurantLocation.lng, lng) == 0;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class Location {
 
     @Override
     public String toString() {
-        return "Location{" +
+        return "RestaurantLocation{" +
                 "lat=" + lat +
                 ", lng=" + lng +
                 '}';

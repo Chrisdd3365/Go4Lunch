@@ -44,7 +44,7 @@ class ListViewModelFactory implements ViewModelProvider.Factory {
             return (T) new ListViewModel(
                     application,
                     currentLocationRepository,
-                mNearbyRepository,
+                    mNearbyRepository,
                     mDetailsRepository
             );
         }

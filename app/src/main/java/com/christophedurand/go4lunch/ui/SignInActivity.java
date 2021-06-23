@@ -2,6 +2,7 @@ package com.christophedurand.go4lunch.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -52,9 +53,6 @@ public class SignInActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        requestWindowFeature(Window.FEATURE_NO_TITLE); // will hide the title
-        Objects.requireNonNull(getSupportActionBar()).hide(); // will hide the title bar
 
         // INIT LAYOUT
         setContentView(R.layout.activity_sign_in);

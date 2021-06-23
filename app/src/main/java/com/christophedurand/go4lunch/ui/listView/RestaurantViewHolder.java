@@ -3,12 +3,13 @@ package com.christophedurand.go4lunch.ui.listView;
 
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.utils.ImageUtils;
+import com.christophedurand.go4lunch.utils.Utils;
 
 
 class RestaurantViewHolder extends RecyclerView.ViewHolder {
@@ -18,18 +19,18 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
     public final TextView mRestaurantAddressTextView;
     public final TextView mRestaurantIsOpenTextView;
     public final TextView mRestaurantDistanceTextView;
-    public final TextView mRestaurantRatingTextView;
+    public final RatingBar mRestaurantRatingBar;
 
 
     public RestaurantViewHolder(View view) {
         super(view);
 
-        mRestaurantImageView = view.findViewById(R.id.item_restaurant_image_view);
+        mRestaurantImageView = view.findViewById(R.id.restaurant_image_view);
         mRestaurantNameTextView = view.findViewById(R.id.restaurant_name);
         mRestaurantAddressTextView = view.findViewById(R.id.restaurant_address);
-        mRestaurantIsOpenTextView = view.findViewById(R.id.restaurant_is_open);
-        mRestaurantDistanceTextView = view.findViewById(R.id.restaurant_distance);
-        mRestaurantRatingTextView = view.findViewById(R.id.restaurant_rating);
+        mRestaurantIsOpenTextView = view.findViewById(R.id.restaurant_opening_hours_text_view);
+        mRestaurantDistanceTextView = view.findViewById(R.id.restaurant_distance_text_view);
+        mRestaurantRatingBar = view.findViewById(R.id.restaurant_rating_bar);
 
     }
 
@@ -37,7 +38,7 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
     public void bind(RestaurantViewState restaurantViewState, ListInterface listener) {
 
         String photoURL = restaurantViewState.getPhotoURL();
-        ImageUtils.loadGooglePhoto(itemView.getContext(), mRestaurantImageView, photoURL);
+        Utils.loadGooglePhoto(itemView.getContext(), mRestaurantImageView, photoURL);
 
         String name = restaurantViewState.getName();
         mRestaurantNameTextView.setText(name);
@@ -48,13 +49,11 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
         String openingHoursString = restaurantViewState.getOpeningHours();
         mRestaurantIsOpenTextView.setText(openingHoursString);
 
-
-//        com.christophedurand.go4lunch.model.pojo.Location restaurantLocation = restaurant.geometry.location;
-//        String distanceFromUser = ListViewModel.getDistanceFromLastKnownUserLocation(currentLocation, restaurantLocation);
-//        mRestaurantDistanceTextView.setText(distanceFromUser);
+        String distanceString = restaurantViewState.getDistance();
+        mRestaurantDistanceTextView.setText(distanceString);
 
         double rating = restaurantViewState.getRating();
-        mRestaurantRatingTextView.setText(String.valueOf(rating));
+        mRestaurantRatingBar.setRating((float) rating);
 
         itemView.setOnClickListener(v -> {
             listener.onClickItemList(restaurantViewState.getPlaceId());

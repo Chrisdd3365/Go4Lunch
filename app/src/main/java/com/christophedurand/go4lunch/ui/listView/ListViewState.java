@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import java.util.List;
 
 
-class ListViewState {
+public class ListViewState {
 
     @NonNull
     private final Location location;

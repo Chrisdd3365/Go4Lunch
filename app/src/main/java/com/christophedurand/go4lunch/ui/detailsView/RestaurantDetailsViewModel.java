@@ -15,10 +15,10 @@ import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 
 public class RestaurantDetailsViewModel extends AndroidViewModel {
 
-    private final MediatorLiveData<DetailsUiModel> detailsUiModelMediatorLiveData = new MediatorLiveData<>();
-    public LiveData<DetailsUiModel> getDetailsUiModelLiveData() {
-        return detailsUiModelMediatorLiveData;
-    }
+//    private final MediatorLiveData<DetailsUiModel> detailsUiModelMediatorLiveData = new MediatorLiveData<>();
+//    public LiveData<DetailsUiModel> getDetailsUiModelLiveData() {
+//        return detailsUiModelMediatorLiveData;
+//    }
 
 
     public RestaurantDetailsViewModel(@NonNull Application application,
@@ -26,22 +26,22 @@ public class RestaurantDetailsViewModel extends AndroidViewModel {
                                       String restaurantId) {
         super(application);
 
-        LiveData<RestaurantDetailsResponse> restaurantDetailsResponseLiveData =
-                detailsRepository.getRestaurantDetailsMutableLiveData(restaurantId);
-
-        detailsUiModelMediatorLiveData.addSource(restaurantDetailsResponseLiveData, response ->
-                combine(response)
-        );
+//        LiveData<RestaurantDetailsResponse> restaurantDetailsResponseLiveData =
+//                detailsRepository.getRestaurantDetailsMutableLiveData(restaurantId);
+//
+//        detailsUiModelMediatorLiveData.addSource(restaurantDetailsResponseLiveData, response ->
+//                //combine(response)
+//        );
 
     }
 
 
-    private void combine(@Nullable RestaurantDetailsResponse response) {
-        detailsUiModelMediatorLiveData.setValue(
-                new DetailsUiModel(
-                        response == null ? null : response.result
-                )
-        );
-    }
+//    private void combine(@Nullable RestaurantDetailsResponse response) {
+//        detailsUiModelMediatorLiveData.setValue(
+//                new DetailsUiModel(
+//                        response == null ? null : response.result
+//                )
+//        );
+//    }
 
 }

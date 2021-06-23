@@ -6,12 +6,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.utils.ImageUtils;
+import com.christophedurand.go4lunch.utils.Utils;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
 import java.util.Map;
-import java.util.Objects;
 
 
 public class RestaurantInfoAdapter implements GoogleMap.InfoWindowAdapter {
@@ -45,7 +44,7 @@ public class RestaurantInfoAdapter implements GoogleMap.InfoWindowAdapter {
 
         ImageView photoImageView = restaurantInfoView.findViewById(R.id.marker_info_window_restaurant_image_view);
         //TODO: FIX ME GLIDE DOESNT LOAD IMAGE (url is good)
-        ImageUtils.loadGooglePhoto(restaurantInfoView.getContext(), photoImageView, markerMap.get(marker.getTag()).getPhotoReference());
+        Utils.loadGooglePhoto(restaurantInfoView.getContext(), photoImageView, markerMap.get(marker.getTag()).getPhotoReference());
 
         TextView nameTextView = restaurantInfoView.findViewById(R.id.marker_info_window_name_text_view);
         String name = markerMap.get(marker.getTag()).getName();

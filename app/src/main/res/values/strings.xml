@@ -18,7 +18,7 @@
     // OTHERS
     <string name="button_allow">Allow</string>
     <string name="button_deny">Deny</string>
-    <string name="permission_location_rationale">permission location rationale</string>
-    <string name="permission_location_denied">permission location denied</string>
-    <string name="permission_location_neverask">permission location never ask</string>
+    <string name="permission_location_rationale">permission restaurantLocation rationale</string>
+    <string name="permission_location_denied">permission restaurantLocation denied</string>
+    <string name="permission_location_neverask">permission restaurantLocation never ask</string>
 </resources>

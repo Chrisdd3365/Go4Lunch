@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.maps.model.LatLng;
 
 
-class MapMarker {
+public class MapMarker {
     @NonNull
     private final String placeId;
     private final String name;
