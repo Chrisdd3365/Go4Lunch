@@ -142,4 +142,5 @@ public class ListViewModelTest {
         assertEquals(1, listViewState.getRestaurantViewStatesList().size());
     }
 
+
 }

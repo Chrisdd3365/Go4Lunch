@@ -1,5 +1,7 @@
 package com.christophedurand.go4lunch.data.nearby;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

@@ -68,7 +68,13 @@ public class MapViewModel extends AndroidViewModel {
             String name = response.getResults().get(i).getName();
             String address = response.getResults().get(i).getVicinity();
             LatLng latLng = new LatLng(response.getResults().get(i).getGeometry().getLocation().getLat(), response.getResults().get(i).getGeometry().getLocation().getLng());
-            String photoReference = response.getResults().get(i).getPhotos().get(0).getPhotoReference();
+
+            String photoReference;
+            if (response.getResults().get(i).getPhotos() != null) {
+                photoReference = response.getResults().get(i).getPhotos().get(0).getPhotoReference();
+            } else {
+                photoReference = "photoReference";
+            }
 
             mapMarkersList.add(new MapMarker(placeId, name, address, latLng, photoReference));
         }

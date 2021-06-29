@@ -14,7 +14,7 @@ public class MapMarker {
     private final String photoReference;
 
 
-    public MapMarker(@NonNull String placeId, String name, String vicinity, LatLng latLng, String photoReference) {
+    public MapMarker(@NonNull String placeId, String name, String vicinity, LatLng latLng, @NonNull String photoReference) {
         this.placeId = placeId;
         this.name = name;
         this.vicinity = vicinity;

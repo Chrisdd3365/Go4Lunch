@@ -2,12 +2,16 @@ package com.christophedurand.go4lunch.ui;
 
 import android.Manifest;
 import android.os.Bundle;
-import android.view.Window;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.ui.mapView.MapFragment;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
@@ -15,10 +19,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import java.util.Objects;
+import java.util.Arrays;
 
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
@@ -34,6 +37,8 @@ public class HomeActivity extends AppCompatActivity {
     public static final int LAUNCH_SECOND_ACTIVITY = 0;
     public static final String apiKey = "AIzaSyD6FndQ_yMQLDPOYVzaeLt1rIuJ72Ntg_M";
 
+    private AutocompleteSupportFragment _autoCompleteFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,14 +49,27 @@ public class HomeActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_home);
 
+        _autoCompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+        _autoCompleteFragment.setTypeFilter(TypeFilter.ADDRESS);
+        _autoCompleteFragment.setPlaceFields(Arrays.asList(
+                Place.Field.LAT_LNG,
+                Place.Field.ADDRESS)
+        );
+        _autoCompleteFragment.setCountry(getIntent().getStringExtra(EXTRA_COUNTRY));
+        _autoCompleteFragment.setOnPlaceSelectedListener(this);
+
         BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_map_view, R.id.navigation_list_view, R.id.navigation_workmates)
-                .build();
+
+        TextView toolbarTitleTextView = findViewById(R.id.toolbar_title_text_view);
+        toolbarTitleTextView.setText("I'm Hungry!");
+
+//        if (workmatesFragment) {
+//            toolbarTitleTextView.setText("Available Workmates!");
+//        } else {
+//            toolbarTitleTextView.setText("I'm Hungry!");
+//        }
+
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        //NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
         HomeActivityPermissionsDispatcher.showCameraWithPermissionCheck(this);
