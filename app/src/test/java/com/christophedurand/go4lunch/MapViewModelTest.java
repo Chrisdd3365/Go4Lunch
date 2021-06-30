@@ -4,9 +4,7 @@ import android.app.Application;
 import android.location.Location;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
-import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Transformations;
 
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
@@ -16,10 +14,8 @@ import com.christophedurand.go4lunch.model.pojo.OpeningHours;
 import com.christophedurand.go4lunch.model.pojo.Photo;
 import com.christophedurand.go4lunch.model.pojo.Restaurant;
 import com.christophedurand.go4lunch.model.pojo.RestaurantLocation;
-import com.christophedurand.go4lunch.ui.mapView.MapMarker;
 import com.christophedurand.go4lunch.ui.mapView.MapViewModel;
 import com.christophedurand.go4lunch.ui.mapView.MapViewState;
-import com.google.android.gms.maps.model.LatLng;
 
 import org.junit.Before;
 import org.junit.Rule;

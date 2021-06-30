@@ -4,7 +4,7 @@ package com.christophedurand.go4lunch.ui.listView;
 import java.util.Objects;
 
 
-class RestaurantViewState {
+public class RestaurantViewState {
 
     private final String address;
     private final String distance;

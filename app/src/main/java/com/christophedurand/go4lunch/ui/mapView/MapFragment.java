@@ -1,6 +1,5 @@
 package com.christophedurand.go4lunch.ui.mapView;
 
-
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -10,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.christophedurand.go4lunch.utils.Utils;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -25,7 +26,11 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -51,6 +56,12 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map_view, container, false);
+
+//        AutocompleteSupportFragment _autoCompleteFragment = (AutocompleteSupportFragment) this.getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+//        if (_autoCompleteFragment != null) {
+//            _autoCompleteFragment.setPlaceFields(Collections.singletonList(Place.Field.NAME));
+//            _autoCompleteFragment.setOnPlaceSelectedListener(this);
+//        }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
@@ -168,5 +179,4 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 )
         );
     }
-
 }
