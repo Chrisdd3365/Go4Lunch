@@ -29,6 +29,7 @@ import java.util.List;
 
 import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -67,7 +68,7 @@ public class MapViewModelTest {
         restaurantsList.add(
                 new Restaurant(
                         "vicinity",
-                        new Geometry(new RestaurantLocation(30.0, 42.0)),
+                        new Geometry(new RestaurantLocation(39.0, 45.0)),
                         "icon",
                         "name",
                         new OpeningHours(true, null, null),
@@ -76,6 +77,19 @@ public class MapViewModelTest {
                         photosList
                 )
         );
+        restaurantsList.add(
+                new Restaurant(
+                        "vicinity1",
+                        new Geometry(new RestaurantLocation(31.0, 43.0)),
+                        "icon1",
+                        "name1",
+                        new OpeningHours(true, null, null),
+                        "placeId1",
+                        5.0,
+                        null
+                )
+        );
+
         NearbyRestaurantsResponse response = new NearbyRestaurantsResponse(restaurantsList);
         nearbyRestaurantsResponseLiveData.setValue(response);
         Mockito.doReturn(nearbyRestaurantsResponseLiveData)
@@ -103,7 +117,20 @@ public class MapViewModelTest {
         MapViewState mapViewState = LiveDataTestUtils.getOrAwaitValue(mapViewModel.getMapViewStateLiveData());
 
         // Then
-        assertEquals(1, mapViewState.getMapMarkersList().size());
+        assertEquals(2, mapViewState.getMapMarkersList().size());
+    }
+
+    @Test
+    public void when_oneRestaurantHasNoPhotos_should_return_fake_photo_reference() throws InterruptedException {
+        // Given
+
+
+        // When
+        MapViewState mapViewState = LiveDataTestUtils.getOrAwaitValue(mapViewModel.getMapViewStateLiveData());
+
+        // Then
+        assertNull(mapViewState.getMapMarkersList().get(1).getPhotoReference());
+
     }
 
 }

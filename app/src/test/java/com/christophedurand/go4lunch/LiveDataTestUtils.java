@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 public class LiveDataTestUtils {
 
+    // TEST D'INTEGRATION
     public static <T> T getOrAwaitValue(final LiveData<T> liveData) throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(1);
         Observer<T> observer = o -> latch.countDown();
@@ -18,6 +19,17 @@ public class LiveDataTestUtils {
             throw new RuntimeException("LiveData value was never set.");
         }
         // No inspection unchecked
+        return liveData.getValue();
+    }
+
+    // TEST UNITAIRE
+    public static <T> T observeForTesting(LiveData<T> liveData) {
+        liveData.observeForever(new Observer<T>() {
+            @Override
+            public void onChanged(T t) {
+
+            }
+        });
         return liveData.getValue();
     }
 

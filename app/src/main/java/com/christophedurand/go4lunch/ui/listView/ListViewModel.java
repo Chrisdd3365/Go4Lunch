@@ -22,6 +22,8 @@ import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
 import com.christophedurand.go4lunch.model.pojo.RestaurantLocation;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -180,7 +182,7 @@ public class ListViewModel extends AndroidViewModel  {
     private double getConvertedRatingWith(double rating) {
         double convertedRating;
 
-        if (rating <= 1.66) {
+        if (rating > 1.00 && rating <= 1.66) {
             convertedRating = 1;
             return convertedRating;
         } else if (rating > 1.66 && rating <= 3.33) {
@@ -195,18 +197,14 @@ public class ListViewModel extends AndroidViewModel  {
         }
     }
 
-    private String getDistanceFromLastKnownUserLocation(Location currentLocation, RestaurantLocation restaurantLocation) {
-       if (currentLocation != null) {
+    private String getDistanceFromLastKnownUserLocation(@NonNull Location currentLocation, RestaurantLocation restaurantLocation) {
 
-           Location location = new Location("restaurant location");
-           location.setLatitude(restaurantLocation.getLat());
-           location.setLongitude(restaurantLocation.getLng());
+        Location location = new Location("restaurant location");
+        location.setLatitude(restaurantLocation.getLat());
+        location.setLongitude(restaurantLocation.getLng());
 
-           float distance = currentLocation.distanceTo(location);
-           return (int) distance + "m";
-       } else {
-           return "0m";
-       }
+        float distance = currentLocation.distanceTo(location);
+        return (int) distance + "m";
     }
 
 }

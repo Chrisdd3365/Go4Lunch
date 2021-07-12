@@ -43,7 +43,8 @@ public class RestaurantInfoAdapter implements GoogleMap.InfoWindowAdapter {
     private void getRestaurantDetailsData(Marker marker) {
 
         ImageView photoImageView = restaurantInfoView.findViewById(R.id.marker_info_window_restaurant_image_view);
-        //TODO: FIX ME GLIDE DOESNT LOAD IMAGE (url is good)
+        //TODO: FIX ME GLIDE DOESN'T LOAD IMAGE (url is good)
+        // USE GOOGLE MAP SDK INFO ADAPTER MAP TARGET
         Utils.loadGooglePhoto(restaurantInfoView.getContext(), photoImageView, markerMap.get(marker.getTag()).getPhotoReference());
 
         TextView nameTextView = restaurantInfoView.findViewById(R.id.marker_info_window_name_text_view);

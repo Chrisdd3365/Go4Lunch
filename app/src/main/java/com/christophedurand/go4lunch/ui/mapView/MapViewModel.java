@@ -73,7 +73,7 @@ public class MapViewModel extends AndroidViewModel {
             if (response.getResults().get(i).getPhotos() != null) {
                 photoReference = response.getResults().get(i).getPhotos().get(0).getPhotoReference();
             } else {
-                photoReference = "photoReference";
+                photoReference = null;
             }
 
             mapMarkersList.add(new MapMarker(placeId, name, address, latLng, photoReference));

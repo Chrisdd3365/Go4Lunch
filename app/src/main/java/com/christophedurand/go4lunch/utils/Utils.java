@@ -21,6 +21,7 @@ public class Utils {
     public static final String PHOTO_URL = "https://maps.googleapis.com/maps/api/place/photo?photoreference=%s&key=%s&maxheight=10000";
 
     public static void loadGooglePhoto(Context context, ImageView imageView, String photoReference) {
+        //TODO: MOVE TO VM
         String url = String.format(PHOTO_URL, photoReference, apiKey);
         loadImage(context, url, imageView);
     }

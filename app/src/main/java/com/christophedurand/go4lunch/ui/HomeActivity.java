@@ -43,8 +43,8 @@ public class HomeActivity extends AppCompatActivity {
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
 
-        TextView toolbarTitleTextView = findViewById(R.id.toolbar_title_text_view);
-        toolbarTitleTextView.setText("I'm Hungry!");
+        //TextView toolbarTitleTextView = findViewById(R.id.toolbar_title_text_view);
+        //toolbarTitleTextView.setText("I'm Hungry!");
 
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupWithNavController(navView, navController);

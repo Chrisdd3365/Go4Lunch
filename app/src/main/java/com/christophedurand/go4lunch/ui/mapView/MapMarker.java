@@ -1,6 +1,7 @@
 package com.christophedurand.go4lunch.ui.mapView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -11,10 +12,11 @@ public class MapMarker {
     private final String name;
     private final String vicinity;
     private final LatLng latLng;
+    @Nullable
     private final String photoReference;
 
 
-    public MapMarker(@NonNull String placeId, String name, String vicinity, LatLng latLng, @NonNull String photoReference) {
+    public MapMarker(@NonNull String placeId, String name, String vicinity, LatLng latLng, @Nullable String photoReference) {
         this.placeId = placeId;
         this.name = name;
         this.vicinity = vicinity;
@@ -40,6 +42,7 @@ public class MapMarker {
         return latLng;
     }
 
+    @Nullable
     public String getPhotoReference() {
         return photoReference;
     }
