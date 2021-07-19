@@ -1,7 +1,5 @@
 package com.christophedurand.go4lunch.data.nearby;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -21,7 +19,7 @@ public class NearbyRepository {
     private static NearbyRepository sNearbyRepository;
 
     public static NearbyRepository getInstance() {
-        if (sNearbyRepository == null){
+        if (sNearbyRepository == null) {
             sNearbyRepository = new NearbyRepository();
         }
         return sNearbyRepository;

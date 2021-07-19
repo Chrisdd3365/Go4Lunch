@@ -2,8 +2,6 @@ package com.christophedurand.go4lunch.ui.listView;
 
 import android.app.Application;
 import android.location.Location;
-import android.text.format.Time;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,11 +20,8 @@ import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
 import com.christophedurand.go4lunch.model.pojo.RestaurantLocation;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import java.util.HashMap;
 import java.util.List;
@@ -180,21 +175,19 @@ public class ListViewModel extends AndroidViewModel  {
     }
 
     private double getConvertedRatingWith(double rating) {
-        double convertedRating;
 
-        if (rating > 1.00 && rating <= 1.66) {
-            convertedRating = 1;
-            return convertedRating;
-        } else if (rating > 1.66 && rating <= 3.33) {
-            convertedRating = 2;
-            return convertedRating;
-        } else if (rating > 3.33 && rating <= 5) {
-            convertedRating = 3;
-            return convertedRating;
+        long convertedRating = Math.round(rating * 3 / 5);
+
+        if (convertedRating <= 0) {
+            return 0;
+        } else if (convertedRating < 1.5) {
+            return 1;
+        } else if (convertedRating >= 1.5 && convertedRating <= 2.5) {
+            return 2;
         } else {
-            convertedRating = 0;
-            return convertedRating;
+            return 3;
         }
+
     }
 
     private String getDistanceFromLastKnownUserLocation(@NonNull Location currentLocation, RestaurantLocation restaurantLocation) {

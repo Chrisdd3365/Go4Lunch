@@ -1,9 +1,8 @@
 package com.christophedurand.go4lunch.model;
 
-
+import com.christophedurand.go4lunch.model.pojo.AutocompleteResponse;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
-
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -21,5 +20,9 @@ public interface GooglePlacesAPIService {
     @GET("maps/api/place/details/json")
     Call<RestaurantDetailsResponse> getPlaceDetails(@Query("place_id") String placeId,
                                                     @Query("key") String apiKey);
+
+    @GET("maps/api/place/autocomplete/json")
+    Call<AutocompleteResponse> getAutocompleteResult(@Query("input") String input,
+                                                     @Query("key") String apiKey);
 
 }

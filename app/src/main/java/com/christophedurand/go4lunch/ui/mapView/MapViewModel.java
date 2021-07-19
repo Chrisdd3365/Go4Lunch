@@ -10,8 +10,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Transformations;
 
+import com.christophedurand.go4lunch.data.autocomplete.AutocompleteRepository;
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
+import com.christophedurand.go4lunch.model.pojo.AutocompleteResponse;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -30,6 +32,7 @@ public class MapViewModel extends AndroidViewModel {
 
 
     public MapViewModel(@NonNull Application application,
+                        AutocompleteRepository autocompleteRepository,
                         NearbyRepository nearbyRepository,
                         CurrentLocationRepository currentLocationRepository) {
         super(application);
@@ -48,30 +51,38 @@ public class MapViewModel extends AndroidViewModel {
                                 apiKey)
                 );
 
-        mMapViewStateMediatorLiveData.addSource(locationLiveData, location ->
-                combine(nearbyRestaurantsResponseLiveData.getValue(), location));
+        LiveData<AutocompleteResponse> autocompleteResponseLiveData =
+                autocompleteRepository.getAutocompleteResponseLiveData("input", apiKey);
 
-        mMapViewStateMediatorLiveData.addSource(nearbyRestaurantsResponseLiveData, response ->
-                combine(response, locationLiveData.getValue()));
+        mMapViewStateMediatorLiveData.addSource(locationLiveData, location ->
+                combine(autocompleteResponseLiveData.getValue(), nearbyRestaurantsResponseLiveData.getValue(), location));
+
+        mMapViewStateMediatorLiveData.addSource(nearbyRestaurantsResponseLiveData, nearbyRestaurantsResponse ->
+                combine(autocompleteResponseLiveData.getValue(), nearbyRestaurantsResponse, locationLiveData.getValue()));
+
+        mMapViewStateMediatorLiveData.addSource(autocompleteResponseLiveData, autocompleteResponse ->
+                combine(autocompleteResponse, nearbyRestaurantsResponseLiveData.getValue(), locationLiveData.getValue()));
 
     }
 
-    private void combine(@Nullable NearbyRestaurantsResponse response,
+    private void combine(@Nullable AutocompleteResponse autocompleteResponse,
+                         @Nullable NearbyRestaurantsResponse nearbyRestaurantsResponse,
                          @Nullable Location location) {
-        if (location == null || response == null) {
+
+        if (location == null || nearbyRestaurantsResponse == null || autocompleteResponse == null) {
             return;
         }
 
         List<MapMarker> mapMarkersList = new ArrayList<>();
-        for (int i=0; i<response.getResults().size(); i++) {
-            String placeId = response.getResults().get(i).getPlaceId();
-            String name = response.getResults().get(i).getName();
-            String address = response.getResults().get(i).getVicinity();
-            LatLng latLng = new LatLng(response.getResults().get(i).getGeometry().getLocation().getLat(), response.getResults().get(i).getGeometry().getLocation().getLng());
+        for (int i=0; i<nearbyRestaurantsResponse.getResults().size(); i++) {
+            String placeId = nearbyRestaurantsResponse.getResults().get(i).getPlaceId();
+            String name = nearbyRestaurantsResponse.getResults().get(i).getName();
+            String address = nearbyRestaurantsResponse.getResults().get(i).getVicinity();
+            LatLng latLng = new LatLng(nearbyRestaurantsResponse.getResults().get(i).getGeometry().getLocation().getLat(), nearbyRestaurantsResponse.getResults().get(i).getGeometry().getLocation().getLng());
 
             String photoReference;
-            if (response.getResults().get(i).getPhotos() != null) {
-                photoReference = response.getResults().get(i).getPhotos().get(0).getPhotoReference();
+            if (nearbyRestaurantsResponse.getResults().get(i).getPhotos() != null) {
+                photoReference = nearbyRestaurantsResponse.getResults().get(i).getPhotos().get(0).getPhotoReference();
             } else {
                 photoReference = null;
             }
@@ -82,7 +93,8 @@ public class MapViewModel extends AndroidViewModel {
         mMapViewStateMediatorLiveData.setValue(
                 new MapViewState(
                         location,
-                        mapMarkersList
+                        mapMarkersList,
+                        new AutocompleteRestaurantViewState()
                 )
         );
     }
