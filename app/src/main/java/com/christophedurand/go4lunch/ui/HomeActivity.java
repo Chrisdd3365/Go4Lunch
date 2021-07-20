@@ -1,8 +1,14 @@
 package com.christophedurand.go4lunch.ui;
 
 import android.Manifest;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -14,19 +20,22 @@ import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
-
-import java.util.Collections;
 
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
@@ -37,10 +46,13 @@ import permissions.dispatcher.RuntimePermissions;
 
 
 @RuntimePermissions
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String apiKey = "AIzaSyD6FndQ_yMQLDPOYVzaeLt1rIuJ72Ntg_M";
 
+    private Toolbar toolbar;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
 
     private ActivityResultLauncher<Intent> activityResultLauncher;
 
@@ -54,17 +66,13 @@ public class HomeActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_home);
 
-        Button menuButton = findViewById(R.id.activity_home_menu_button);
-        menuButton.setOnClickListener(v -> {
+        configureToolBar();
+        configureDrawerLayout();
+        configureNavigationView();
 
-        });
-
-        Button searchButton = findViewById(R.id.activity_home_search_button);
-        searchButton.setOnClickListener(this::startAutocompleteActivity);
-
-        BottomNavigationView navView = findViewById(R.id.nav_view);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_view);
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupWithNavController(navView, navController);
+        NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
         HomeActivityPermissionsDispatcher.showCameraWithPermissionCheck(this);
 
@@ -84,13 +92,55 @@ public class HomeActivity extends AppCompatActivity {
                 });
     }
 
-    public void startAutocompleteActivity(View view) {
-        Intent intent = new Autocomplete.IntentBuilder(
-                AutocompleteActivityMode.OVERLAY,
-                Collections.singletonList(Place.Field.NAME))
-                .build(this);
-        activityResultLauncher.launch(intent);
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+
+        return true;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id){
+            case R.id.nav_lunch:
+                break;
+            case R.id.nav_settings:
+                break;
+            case R.id.nav_logout:
+                break;
+            default:
+                break;
+        }
+
+        this.drawerLayout.closeDrawer(GravityCompat.START);
+
+        return true;
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
+    }
+
 
     @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     void showCamera() {
@@ -123,6 +173,27 @@ public class HomeActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         HomeActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
+
+    private void configureToolBar() {
+        toolbar = findViewById(R.id.activity_home_toolbar);
+        toolbar.setTitle(R.string.hungry_title);
+        toolbar.setTitleTextColor(Color.parseColor("#FFFFFF"));
+        setSupportActionBar(toolbar);
+    }
+
+    private void configureDrawerLayout() {
+        drawerLayout = findViewById(R.id.activity_home_parent_drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+    }
+
+    private void configureNavigationView() {
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setVisibility(View.GONE);
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
 }

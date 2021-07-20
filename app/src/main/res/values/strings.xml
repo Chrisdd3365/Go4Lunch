@@ -15,10 +15,19 @@
     <string name="list_view_title">List View</string>
     <string name="workmates_view_title">Workmates</string>
 
+    // NAVIGATION DRAWER
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
     // OTHERS
     <string name="button_allow">Allow</string>
     <string name="button_deny">Deny</string>
     <string name="permission_location_rationale">permission restaurantLocation rationale</string>
     <string name="permission_location_denied">permission restaurantLocation denied</string>
     <string name="permission_location_neverask">permission restaurantLocation never ask</string>
+
 </resources>
