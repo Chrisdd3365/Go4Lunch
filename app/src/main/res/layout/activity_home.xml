@@ -38,18 +38,6 @@
             app:layout_constraintTop_toBottomOf="@+id/activity_home_toolbar"
             app:navGraph="@navigation/mobile_navigation"/>
 
-        <com.google.android.material.navigation.NavigationView
-            android:id="@+id/nav_view"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:fitsSystemWindows="true"
-            app:headerLayout="@layout/home_nav_header"
-            app:menu="@menu/home_menu_drawer"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/nav_host_fragment"
-            app:layout_constraintTop_toTopOf="parent"/>
-
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_nav_view"
             android:layout_width="match_parent"
@@ -63,5 +51,17 @@
             app:menu="@menu/bottom_nav_menu"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        android:background="@color/colorOrange"
+        app:itemIconTint="@android:color/white"
+        app:itemTextColor="@android:color/white"
+        app:headerLayout="@layout/home_nav_header"
+        app:menu="@menu/home_menu_drawer" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

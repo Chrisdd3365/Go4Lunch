@@ -10,4 +10,5 @@
     <color name="colorGreen">#59981A</color>
     <color name="colorYellow">#F8E63B</color>
     <color name="colorLightGrey">#d3d3d3</color>
+    <color name="colorAvatarPlaceholder">#1AFE2851</color>
 </resources>

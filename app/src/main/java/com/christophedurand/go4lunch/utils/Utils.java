@@ -3,6 +3,7 @@ package com.christophedurand.go4lunch.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.widget.ImageView;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
+import com.christophedurand.go4lunch.R;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
@@ -81,6 +83,12 @@ public class Utils {
         vectorDrawable.draw(canvas);
 
         return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    public static Drawable getAvatarPlaceHolder(Context context) {
+        Drawable avatarPlaceHolder = ContextCompat.getDrawable(context, R.drawable.ic_account_circle).mutate();
+        avatarPlaceHolder.setColorFilter(ContextCompat.getColor(context, R.color.colorAvatarPlaceholder), PorterDuff.Mode.SRC_IN);
+        return avatarPlaceHolder;
     }
 
 }

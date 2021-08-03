@@ -1,20 +1,30 @@
 package com.christophedurand.go4lunch.ui;
 
 import android.Manifest;
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.christophedurand.go4lunch.R;
+import com.christophedurand.go4lunch.model.User;
 import com.christophedurand.go4lunch.ui.mapView.MapFragment;
+import com.christophedurand.go4lunch.utils.Utils;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.Status;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -37,6 +47,9 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
 import permissions.dispatcher.OnPermissionDenied;
@@ -52,7 +65,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
 
     private ActivityResultLauncher<Intent> activityResultLauncher;
 
@@ -90,6 +102,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                     }
 
                 });
+
+
     }
 
 
@@ -98,8 +112,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            drawerLayout.openDrawer(GravityCompat.START);
         }
+
+        moveTaskToBack(true);
     }
 
     @Override
@@ -191,9 +207,33 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void configureNavigationView() {
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setVisibility(View.GONE);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View headerView = navigationView.getHeaderView(0);
+        configureUserProfile(headerView);
+    }
+
+    private void configureUserProfile(View headerView) {
+        TextView userNameTextView = (TextView) headerView.findViewById(R.id.user_name_text_view);
+        TextView userMailTextView = (TextView) headerView.findViewById(R.id.user_mail_text_view);
+        ImageView userAvatarImageView = (ImageView) headerView.findViewById(R.id.user_avatar_image_view);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            User user = (User) extras.getSerializable("user");
+
+            userNameTextView.setText(user.getName());
+            userMailTextView.setText(user.getEmailAddress());
+
+            Drawable avatarPlaceHolder = Utils.getAvatarPlaceHolder(this);
+
+            Glide.with(this)
+                    .load(user.getAvatarURL())
+                    .circleCrop()
+                    .placeholder(avatarPlaceHolder)
+                    .into(userAvatarImageView);
+        }
+
     }
 
 }

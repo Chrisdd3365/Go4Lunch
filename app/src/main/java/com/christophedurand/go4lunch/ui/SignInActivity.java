@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.christophedurand.go4lunch.R;
+import com.christophedurand.go4lunch.model.User;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -26,40 +27,35 @@ import com.google.android.gms.tasks.Task;
 
 public class SignInActivity extends AppCompatActivity {
 
-    // -- PROPERTIES
-    // STATICS
-    // FACEBOOK LOGIN REQUEST CODE
     public static final int FACEBOOK_LOGIN = 0;
-    // GOOGLE SIGN IN REQUEST CODE
     public static final int RC_SIGN_IN = 1;
 
-    // MODEL
-    private CallbackManager callbackManager;
-    public GoogleSignInClient mGoogleSignInClient;
-
-    // UI
     private ImageView go4LunchImageView;
     private TextView go4LunchTextView;
     private TextView descriptionTextView;
     private LoginButton facebookLoginButton;
     private SignInButton googleSignInButton;
 
+    private CallbackManager callbackManager;
+    public GoogleSignInClient mGoogleSignInClient;
+    private User user;
 
-    // -- VIEW LIFE CYCLE
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // INIT LAYOUT
         setContentView(R.layout.activity_sign_in);
 
-        // FACEBOOK INIT CALLBACK MANAGER
+        go4LunchImageView = findViewById(R.id.go4LunchImageView);
+        go4LunchTextView = findViewById(R.id.go4LunchTextView);
+        descriptionTextView = findViewById(R.id.descriptionTextView);
+
         callbackManager = CallbackManager.Factory.create();
 
 //        AccessToken accessToken = AccessToken.getCurrentAccessToken();
 //        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
 
-        // GOOGLE SIGN IN OPTIONS INIT
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -68,14 +64,7 @@ public class SignInActivity extends AppCompatActivity {
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        // INIT UI
-        go4LunchImageView = findViewById(R.id.go4LunchImageView);
-        go4LunchTextView = findViewById(R.id.go4LunchTextView);
-        descriptionTextView = findViewById(R.id.descriptionTextView);
-
-        // FACEBOOK LOGIN BUTTON
         facebookLoginButton = findViewById(R.id.facebook_login_button);
-        // FACEBOOK LOGIN BUTTON REGISTER CALLBACK
         facebookLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -93,9 +82,7 @@ public class SignInActivity extends AppCompatActivity {
             }
         });
 
-        // GOOGLE SIGN IN BUTTON
         googleSignInButton = findViewById(R.id.google_sign_in_button);
-        // GOOGLE SIGN IN BUTTON SET ON CLICK LISTENER
         googleSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,61 +100,49 @@ public class SignInActivity extends AppCompatActivity {
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        updateUI(account);
+
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // FACEBOOK
-        if (requestCode == FACEBOOK_LOGIN)
-            callbackManager.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
 
-        // GOOGLE
-        // NearbyRestaurantsResponse returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        GoogleSignInAccount googleSignInAccount;
+
+        if (requestCode == FACEBOOK_LOGIN) {
+            callbackManager.onActivityResult(requestCode, resultCode, data);
+        }
+
         if (requestCode == RC_SIGN_IN) {
             // The Task returned from this call is always completed, no need to attach
             // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
+            googleSignInAccount = handleSignInResult(task);
+            user = new User(googleSignInAccount.getDisplayName(), googleSignInAccount.getEmail(), googleSignInAccount.getPhotoUrl() != null ? googleSignInAccount.getPhotoUrl().toString() : "");
+
         }
 
-        super.onActivityResult(requestCode, resultCode, data);
-
         Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
+        intent.putExtra("user", user);
         startActivity(intent);
-
     }
 
 
     // -- GOOGLE METHODS
-    private void updateUI(GoogleSignInAccount account) {
-
-    }
-
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+    private GoogleSignInAccount handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-
-//            assert account != null;
-//            account.getDisplayName();
-//            account.getGivenName(); // first name of user
-//            account.getFamilyName(); // last name of user
-//            account.getEmail(); // email of user
-
-            // Signed in successfully, show authenticated UI.
-            updateUI(account);
-
+            return completedTask.getResult(ApiException.class);
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w("Sign In NearbyRestaurantsResponse", "signInResult: failed code= " + e.getStatusCode());
-            updateUI(null);
+            Log.w("Google Sign In", "signInResult: failed code= " + e.getStatusCode());
         }
+        return null;
     }
 
 }
