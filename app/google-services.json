@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "486167789733-6tkprmgje7eihecg0abrv20pf275ipii.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.christophedurand.go4lunch",
+            "certificate_hash": "b1eae17d64340edf2d906ef861c775cf6bd1125b"
+          }
+        },
+        {
           "client_id": "486167789733-k1q374tgm3f05eo8qmubo3vm70tceqos.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -3,7 +3,7 @@
     <string name="app_name">Go4Lunch</string>
 
     // FACEBOOK
-    <string name="facebook_app_id">1164754350562024</string>
+    <string name="facebook_application_id">1164754350562024</string>
     <string name="fb_login_protocol_scheme">fb1164754350562024</string>
 
     // UI

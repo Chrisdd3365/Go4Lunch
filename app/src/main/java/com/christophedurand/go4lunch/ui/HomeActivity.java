@@ -1,15 +1,13 @@
 package com.christophedurand.go4lunch.ui;
 
 import android.Manifest;
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,22 +17,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.model.User;
+import com.christophedurand.go4lunch.model.UserManager;
 import com.christophedurand.go4lunch.ui.mapView.MapFragment;
 import com.christophedurand.go4lunch.utils.Utils;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.common.api.Status;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.widget.Autocomplete;
-import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseUser;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -46,9 +38,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
-
-import java.util.LinkedList;
-import java.util.List;
 
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
@@ -66,13 +55,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
 
-    private ActivityResultLauncher<Intent> activityResultLauncher;
+    //private ActivityResultLauncher<Intent> activityResultLauncher;
+
+    private UserManager userManager = UserManager.getInstance();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        Places.initialize(getApplication(), apiKey);
 
         super.onCreate(savedInstanceState);
 
@@ -81,28 +70,26 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         configureToolBar();
         configureDrawerLayout();
         configureNavigationView();
-
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_view);
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupWithNavController(bottomNavigationView, navController);
+        configureBottomNavigationView();
 
         HomeActivityPermissionsDispatcher.showCameraWithPermissionCheck(this);
 
-        activityResultLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(), result -> {
+        Places.initialize(getApplication(), apiKey);
 
-                    if (result.getResultCode() == RESULT_OK) {
-                        Place place = Autocomplete.getPlaceFromIntent(result.getData());
-
-                    } else if (result.getResultCode() == AutocompleteActivity.RESULT_ERROR) {
-                        Status status = Autocomplete.getStatusFromIntent(result.getData());
-
-                    } else if (result.getResultCode() == RESULT_CANCELED) {
-                        // The user canceled the operation
-                    }
-
-                });
-
+//        activityResultLauncher = registerForActivityResult(
+//                new ActivityResultContracts.StartActivityForResult(), result -> {
+//
+//                    if (result.getResultCode() == RESULT_OK) {
+//                        Place place = Autocomplete.getPlaceFromIntent(result.getData());
+//
+//                    } else if (result.getResultCode() == AutocompleteActivity.RESULT_ERROR) {
+//                        Status status = Autocomplete.getStatusFromIntent(result.getData());
+//
+//                    } else if (result.getResultCode() == RESULT_CANCELED) {
+//                        // The user canceled the operation
+//                    }
+//
+//                });
 
     }
 
@@ -136,27 +123,22 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        switch (id){
+        switch (id) {
             case R.id.nav_lunch:
                 break;
             case R.id.nav_settings:
                 break;
             case R.id.nav_logout:
+                signOut();
                 break;
             default:
                 break;
         }
 
-        this.drawerLayout.closeDrawer(GravityCompat.START);
+        drawerLayout.closeDrawer(GravityCompat.START);
 
         return true;
     }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-
-    }
-
 
     @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     void showCamera() {
@@ -199,6 +181,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(toolbar);
     }
 
+    private void configureBottomNavigationView() {
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_view);
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupWithNavController(bottomNavigationView, navController);
+    }
+
     private void configureDrawerLayout() {
         drawerLayout = findViewById(R.id.activity_home_parent_drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -207,33 +195,51 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void configureNavigationView() {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View headerView = navigationView.getHeaderView(0);
-        configureUserProfile(headerView);
+        updateUIWithUserData(headerView);
     }
 
-    private void configureUserProfile(View headerView) {
-        TextView userNameTextView = (TextView) headerView.findViewById(R.id.user_name_text_view);
-        TextView userMailTextView = (TextView) headerView.findViewById(R.id.user_mail_text_view);
-        ImageView userAvatarImageView = (ImageView) headerView.findViewById(R.id.user_avatar_image_view);
+    private void updateUIWithUserData(View headerView) {
+        if (userManager.isCurrentUserLogged()) {
+            setUserProfileUI(headerView);
+        }
+    }
 
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            User user = (User) extras.getSerializable("user");
+    private void setUserProfileUI(View headerView) {
 
-            userNameTextView.setText(user.getName());
-            userMailTextView.setText(user.getEmailAddress());
+        TextView userNameTextView = headerView.findViewById(R.id.user_name_text_view);
+        TextView userMailTextView = headerView.findViewById(R.id.user_mail_text_view);
+        ImageView userAvatarImageView = headerView.findViewById(R.id.user_avatar_image_view);
 
-            Drawable avatarPlaceHolder = Utils.getAvatarPlaceHolder(this);
+        Drawable avatarPlaceHolder = Utils.getAvatarPlaceHolder(this);
 
-            Glide.with(this)
-                    .load(user.getAvatarURL())
-                    .circleCrop()
-                    .placeholder(avatarPlaceHolder)
-                    .into(userAvatarImageView);
+        if (userManager.getCurrentUser() == null) {
+            userManager.createUser();
         }
 
+        userManager.getUserData().addOnSuccessListener(user -> {
+            String username = TextUtils.isEmpty(user.getName()) ? "No User Name Found" : user.getName();
+            userNameTextView.setText(username);
+
+            String email = TextUtils.isEmpty(user.getEmail()) ? "No Email Found" : user.getEmail();
+            userMailTextView.setText(email);
+
+            if (user.getAvatarURL() != null) {
+                Glide.with(this)
+                        .load(user.getAvatarURL())
+                        .apply(RequestOptions.circleCropTransform())
+                        .placeholder(avatarPlaceHolder)
+                        .into(userAvatarImageView);
+            }
+        });
     }
+
+    private void signOut() {
+        userManager.signOut(this).addOnCompleteListener(task -> finish());
+    }
+
+
 
 }

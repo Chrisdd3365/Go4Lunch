@@ -1,57 +1,39 @@
 package com.christophedurand.go4lunch.model;
 
 
-import java.io.Serializable;
-import java.util.Objects;
+import androidx.annotation.Nullable;
 
 
-public class User implements Serializable {
+public class User {
 
-   private String name;
-   private String emailAddress;
-   private String avatarURL;
-
-
-   public User(String name, String emailAddress, String avatarURL) {
-      this.name = name;
-      this.emailAddress = emailAddress;
-      this.avatarURL = avatarURL;
-   }
+    private final String uid;
+    private final String name;
+    private final String email;
+    @Nullable
+    private final String avatarURL;
 
 
-   public String getName() {
-      return name;
-   }
+    public User(String uid, String name, String email, @Nullable String avatarURL) {
+        this.uid = uid;
+        this.name = name;
+        this.email = email;
+        this.avatarURL = avatarURL;
+    }
 
-   public String getEmailAddress() {
-      return emailAddress;
-   }
+    public String getUid() {
+        return uid;
+    }
 
-   public String getAvatarURL() {
-      return avatarURL;
-   }
+    public String getName() {
+        return name;
+    }
 
+    public String getEmail() {
+        return email;
+    }
 
-   @Override
-   public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
-      User user = (User) o;
-      return Objects.equals(name, user.name) && Objects.equals(emailAddress, user.emailAddress) && Objects.equals(avatarURL, user.avatarURL);
-   }
-
-   @Override
-   public int hashCode() {
-      return Objects.hash(name, emailAddress, avatarURL);
-   }
-
-   @Override
-   public String toString() {
-      return "User{" +
-              "name='" + name + '\'' +
-              ", emailAddress='" + emailAddress + '\'' +
-              ", avatarURL='" + avatarURL + '\'' +
-              '}';
-   }
-
+    @Nullable
+    public String getAvatarURL() {
+        return avatarURL;
+    }
 }
