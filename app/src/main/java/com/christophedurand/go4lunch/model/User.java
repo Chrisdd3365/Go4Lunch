@@ -6,12 +6,16 @@ import androidx.annotation.Nullable;
 
 public class User {
 
-    private final String uid;
-    private final String name;
-    private final String email;
+    private String uid;
+    private String name;
+    private String email;
     @Nullable
-    private final String avatarURL;
+    private String avatarURL;
 
+
+    public User() {
+
+    }
 
     public User(String uid, String name, String email, @Nullable String avatarURL) {
         this.uid = uid;

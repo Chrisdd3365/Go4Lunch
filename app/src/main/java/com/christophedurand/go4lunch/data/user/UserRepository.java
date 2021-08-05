@@ -14,10 +14,10 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+
 public final class UserRepository {
 
     private static final String COLLECTION_NAME = "users";
-    private static final String USERNAME_FIELD = "username";
 
     private static volatile UserRepository instance;
 
@@ -51,6 +51,8 @@ public final class UserRepository {
         return AuthUI.getInstance().signOut(context);
     }
 
+    public Task<Void> deleteUser(Context context) { return AuthUI.getInstance().delete(context); }
+
 
     // Get the Collection Reference
     private CollectionReference getUsersCollection() {
@@ -60,7 +62,7 @@ public final class UserRepository {
     // Create User in Firestore
     public void createUser() {
         FirebaseUser user = getCurrentUser();
-        if (user != null){
+        if (user != null) {
             String uid = user.getUid();
             String name = user.getDisplayName();
             String email = user.getEmail();
@@ -69,9 +71,19 @@ public final class UserRepository {
             User userToCreate = new User(uid, name, email, avatarURL);
 
             Task<DocumentSnapshot> userData = getUserData();
-            userData.addOnSuccessListener(documentSnapshot -> {
-                getUsersCollection().document(uid).set(userToCreate);
-            });
+            if (userData != null) {
+                userData.addOnSuccessListener(documentSnapshot -> {
+                    getUsersCollection().document(uid).set(userToCreate);
+                });
+            }
+        }
+    }
+
+    // Delete the User from Firestore
+    public void deleteUserFromFirestore() {
+        String uid = getCurrentUserUID();
+        if (uid != null) {
+            this.getUsersCollection().document(uid).delete();
         }
     }
 
@@ -80,7 +92,7 @@ public final class UserRepository {
         String uid = getCurrentUserUID();
         if (uid != null) {
             return getUsersCollection().document(uid).get();
-        } else{
+        } else {
             return null;
         }
     }

@@ -3,9 +3,9 @@ package com.christophedurand.go4lunch.ui;
 import android.Manifest;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -25,7 +25,6 @@ import com.christophedurand.go4lunch.utils.Utils;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.auth.FirebaseUser;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -215,10 +214,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         Drawable avatarPlaceHolder = Utils.getAvatarPlaceHolder(this);
 
-        if (userManager.getCurrentUser() == null) {
-            userManager.createUser();
-        }
-
         userManager.getUserData().addOnSuccessListener(user -> {
             String username = TextUtils.isEmpty(user.getName()) ? "No User Name Found" : user.getName();
             userNameTextView.setText(username);
@@ -237,7 +232,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void signOut() {
-        userManager.signOut(this).addOnCompleteListener(task -> finish());
+        userManager.signOut(this).addOnCompleteListener(task -> {
+            startActivity(new Intent(HomeActivity.this, MainActivity.class));
+            finish();
+        });
     }
 
 
