@@ -1,10 +1,19 @@
 package com.christophedurand.go4lunch.ui.mapView;
 
 
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.utils.Utils;
 import com.google.android.gms.maps.GoogleMap;
@@ -28,9 +37,7 @@ public class RestaurantInfoAdapter implements GoogleMap.InfoWindowAdapter {
 
     @Override
     public View getInfoWindow(Marker marker) {
-        getRestaurantDetailsData(marker);
-
-        return restaurantInfoView;
+        return null;
     }
 
     @Override
@@ -43,9 +50,11 @@ public class RestaurantInfoAdapter implements GoogleMap.InfoWindowAdapter {
     private void getRestaurantDetailsData(Marker marker) {
 
         ImageView photoImageView = restaurantInfoView.findViewById(R.id.marker_info_window_restaurant_image_view);
-        //TODO: FIX ME GLIDE DOESN'T LOAD IMAGE (url is good)
-        // USE GOOGLE MAP SDK INFO ADAPTER MAP TARGET
-        Utils.loadGooglePhoto(restaurantInfoView.getContext(), photoImageView, markerMap.get(marker.getTag()).getPhotoReference());
+        String photoReference = markerMap.get(marker.getTag()).getPhotoReference();
+        String photoURL = Utils.buildGooglePhotoURL(photoReference);
+        Glide.with(restaurantInfoView)
+                .load(photoURL)
+                .into(photoImageView);
 
         TextView nameTextView = restaurantInfoView.findViewById(R.id.marker_info_window_name_text_view);
         String name = markerMap.get(marker.getTag()).getName();
@@ -56,5 +65,4 @@ public class RestaurantInfoAdapter implements GoogleMap.InfoWindowAdapter {
         descriptionTextView.setText(vicinity);
 
     }
-
 }

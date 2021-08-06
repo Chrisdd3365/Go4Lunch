@@ -22,6 +22,10 @@ public class Utils {
 
     public static final String PHOTO_URL = "https://maps.googleapis.com/maps/api/place/photo?photoreference=%s&key=%s&maxheight=10000";
 
+    public static String buildGooglePhotoURL(String photoReference) {
+        return  String.format(PHOTO_URL, photoReference, apiKey);
+    }
+
     public static void loadGooglePhoto(Context context, ImageView imageView, String photoReference) {
         //TODO: MOVE TO VM
         String url = String.format(PHOTO_URL, photoReference, apiKey);
@@ -56,7 +60,7 @@ public class Utils {
 //
 //                })
 //                .into(imageView);
-        Glide.with(context).load(url).into(imageView);
+        Glide.with(context).asBitmap().load(url).into(imageView);
     }
 
 //    public static void loadMarkerIcon(Context context, Marker marker, String iconUrl) {

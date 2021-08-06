@@ -56,7 +56,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     //private ActivityResultLauncher<Intent> activityResultLauncher;
 
-    private UserManager userManager = UserManager.getInstance();
+    private final UserManager userManager = UserManager.getInstance();
 
 
     @Override
@@ -112,8 +112,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         return true;
     }
@@ -189,6 +188,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private void configureDrawerLayout() {
         drawerLayout = findViewById(R.id.activity_home_parent_drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(R.color.colorWhite));
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
     }
@@ -237,7 +237,5 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             finish();
         });
     }
-
-
 
 }
