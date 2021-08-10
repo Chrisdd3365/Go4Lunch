@@ -1,6 +1,7 @@
 package com.christophedurand.go4lunch.ui.mapView;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -165,12 +166,10 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 )
         );
 
-        mMap.setOnInfoWindowClickListener(marker ->
-                RestaurantDetailsActivity.startActivity(
-                        requireActivity(),
-                        Objects.requireNonNull(
-                                markerMap.get(marker.getTag())).getPlaceId()
-                )
-        );
+        mMap.setOnInfoWindowClickListener(marker -> {
+            Intent intent = new Intent(requireActivity(), RestaurantDetailsActivity.class);
+            intent.putExtra("restaurantId", markerMap.get(marker.getTag()).getPlaceId());
+            startActivity(intent);
+        });
     }
 }

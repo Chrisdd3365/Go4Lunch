@@ -11,17 +11,19 @@ public class User {
     private String email;
     @Nullable
     private String avatarURL;
+    private boolean isNotified;
 
 
     public User() {
 
     }
 
-    public User(String uid, String name, String email, @Nullable String avatarURL) {
+    public User(String uid, String name, String email, @Nullable String avatarURL, boolean isNotified) {
         this.uid = uid;
         this.name = name;
         this.email = email;
         this.avatarURL = avatarURL;
+        this.isNotified = isNotified;
     }
 
     public String getUid() {
@@ -40,4 +42,9 @@ public class User {
     public String getAvatarURL() {
         return avatarURL;
     }
+
+    public boolean isNotified() {
+        return isNotified;
+    }
+
 }

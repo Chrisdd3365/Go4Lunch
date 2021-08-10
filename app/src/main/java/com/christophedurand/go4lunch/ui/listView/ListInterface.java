@@ -2,5 +2,5 @@ package com.christophedurand.go4lunch.ui.listView;
 
 
 public interface ListInterface {
-    void onClickItemList(String placeId);
+    void onClickItemList(String restaurantId);
 }

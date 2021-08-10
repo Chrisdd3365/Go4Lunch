@@ -13,11 +13,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 
 public final class UserRepository {
 
-    private static final String COLLECTION_NAME = "users";
+    private static final String COLLECTION_USERS = "users";
+    private static final String COLLECTION_FAVORITES_RESTAURANTS = "favoritesRestaurants";
 
     private static volatile UserRepository instance;
 
@@ -56,7 +58,15 @@ public final class UserRepository {
 
     // Get the Collection Reference
     private CollectionReference getUsersCollection() {
-        return FirebaseFirestore.getInstance().collection(COLLECTION_NAME);
+        return FirebaseFirestore.getInstance().collection(COLLECTION_USERS);
+    }
+
+    public Query getFavoritesRestaurantsListForUser(String userId) {
+        return getUsersCollection()
+                .document(userId)
+                .collection(COLLECTION_FAVORITES_RESTAURANTS)
+                .orderBy("dateCreated")
+                .limit(50);
     }
 
     // Create User in Firestore
@@ -68,7 +78,7 @@ public final class UserRepository {
             String email = user.getEmail();
             String avatarURL = (user.getPhotoUrl() != null) ? user.getPhotoUrl().toString() : null;
 
-            User userToCreate = new User(uid, name, email, avatarURL);
+            User userToCreate = new User(uid, name, email, avatarURL,true);
 
             Task<DocumentSnapshot> userData = getUserData();
             if (userData != null) {
@@ -83,7 +93,7 @@ public final class UserRepository {
     public void deleteUserFromFirestore() {
         String uid = getCurrentUserUID();
         if (uid != null) {
-            this.getUsersCollection().document(uid).delete();
+            getUsersCollection().document(uid).delete();
         }
     }
 

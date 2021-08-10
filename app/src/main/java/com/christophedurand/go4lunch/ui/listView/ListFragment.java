@@ -1,5 +1,6 @@
 package com.christophedurand.go4lunch.ui.listView;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -70,8 +71,10 @@ public class ListFragment extends Fragment implements ListInterface {
 
 
     @Override
-    public void onClickItemList(String placeId) {
-        RestaurantDetailsActivity.startActivity(requireActivity(), placeId);
+    public void onClickItemList(String restaurantId) {
+        Intent intent = new Intent(requireActivity(), RestaurantDetailsActivity.class);
+        intent.putExtra("restaurantId", restaurantId);
+        startActivity(intent);
     }
 
 

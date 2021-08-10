@@ -10,9 +10,35 @@
         android:id="@+id/restaurant_image_view"
         android:layout_width="match_parent"
         android:layout_height="200dp"
+        android:scaleType="fitXY"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/joining_card_view"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="-24dp"
+        android:layout_centerHorizontal="true"
+        android:innerRadius="0dp"
+        android:shape="ring"
+        android:thicknessRatio="1.9"
+        app:cardCornerRadius="40dp"
+        app:layout_constraintBottom_toBottomOf="@+id/restaurant_image_view"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/joining_image_view"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:background="@color/colorWhite"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_check_circle" />
+
+    </androidx.cardview.widget.CardView>
 
     <LinearLayout
         android:id="@+id/restaurant_description_linear_layout"
@@ -28,14 +54,24 @@
             android:id="@+id/restaurant_name_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:textSize="20sp"
+            android:textColor="@color/colorWhite"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/restaurant_address_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_marginEnd="16dp"
+            android:textSize="14sp"
+            android:textColor="@color/colorWhite"
+            android:textStyle="normal"/>
 
     </LinearLayout>
 
@@ -69,7 +105,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginTop="16dp"
-        android:background="@drawable/ic_star"
+        android:background="@drawable/ic_star_outline"
         android:backgroundTint="@color/colorOrange"
         app:layout_constraintEnd_toStartOf="@+id/website_image_button"
         app:layout_constraintStart_toEndOf="@+id/call_image_button"

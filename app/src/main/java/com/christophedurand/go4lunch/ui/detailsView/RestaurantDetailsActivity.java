@@ -1,7 +1,7 @@
 package com.christophedurand.go4lunch.ui.detailsView;
 
-import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -10,104 +10,121 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.Glide;
 import com.christophedurand.go4lunch.R;
+import com.christophedurand.go4lunch.model.UserManager;
+import com.christophedurand.go4lunch.utils.Utils;
+
+import java.util.ArrayList;
 
 
 public class RestaurantDetailsActivity extends AppCompatActivity {
 
-    public static final String RESTAURANT_ID = "RESTAURANT_ID";
-
-    private ImageView restaurantImageView;
-    private TextView restaurantNameTextView;
-    private TextView restaurantAddressTextView;
-    private ImageButton callImageButton;
-    private ImageButton likeImageButton;
-    private ImageButton websiteImageButton;
-
     private String restaurantId;
     private RestaurantDetailsViewModel restaurantDetailsViewModel;
+    private final UserManager userManager = UserManager.getInstance();
+    private ArrayList<String> favoriteRestaurantIds = new ArrayList<>();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_detailed_restaurant);
+
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            restaurantId = extras.getString(RESTAURANT_ID);
-
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_detailed_restaurant);
-
-            restaurantImageView = findViewById(R.id.restaurant_image_view);
-            restaurantNameTextView = findViewById(R.id.restaurant_name_text_view);
-            restaurantAddressTextView = findViewById(R.id.restaurant_address_text_view);
-            callImageButton = findViewById(R.id.call_image_button);
-            likeImageButton = findViewById(R.id.like_image_button);
-            websiteImageButton = findViewById(R.id.website_image_button);
-
-            configureViewModel();
-
-//            restaurantDetailsViewModel.getDetailsUiModelLiveData().observe(this, detailsUiModel -> {
-//
-//                String photoReference = detailsUiModel.getRestaurantDetails().photos.get(0).getPhotoReference();
-//                ImageUtils.loadGooglePhoto(this, restaurantImageView, photoReference);
-//
-//                String name = detailsUiModel.getRestaurantDetails().name;
-//                restaurantNameTextView.setText(name);
-//
-//                String formattedAddress = detailsUiModel.getRestaurantDetails().formattedAddress;
-//                restaurantAddressTextView.setText(formattedAddress);
-//
-//                //TODO: refactoring into VIEW MODEL
-//                if (detailsUiModel.getRestaurantDetails().internationalPhoneNumber != null) {
-//                    callImageButton.setOnClickListener(v -> {
-//                        Intent callIntent = new Intent(Intent.ACTION_CALL);
-//                        callIntent.setData(
-//                                Uri.parse(
-//                                        "tel:" + detailsUiModel.getRestaurantDetails().getInternationalPhoneNumber()
-//                                )
-//                        );
-//                        callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                        startActivity(callIntent);
-//                    });
-//                } else {
-//                    Toast.makeText(getApplicationContext(), "Numéro de téléphone indisponible", Toast.LENGTH_SHORT).show();
-//                }
-//
-//                //TODO: create live data to manage favorite
-//                likeImageButton.setOnClickListener(v -> {
-//                    //like restaurant
-//                });
-//
-//                //TODO: refactoring into VIEW MODEL
-//                if (detailsUiModel.getRestaurantDetails().website != null) {
-//                    websiteImageButton.setOnClickListener(v -> {
-//                        Uri websiteUri = Uri.parse(detailsUiModel.getRestaurantDetails().website);
-//                        Intent launchBrowser = new Intent(Intent.ACTION_VIEW, websiteUri);
-//                        startActivity(launchBrowser);
-//                    });
-//                } else {
-//                    Toast.makeText(getApplicationContext(), "Site internet indisponible", Toast.LENGTH_SHORT).show();
-//                }
-//
-//            });
+            restaurantId = extras.getString("restaurantId");
         }
+
+        configureViewModel();
+
+        restaurantDetailsViewModel.getDetailsViewStateLiveData().observe(this, detailsViewState -> {
+            String photoReference = detailsViewState.getRestaurantDetailsViewState().getPhotoURL();
+            configureRestaurantImage(photoReference);
+
+            String restaurantName = detailsViewState.getRestaurantDetailsViewState().getRestaurantName();
+            configureRestaurantName(restaurantName);
+
+            String restaurantAddress = detailsViewState.getRestaurantDetailsViewState().getRestaurantAddress();
+            configureRestaurantAddress(restaurantAddress);
+
+            String phoneNumber = detailsViewState.getRestaurantDetailsViewState().getPhoneNumber();
+            callButtonIsTapped(phoneNumber);
+
+            String websiteURL = detailsViewState.getRestaurantDetailsViewState().getWebsiteURL();
+            websiteButtonIsTapped(websiteURL);
+
+        });
+
+        likeButtonIsTapped();
+
     }
 
-    public static void startActivity(Activity activity, String restaurantId) {
-        activity.startActivity(
-                new Intent(
-                        activity,
-                        RestaurantDetailsActivity.class
-                ).putExtra(RESTAURANT_ID, restaurantId)
-        );
+    private void configureRestaurantImage(String photoReference) {
+        ImageView restaurantImageView = findViewById(R.id.restaurant_image_view);
+        Glide.with(this).load(Utils.buildGooglePhotoURL(photoReference)).into(restaurantImageView);
+    }
+
+    private void configureRestaurantName(String restaurantName) {
+        TextView restaurantNameTextView = findViewById(R.id.restaurant_name_text_view);
+        restaurantNameTextView.setText(restaurantName);
+    }
+
+    private void configureRestaurantAddress(String restaurantAddress) {
+        TextView restaurantAddressTextView = findViewById(R.id.restaurant_address_text_view);
+        restaurantAddressTextView.setText(restaurantAddress);
+    }
+
+    private ImageButton configureLikeButton() {
+        ImageButton likeButton = findViewById(R.id.like_image_button);
+        if (favoriteRestaurantIds.contains(restaurantId)) {
+            likeButton.setImageResource(R.drawable.ic_star_filled);
+        } else {
+            likeButton.setImageResource(R.drawable.ic_star_outline);
+        }
+        return likeButton;
+    }
+
+    private void callButtonIsTapped(String phoneNumber) {
+        ImageButton callButton = findViewById(R.id.call_image_button);
+        callButton.setOnClickListener(view -> {
+            Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
+            startActivity(intent);
+        });
+    }
+
+    private void likeButtonIsTapped() {
+        getFavoriteRestaurantIds();
+
+        configureLikeButton().setOnClickListener(view -> {
+            if (favoriteRestaurantIds.contains(restaurantId)) {
+                favoriteRestaurantIds.remove(restaurantId);
+            } else {
+                favoriteRestaurantIds.add(restaurantId);
+            }
+        });
+    }
+
+    private void getFavoriteRestaurantIds() {
+        userManager.getUserData().addOnSuccessListener(user -> {
+            userManager.getFavoritesRestaurantsListForUser(user.getUid());
+            favoriteRestaurantIds = user.getFavoriteRestaurantIdsList();
+        });
+    }
+
+    private void websiteButtonIsTapped(String websiteURL) {
+        ImageButton websiteButton = findViewById(R.id.website_image_button);
+        websiteButton.setOnClickListener(view -> {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(websiteURL));
+            startActivity(browserIntent);
+        });
     }
 
     private void configureViewModel() {
         RestaurantDetailsViewModelFactory restaurantDetailsViewModelFactory = new RestaurantDetailsViewModelFactory(restaurantId);
-        restaurantDetailsViewModel = new ViewModelProvider(
-                this,
-                restaurantDetailsViewModelFactory).get(RestaurantDetailsViewModel.class);
+        restaurantDetailsViewModel = new ViewModelProvider(this, restaurantDetailsViewModelFactory).get(RestaurantDetailsViewModel.class);
     }
 
 }

@@ -6,6 +6,7 @@ import android.content.Context;
 import com.christophedurand.go4lunch.data.user.UserRepository;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.Query;
 
 
 public class UserManager {
@@ -58,6 +59,10 @@ public class UserManager {
         return userRepository.deleteUser(context).addOnCompleteListener(task -> {
             userRepository.deleteUserFromFirestore();
         });
+    }
+
+    public Query getFavoritesRestaurantsListForUser(String userId) {
+        return userRepository.getFavoritesRestaurantsListForUser(userId);
     }
 
 }
