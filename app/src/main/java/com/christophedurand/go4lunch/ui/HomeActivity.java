@@ -201,9 +201,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void updateUIWithUserData(View headerView) {
-        if (userManager.isCurrentUserLogged()) {
-            setUserProfileUI(headerView);
-        }
+        setUserProfileUI(headerView);
     }
 
     private void setUserProfileUI(View headerView) {

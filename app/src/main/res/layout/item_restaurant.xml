@@ -109,7 +109,6 @@
         app:layout_constraintEnd_toStartOf="@id/restaurant_image_view"
         app:layout_constraintTop_toBottomOf="@id/workmates_image_view" />
 
-
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 

@@ -96,7 +96,6 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
     }
 
     private void likeButtonIsTapped() {
-        getFavoriteRestaurantIds();
 
         configureLikeButton().setOnClickListener(view -> {
             if (favoriteRestaurantIds.contains(restaurantId)) {
@@ -104,13 +103,6 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
             } else {
                 favoriteRestaurantIds.add(restaurantId);
             }
-        });
-    }
-
-    private void getFavoriteRestaurantIds() {
-        userManager.getUserData().addOnSuccessListener(user -> {
-            userManager.getFavoritesRestaurantsListForUser(user.getUid());
-            favoriteRestaurantIds = user.getFavoriteRestaurantIdsList();
         });
     }
 

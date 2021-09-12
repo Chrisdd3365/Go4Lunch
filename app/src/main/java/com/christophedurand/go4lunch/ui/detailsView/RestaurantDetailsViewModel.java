@@ -12,7 +12,6 @@ import androidx.lifecycle.MediatorLiveData;
 import com.christophedurand.go4lunch.data.details.DetailsRepository;
 import com.christophedurand.go4lunch.model.User;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
-import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 

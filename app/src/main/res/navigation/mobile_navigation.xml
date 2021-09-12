@@ -21,7 +21,7 @@
 
     <fragment
         android:id="@+id/navigation_workmates"
-        android:name="com.christophedurand.go4lunch.ui.workmates.NotificationsFragment"
+        android:name="com.christophedurand.go4lunch.ui.workmatesView.WorkmatesFragment"
         android:label="@string/workmates_view_title"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_workmates_list" />
 </navigation>
