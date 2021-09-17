@@ -30,12 +30,18 @@ public class MapViewModel extends AndroidViewModel {
         return mMapViewStateMediatorLiveData;
     }
 
+    private final String input;
+
 
     public MapViewModel(@NonNull Application application,
                         AutocompleteRepository autocompleteRepository,
                         NearbyRepository nearbyRepository,
-                        CurrentLocationRepository currentLocationRepository) {
+                        CurrentLocationRepository currentLocationRepository,
+                        String input) {
+
         super(application);
+
+        this.input = input;
 
         currentLocationRepository.initCurrentLocationUpdate();
 
@@ -52,7 +58,8 @@ public class MapViewModel extends AndroidViewModel {
                 );
 
         LiveData<AutocompleteResponse> autocompleteResponseLiveData =
-                autocompleteRepository.getAutocompleteResponseLiveData("input", apiKey);
+                autocompleteRepository.getAutocompleteResponseLiveData(input, apiKey);
+
 
         mMapViewStateMediatorLiveData.addSource(locationLiveData, location ->
                 combine(autocompleteResponseLiveData.getValue(), nearbyRestaurantsResponseLiveData.getValue(), location));
@@ -74,6 +81,8 @@ public class MapViewModel extends AndroidViewModel {
         }
 
         List<MapMarker> mapMarkersList = new ArrayList<>();
+
+
         for (int i=0; i<nearbyRestaurantsResponse.getResults().size(); i++) {
             String placeId = nearbyRestaurantsResponse.getResults().get(i).getPlaceId();
             String name = nearbyRestaurantsResponse.getResults().get(i).getName();
@@ -87,14 +96,14 @@ public class MapViewModel extends AndroidViewModel {
                 photoReference = null;
             }
 
-            mapMarkersList.add(new MapMarker(placeId, name, address, latLng, photoReference));
+            mapMarkersList.add(new MapMarker(placeId, name, address, latLng, photoReference, "ic_restaurant_red_marker"));
         }
 
         mMapViewStateMediatorLiveData.setValue(
                 new MapViewState(
                         location,
                         mapMarkersList,
-                        new AutocompleteRestaurantViewState()
+                        input
                 )
         );
     }

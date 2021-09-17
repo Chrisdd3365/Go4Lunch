@@ -1,5 +1,7 @@
 package com.christophedurand.go4lunch.ui.detailsView;
 
+import java.util.Objects;
+
 
 public class RestaurantDetailsViewState {
 
@@ -43,6 +45,32 @@ public class RestaurantDetailsViewState {
 
     public String getWebsiteURL() {
         return websiteURL;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RestaurantDetailsViewState that = (RestaurantDetailsViewState) o;
+        return Objects.equals(restaurantId, that.restaurantId) && Objects.equals(restaurantName, that.restaurantName) && Objects.equals(restaurantAddress, that.restaurantAddress) && Objects.equals(photoURL, that.photoURL) && Objects.equals(phoneNumber, that.phoneNumber) && Objects.equals(websiteURL, that.websiteURL);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(restaurantId, restaurantName, restaurantAddress, photoURL, phoneNumber, websiteURL);
+    }
+
+    @Override
+    public String toString() {
+        return "RestaurantDetailsViewState{" +
+                "restaurantId='" + restaurantId + '\'' +
+                ", restaurantName='" + restaurantName + '\'' +
+                ", restaurantAddress='" + restaurantAddress + '\'' +
+                ", photoURL='" + photoURL + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", websiteURL='" + websiteURL + '\'' +
+                '}';
     }
 
 }

@@ -1,19 +1,20 @@
 package com.christophedurand.go4lunch.ui.detailsView;
 
-
 import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 
 import com.christophedurand.go4lunch.data.details.DetailsRepository;
 import com.christophedurand.go4lunch.model.User;
+import com.christophedurand.go4lunch.model.UserManager;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
-
-import java.util.ArrayList;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.firestore.Query;
 
 
 public class RestaurantDetailsViewModel extends AndroidViewModel {
@@ -23,11 +24,16 @@ public class RestaurantDetailsViewModel extends AndroidViewModel {
         return detailsViewStateMediatorLiveData;
     }
 
+    private final LifecycleOwner owner;
+
 
     public RestaurantDetailsViewModel(@NonNull Application application,
                                       DetailsRepository detailsRepository,
-                                      String restaurantId) {
+                                      String restaurantId,
+                                      LifecycleOwner owner) {
         super(application);
+
+        this.owner = owner;
 
         LiveData<RestaurantDetailsResponse> restaurantDetailsResponseLiveData =
                 detailsRepository.getRestaurantDetailsMutableLiveData(restaurantId);
@@ -50,10 +56,21 @@ public class RestaurantDetailsViewModel extends AndroidViewModel {
                     response.getResult().getFormattedAddress(),
                     response.getResult().getPhotos().get(0).getPhotoReference(),
                     response.getResult().getInternationalPhoneNumber(),
-                    response.getResult().getWebsite());
+                    response.getResult().getWebsite()
+        );
 
-        ArrayList<User> workmatesList = new ArrayList<>();
+        FirestoreRecyclerOptions<User> workmatesList = createWorkmatesFilteredDataSource(response.getResult().getPlaceId());
         DetailsViewState detailsViewState = new DetailsViewState(restaurantDetailsViewState, workmatesList);
         detailsViewStateMediatorLiveData.setValue(detailsViewState);
     }
+
+    private FirestoreRecyclerOptions<User> createWorkmatesFilteredDataSource(String restaurantId) {
+        Query query = UserManager.getInstance().getUsersFilteredListBy(restaurantId);
+        return new FirestoreRecyclerOptions.Builder<User>().setQuery(query, User.class).setLifecycleOwner(owner).build();
+    }
+
+    public void onCleared() {
+        detailsViewStateMediatorLiveData.removeObservers(owner);
+    }
+
 }

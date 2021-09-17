@@ -7,10 +7,12 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.christophedurand.go4lunch.R;
+import com.christophedurand.go4lunch.model.Restaurant;
 import com.christophedurand.go4lunch.model.UserManager;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == AUTH_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                userManager.createCurrentUser("undefined", "undefined");
+                userManager.createCurrentUser(new Restaurant("", ""), new ArrayList<>());
                 startHomeActivity();
             }
         }

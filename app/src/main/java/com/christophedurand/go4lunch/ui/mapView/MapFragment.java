@@ -15,6 +15,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.christophedurand.go4lunch.R;
+import com.christophedurand.go4lunch.model.User;
+import com.christophedurand.go4lunch.model.UserManager;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.christophedurand.go4lunch.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,10 +27,11 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 
 public class MapFragment extends Fragment implements LocationListener, OnMapReadyCallback {
@@ -102,7 +105,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
 
     private void configureViewModel() {
-        MapViewModelFactory mMapViewModelFactory = MapViewModelFactory.getInstance();
+        MapViewModelFactory mMapViewModelFactory = MapViewModelFactory.getInstance("this");
         mMapViewModel = new ViewModelProvider(this, mMapViewModelFactory).get(MapViewModel.class);
     }
 
@@ -145,14 +148,26 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         if (mapViewState.getMapMarkersList() != null) {
             Map<Object, MapMarker> markerHashMap = new HashMap<>();
             for (MapMarker mapMarker : mapViewState.getMapMarkersList()) {
+                String restaurantId = mapMarker.getPlaceId();
                 LatLng restaurantLatLng = mapMarker.getLatLng();
-                Marker marker = mMap.addMarker(
-                        new MarkerOptions()
-                                .position(restaurantLatLng)
-                                .icon(Utils.bitmapDescriptorFromVector(getActivity(), R.drawable.ic_restaurant_red_marker))
-                );
-                marker.setTag(mapMarker.getPlaceId());
-                markerHashMap.put(marker.getTag(), mapMarker);
+
+                UserManager.getInstance().getAllUsers().get().addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<DocumentSnapshot> workmatesList = queryDocumentSnapshots.getDocuments();
+                    int numberOfWorkmates = 0;
+                    for (DocumentSnapshot workmate : workmatesList) {
+                        User user = workmate.toObject(User.class);
+                        if (user.getRestaurant().getId() != null && user.getRestaurant().getId().equals(restaurantId)) {
+                            numberOfWorkmates += 1;
+                        }
+                    }
+                    Marker marker = mMap.addMarker(
+                            new MarkerOptions()
+                                    .position(restaurantLatLng)
+                                    .icon(Utils.bitmapDescriptorFromVector(getActivity(), Utils.getResId(setMapMarkerIcon(numberOfWorkmates), R.drawable.class)))
+                    );
+                    marker.setTag(mapMarker.getPlaceId());
+                    markerHashMap.put(marker.getTag(), mapMarker);
+                });
             }
             setNearbyRestaurantInfoWindowAdapter(mMap, markerHashMap);
         }
@@ -172,4 +187,13 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
             startActivity(intent);
         });
     }
+
+    private String setMapMarkerIcon(int numberOfWorkmates) {
+        if (numberOfWorkmates == 0) {
+            return "ic_restaurant_red_marker";
+        } else {
+            return "ic_restaurant_green_marker";
+        }
+    }
+
 }

@@ -1,12 +1,14 @@
 package com.christophedurand.go4lunch.data.user;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 import com.christophedurand.go4lunch.model.Restaurant;
 import com.christophedurand.go4lunch.model.User;
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -14,13 +16,13 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.List;
 
 
 public final class UserRepository {
 
     private static final String COLLECTION_USERS = "users";
-    private static final String COLLECTION_FAVORITES_RESTAURANTS = "favoritesRestaurants";
 
     private static volatile UserRepository instance;
 
@@ -59,7 +61,7 @@ public final class UserRepository {
         return AuthUI.getInstance().signOut(context);
     }
 
-    public void createCurrentUser(String restaurantName, String restaurantId) {
+    public void createCurrentUser(Restaurant restaurant, List<String> favoriteRestaurantsIdsList) {
         FirebaseUser user = getCurrentUser();
         if (user != null) {
             String uid = user.getUid();
@@ -67,7 +69,7 @@ public final class UserRepository {
             String email = user.getEmail();
             String avatarURL = (user.getPhotoUrl() != null) ? user.getPhotoUrl().toString() : null;
 
-            User userToCreate = new User(uid, name, email, avatarURL, restaurantName, restaurantId);
+            User userToCreate = new User(uid, name, email, avatarURL, restaurant, favoriteRestaurantsIdsList);
 
             Task<DocumentSnapshot> userData = getCurrentUserData();
             if (userData != null) {
@@ -94,12 +96,20 @@ public final class UserRepository {
         }
     }
 
-    public Task<Void> createUser(String userId, String userName, String email, String avatarURL, String restaurantName, String restaurantId) {
-        final User userToCreate = new User(userId, userName, email, avatarURL, restaurantName, restaurantId);
-        return getUsersCollection().document(userId).set(userToCreate);
+    public void createUser(String userId, String userName, String email, String avatarURL, Restaurant restaurant, List<String> favoriteRestaurantsIdsList) {
+        final User userToCreate = new User(userId, userName, email, avatarURL, restaurant, favoriteRestaurantsIdsList);
+        Task<DocumentSnapshot> userData = getUserData(userId);
+        if (userData != null) {
+            userData.addOnSuccessListener(documentSnapshot -> {
+                getUsersCollection().document(userId).set(userToCreate);
+            })
+                    .addOnFailureListener(e -> {
+                        Log.d("Error", "Error writing document", e);
+                    });
+        }
     }
 
-    public Task<DocumentSnapshot> getUser(String userId) {
+    public Task<DocumentSnapshot> getUserData(String userId) {
         return getUsersCollection().document(userId).get();
     }
 
@@ -107,21 +117,33 @@ public final class UserRepository {
         return getUsersCollection().orderBy("name");
     }
 
-    public Task<Void> deleteUser(String userId)  {
-        return getUsersCollection().document(userId).delete();
+    public Query getUsersFilteredListBy(String restaurantId) {
+        return getUsersCollection().whereEqualTo("restaurant.id", restaurantId);
     }
 
-    public Task<QuerySnapshot> getFavoritesList(String userId) {
-        return getUsersCollection().document(userId).collection(COLLECTION_FAVORITES_RESTAURANTS).get();
+    public void deleteUser(String userId)  {
+        getUsersCollection().document(userId).delete();
     }
 
-    public Task<Void> addRestaurantToFavoritesList(String userId, String restaurantId) {
-        Restaurant favoriteRestaurant = new Restaurant(restaurantId);
-        return getUsersCollection().document(userId).collection(COLLECTION_FAVORITES_RESTAURANTS).document(restaurantId).set(favoriteRestaurant);
+    public void updateFavoriteRestaurantsIdsList(final String favoriteRestaurantId, final String userId) {
+        getUserData(userId).addOnSuccessListener(documentSnapshot -> {
+            User user = documentSnapshot.toObject(User.class);
+
+            if (user.getFavoriteRestaurantsIdsList().contains(favoriteRestaurantId)) {
+                user.getFavoriteRestaurantsIdsList().remove(favoriteRestaurantId);
+            } else {
+                user.getFavoriteRestaurantsIdsList().add(favoriteRestaurantId);
+            }
+
+            getUsersCollection().document(userId).update("favoriteRestaurantsIdsList", user.getFavoriteRestaurantsIdsList());
+        });
     }
 
-    public Task<Void> deleteRestaurantFromFavoritesList(String userId, String restaurantId) {
-        return getUsersCollection().document(userId).collection(COLLECTION_FAVORITES_RESTAURANTS).document(restaurantId).delete();
+    public void updateChosenRestaurant(final String chosenRestaurantId, final String chosenRestaurantName, final String userId) {
+        getUserData(userId).addOnSuccessListener(documentSnapshot -> {
+            getUsersCollection().document(userId).update("restaurant.id", chosenRestaurantId);
+            getUsersCollection().document(userId).update("restaurant.name", chosenRestaurantName);
+        });
     }
 
 }

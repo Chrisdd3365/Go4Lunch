@@ -13,13 +13,13 @@ public class MapViewState {
     @NonNull
     private final Location location;
     private final List<MapMarker> mapMarkersList;
-    private final AutocompleteRestaurantViewState autocompleteRestaurantViewState;
+    private final String input;
 
 
-    public MapViewState(@NonNull Location location, List<MapMarker> mapMarkersList, AutocompleteRestaurantViewState autocompleteRestaurantViewState) {
+    public MapViewState(@NonNull Location location, List<MapMarker> mapMarkersList, String input) {
         this.location = location;
         this.mapMarkersList = mapMarkersList;
-        this.autocompleteRestaurantViewState = autocompleteRestaurantViewState;
+        this.input = input;
     }
 
 
@@ -32,8 +32,8 @@ public class MapViewState {
         return mapMarkersList;
     }
 
-    public AutocompleteRestaurantViewState getAutocompleteRestaurantViewState() {
-        return autocompleteRestaurantViewState;
+    public String getInput() {
+        return input;
     }
 
 }

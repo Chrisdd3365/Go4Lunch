@@ -123,6 +123,7 @@ public class ListViewModel extends AndroidViewModel  {
                                 }
                         );
                     }
+
                     RestaurantViewState restaurantViewState = new RestaurantViewState(
                             restaurant.getVicinity(),
                             getDistanceFromLastKnownUserLocation(currentLocation, restaurant.getGeometry().getLocation()),

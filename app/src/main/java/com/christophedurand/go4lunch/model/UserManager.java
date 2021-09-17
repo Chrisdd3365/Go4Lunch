@@ -7,6 +7,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.Query;
 
+import java.util.List;
+
 
 public class UserManager {
 
@@ -41,11 +43,11 @@ public class UserManager {
         return userRepository.signOut(context);
     }
 
-    public void createCurrentUser(String restaurantName, String restaurantId) {
-        userRepository.createCurrentUser(restaurantName, restaurantId);
+    public void createCurrentUser(Restaurant restaurant, List<String> favoriteRestaurantsIdsList) {
+        userRepository.createCurrentUser(restaurant, favoriteRestaurantsIdsList);
     }
 
-    public Task<User> getUserData() {
+    public Task<User> getCurrentUserData() {
         // Get the user from Firestore and cast it to a User model Object
         return userRepository.getCurrentUserData().continueWith(task -> task.getResult().toObject(User.class));
     }
@@ -56,32 +58,32 @@ public class UserManager {
         });
     }
 
-    public void createUser(String userId, String userName, String email, String avatarURL, String restaurantName, String restaurantId) {
-        userRepository.createUser(userId, userName, email, avatarURL, restaurantName, restaurantId);
+    public void createUser(String userId, String userName, String email, String avatarURL, Restaurant restaurant, List<String> favoriteRestaurantsIdsList) {
+        userRepository.createUser(userId, userName, email, avatarURL, restaurant, favoriteRestaurantsIdsList);
     }
 
     public void getUser(String userId) {
-        userRepository.getUser(userId);
+        userRepository.getUserData(userId);
     }
 
     public Query getAllUsers() {
         return userRepository.getAllUsers();
     }
 
+    public Query getUsersFilteredListBy(String restaurantId) {
+        return userRepository.getUsersFilteredListBy(restaurantId);
+    }
+
     public void deleteUser(String userId) {
         userRepository.deleteUser(userId);
     }
 
-    public void getFavoritesList(String userId) {
-        userRepository.getFavoritesList(userId);
+    public void updateFavoriteRestaurantsIdsList(final String favoriteRestaurantId, final String userId) {
+        userRepository.updateFavoriteRestaurantsIdsList(favoriteRestaurantId, userId);
     }
 
-    public void addRestaurantToFavoritesList(String userId, String restaurantId) {
-        userRepository.addRestaurantToFavoritesList(userId, restaurantId);
-    }
-
-    public void deleteRestaurantFromFavoritesList(String userId, String restaurantId) {
-        userRepository.deleteRestaurantFromFavoritesList(userId, restaurantId);
+    public void updateChosenRestaurant(final String chosenRestaurantId, final String chosenRestaurantName, final String userId) {
+        userRepository.updateChosenRestaurant(chosenRestaurantId, chosenRestaurantName, userId);
     }
 
 }

@@ -9,7 +9,7 @@ import java.util.Objects;
 public class AutocompleteResponse {
 
     @SerializedName("predictions")
-    private List<Prediction> predictions = null;
+    private List<Prediction> predictions;
     @SerializedName("status")
     private String status;
 

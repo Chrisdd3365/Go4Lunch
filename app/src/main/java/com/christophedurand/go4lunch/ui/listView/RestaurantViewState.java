@@ -1,6 +1,5 @@
 package com.christophedurand.go4lunch.ui.listView;
 
-
 import java.util.Objects;
 
 
@@ -24,6 +23,7 @@ public class RestaurantViewState {
         this.photoURL = photoURL;
         this.openingHours = openingHours;
     }
+
 
     public String getAddress() {
         return address;
@@ -59,20 +59,13 @@ public class RestaurantViewState {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RestaurantViewState that = (RestaurantViewState) o;
-        return Double.compare(that.rating, rating) == 0 &&
-                Objects.equals(address, that.address) &&
-                Objects.equals(distance, that.distance) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(placeId, that.placeId) &&
-                Objects.equals(photoURL, that.photoURL) &&
-                Objects.equals(openingHours, that.openingHours);
+        return Double.compare(that.rating, rating) == 0 && Objects.equals(address, that.address) && Objects.equals(distance, that.distance) && Objects.equals(name, that.name) && Objects.equals(placeId, that.placeId) && Objects.equals(photoURL, that.photoURL) && Objects.equals(openingHours, that.openingHours);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(address, distance, name, placeId, rating, photoURL, openingHours);
     }
-
 
     @Override
     public String toString() {

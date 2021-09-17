@@ -212,7 +212,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         Drawable avatarPlaceHolder = Utils.getAvatarPlaceHolder(this);
 
-        userManager.getUserData().addOnSuccessListener(user -> {
+        userManager.getCurrentUserData().addOnSuccessListener(user -> {
             String username = TextUtils.isEmpty(user.getName()) ? "No User Name Found" : user.getName();
             userNameTextView.setText(username);
 

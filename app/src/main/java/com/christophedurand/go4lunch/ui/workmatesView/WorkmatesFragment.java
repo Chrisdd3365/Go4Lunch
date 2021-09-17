@@ -23,6 +23,8 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
 
     private RecyclerView workmatesRecyclerView;
 
+    private WorkmatesRecyclerViewAdapter workmatesRecyclerViewAdapter;
+
     private WorkmatesViewModel workmatesViewModel;
 
 
@@ -44,7 +46,7 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
 
         workmatesRecyclerView = view.findViewById(R.id.workmates_list_recycler_view);
 
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(view.getContext());
         workmatesRecyclerView.setLayoutManager(layoutManager);
         workmatesRecyclerView.setItemAnimator(new DefaultItemAnimator());
         workmatesRecyclerView.setClickable(true);
@@ -61,10 +63,32 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
     @Override
     public void onResume() {
         super.onResume();
-
-        subscribe();
+        if (workmatesRecyclerViewAdapter != null) {
+            workmatesRecyclerViewAdapter.startListening();
+        }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        workmatesRecyclerViewAdapter.stopListening();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        workmatesViewModel.onCleared();
+    }
 
     @Override
     public void onClickItemList(String restaurantId) {
@@ -80,8 +104,9 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
     }
 
     private void subscribe() {
-        workmatesViewModel.getWorkmatesViewStateMutableLiveData().observe(getViewLifecycleOwner(), workmatesViewState -> {
-            WorkmatesRecyclerViewAdapter workmatesRecyclerViewAdapter = new WorkmatesRecyclerViewAdapter(requireContext(), this, workmatesViewState.getWorkmatesList());
+        workmatesViewModel.getWorkmatesViewStateMediatorLiveData().observe(getViewLifecycleOwner(), workmatesViewState -> {
+            workmatesRecyclerViewAdapter = new WorkmatesRecyclerViewAdapter(this, workmatesViewState.getWorkmatesList());
+            workmatesRecyclerViewAdapter.startListening();
             workmatesRecyclerView.setAdapter(workmatesRecyclerViewAdapter);
         });
     }

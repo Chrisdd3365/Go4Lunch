@@ -9,17 +9,23 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.christophedurand.go4lunch.R;
+import com.christophedurand.go4lunch.model.User;
+import com.christophedurand.go4lunch.model.UserManager;
 import com.christophedurand.go4lunch.utils.Utils;
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import java.util.List;
 
 
 class RestaurantViewHolder extends RecyclerView.ViewHolder {
 
-    public final ImageView mRestaurantImageView;
-    public final TextView mRestaurantNameTextView;
-    public final TextView mRestaurantAddressTextView;
-    public final TextView mRestaurantIsOpenTextView;
-    public final TextView mRestaurantDistanceTextView;
-    public final RatingBar mRestaurantRatingBar;
+    private final ImageView mRestaurantImageView;
+    private final TextView mRestaurantNameTextView;
+    private final TextView mRestaurantAddressTextView;
+    private final TextView mRestaurantIsOpenTextView;
+    private final TextView mRestaurantDistanceTextView;
+    private final TextView mRestaurantWorkmatesTextView;
+    private final RatingBar mRestaurantRatingBar;
 
 
     public RestaurantViewHolder(View view) {
@@ -30,8 +36,8 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
         mRestaurantAddressTextView = view.findViewById(R.id.restaurant_address);
         mRestaurantIsOpenTextView = view.findViewById(R.id.restaurant_opening_hours_text_view);
         mRestaurantDistanceTextView = view.findViewById(R.id.restaurant_distance_text_view);
+        mRestaurantWorkmatesTextView = view.findViewById(R.id.workmates_text_view);
         mRestaurantRatingBar = view.findViewById(R.id.restaurant_rating_bar);
-
     }
 
 
@@ -54,6 +60,18 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
 
         double rating = restaurantViewState.getRating();
         mRestaurantRatingBar.setRating((float) rating);
+
+        UserManager.getInstance().getAllUsers().get().addOnSuccessListener(queryDocumentSnapshots -> {
+            List<DocumentSnapshot> workmatesList = queryDocumentSnapshots.getDocuments();
+            int numberOfWorkmates = 0;
+            for (DocumentSnapshot workmate : workmatesList) {
+                User user = workmate.toObject(User.class);
+                if (user.getRestaurant().getId() != null && user.getRestaurant().getId().equals(restaurantViewState.getPlaceId())) {
+                    numberOfWorkmates += 1;
+                    mRestaurantWorkmatesTextView.setText("(" + numberOfWorkmates + ")");
+                }
+            }
+        });
 
         itemView.setOnClickListener(v -> {
             listener.onClickItemList(restaurantViewState.getPlaceId());

@@ -2,6 +2,8 @@ package com.christophedurand.go4lunch.model;
 
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -13,18 +15,17 @@ public class User {
     @Nullable
     private String avatarURL = "";
     @Nullable
-    private String restaurantName = "";
-    @Nullable
-    private String restaurantId = "";
+    private Restaurant restaurant = new Restaurant("", "");
+    private List<String> favoriteRestaurantsIdsList = new ArrayList<>();
 
 
-    public User(String uid, String name, String email, @Nullable String avatarURL, @Nullable String restaurantName, @Nullable String restaurantId) {
+    public User(String uid, String name, String email, @Nullable String avatarURL, @Nullable Restaurant restaurant, List<String> favoriteRestaurantsIdsList) {
         this.uid = uid;
         this.name = name;
         this.email = email;
         this.avatarURL = avatarURL;
-        this.restaurantName = restaurantName;
-        this.restaurantId = restaurantId;
+        this.restaurant = restaurant;
+        this.favoriteRestaurantsIdsList = favoriteRestaurantsIdsList;
     }
 
     public User() { }
@@ -48,13 +49,12 @@ public class User {
     }
 
     @Nullable
-    public String getRestaurantName() {
-        return restaurantName;
+    public Restaurant getRestaurant() {
+        return restaurant;
     }
 
-    @Nullable
-    public String getRestaurantId() {
-        return restaurantId;
+    public List<String> getFavoriteRestaurantsIdsList() {
+        return favoriteRestaurantsIdsList;
     }
 
 
@@ -63,12 +63,12 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(uid, user.uid) && Objects.equals(name, user.name) && Objects.equals(email, user.email) && Objects.equals(avatarURL, user.avatarURL) && Objects.equals(restaurantName, user.restaurantName) && Objects.equals(restaurantId, user.restaurantId);
+        return Objects.equals(uid, user.uid) && Objects.equals(name, user.name) && Objects.equals(email, user.email) && Objects.equals(avatarURL, user.avatarURL) && Objects.equals(restaurant, user.restaurant) && Objects.equals(favoriteRestaurantsIdsList, user.favoriteRestaurantsIdsList);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uid, name, email, avatarURL, restaurantName, restaurantId);
+        return Objects.hash(uid, name, email, avatarURL, restaurant, favoriteRestaurantsIdsList);
     }
 
     @Override
@@ -78,8 +78,8 @@ public class User {
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", avatarURL='" + avatarURL + '\'' +
-                ", userRestaurantName='" + restaurantName + '\'' +
-                ", userRestaurantId='" + restaurantId + '\'' +
+                ", restaurant=" + restaurant +
+                ", favoriteRestaurantsIdsList=" + favoriteRestaurantsIdsList +
                 '}';
     }
 

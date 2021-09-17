@@ -19,6 +19,7 @@ public class AutocompleteRepository {
     private static GooglePlacesAPIService mGooglePlacesAPIService = null;
     private static AutocompleteRepository sAutocompleteRepository;
 
+
     public static AutocompleteRepository getInstance() {
         if (sAutocompleteRepository == null) {
             sAutocompleteRepository = new AutocompleteRepository();
@@ -26,11 +27,13 @@ public class AutocompleteRepository {
         return sAutocompleteRepository;
     }
 
+
     private AutocompleteRepository() {
         mGooglePlacesAPIService = RetrofitService.getInstance().getGooglePlacesAPIService();
     }
 
-public LiveData<AutocompleteResponse> getAutocompleteResponseLiveData(String input, String apiKey) {
+
+    public LiveData<AutocompleteResponse> getAutocompleteResponseLiveData(String input, String apiKey) {
         final MutableLiveData<AutocompleteResponse> autocompleteResponseMutableLiveData = new MutableLiveData<>();
         Call<AutocompleteResponse> nearbyRestaurantsList = mGooglePlacesAPIService.getAutocompleteResult(input, apiKey);
         nearbyRestaurantsList.enqueue(new Callback<AutocompleteResponse>() {

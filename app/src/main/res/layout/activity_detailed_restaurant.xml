@@ -3,6 +3,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -29,14 +30,13 @@
         app:layout_constraintBottom_toBottomOf="@+id/restaurant_image_view"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageView
-            android:id="@+id/joining_image_view"
+        <ImageButton
+            android:id="@+id/joining_image_button"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="center"
             android:background="@color/colorWhite"
-            android:scaleType="fitXY"
-            android:src="@drawable/ic_check_circle" />
+            android:scaleType="fitXY"/>
 
     </androidx.cardview.widget.CardView>
 
@@ -105,8 +105,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginTop="16dp"
-        android:background="@drawable/ic_star_outline"
-        android:backgroundTint="@color/colorOrange"
+        android:background="@null"
         app:layout_constraintEnd_toStartOf="@+id/website_image_button"
         app:layout_constraintStart_toEndOf="@+id/call_image_button"
         app:layout_constraintTop_toBottomOf="@+id/restaurant_description_linear_layout" />
@@ -150,11 +149,26 @@
         app:layout_constraintStart_toStartOf="@+id/website_image_button"
         app:layout_constraintTop_toBottomOf="@+id/website_image_button" />
 
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="48dp"
+        android:alpha="0.21"
+        android:background="@color/colorGrey"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/like_image_button"
+        android:orientation="horizontal" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/workmates_list_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        app:layout_constraintTop_toBottomOf="@+id/favorite_text_view" />
+        app:layout_constraintTop_toBottomOf="@+id/favorite_text_view"
+        app:layoutManager="LinearLayoutManager"
+        tools:listitem="@layout/item_workmate"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

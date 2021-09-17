@@ -17,6 +17,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 
+import java.lang.reflect.Field;
+
 
 public class Utils {
 
@@ -93,6 +95,16 @@ public class Utils {
         Drawable avatarPlaceHolder = ContextCompat.getDrawable(context, R.drawable.ic_account_circle).mutate();
         avatarPlaceHolder.setColorFilter(ContextCompat.getColor(context, R.color.colorAvatarPlaceholder), PorterDuff.Mode.SRC_IN);
         return avatarPlaceHolder;
+    }
+
+    public static int getResId(String resName, Class<?> c) {
+        try {
+            Field idField = c.getDeclaredField(resName);
+            return idField.getInt(idField);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
 }

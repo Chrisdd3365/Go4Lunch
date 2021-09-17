@@ -1,7 +1,6 @@
 package com.christophedurand.go4lunch.ui.workmatesView;
 
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,18 +16,12 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
 public class WorkmatesRecyclerViewAdapter extends FirestoreRecyclerAdapter<User, WorkmateViewHolder> {
 
-    private final Context context;
     private final ListInterface listener;
 
 
-    /**
-     * Create a new RecyclerView adapter that listens to a Firestore Query.
-     * @param options options
-     */
-    public WorkmatesRecyclerViewAdapter(Context context, ListInterface listener, @NonNull FirestoreRecyclerOptions<User> options) {
+    public WorkmatesRecyclerViewAdapter(ListInterface listener, @NonNull FirestoreRecyclerOptions<User> options) {
         super(options);
 
-        this.context = context;
         this.listener = listener;
     }
 
@@ -43,6 +36,11 @@ public class WorkmatesRecyclerViewAdapter extends FirestoreRecyclerAdapter<User,
     @Override
     protected void onBindViewHolder(@NonNull WorkmateViewHolder workmateViewHolder, int i, @NonNull User user) {
         workmateViewHolder.bind(user, listener);
+    }
+
+    @Override
+    public int getItemCount() {
+        return super.getItemCount();
     }
 
 }

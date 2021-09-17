@@ -4,6 +4,7 @@ package com.christophedurand.go4lunch.ui.mapView;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -21,20 +22,22 @@ public class MapViewModelFactory implements ViewModelProvider.Factory {
     private final AutocompleteRepository mAutocompleteRepository;
     private final NearbyRepository mNearbyRepository;
     private final CurrentLocationRepository currentLocationRepository;
+    private final String input;
 
 
-    public static MapViewModelFactory getInstance() {
+    public static MapViewModelFactory getInstance(String input) {
         if (sInstance == null) {
-            sInstance = new MapViewModelFactory();
+            sInstance = new MapViewModelFactory(input);
         }
         return sInstance;
     }
 
-    private MapViewModelFactory() {
+    private MapViewModelFactory(String input) {
         this.application = MainApplication.getApplication();
         this.mAutocompleteRepository = AutocompleteRepository.getInstance();
         this.mNearbyRepository = NearbyRepository.getInstance();
         this.currentLocationRepository = new CurrentLocationRepository(LocationServices.getFusedLocationProviderClient(application));
+        this.input = input;
     }
 
 
@@ -42,7 +45,7 @@ public class MapViewModelFactory implements ViewModelProvider.Factory {
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(MapViewModel.class)) {
-            return (T) new MapViewModel(application, mAutocompleteRepository, mNearbyRepository, currentLocationRepository);
+            return (T) new MapViewModel(application, mAutocompleteRepository, mNearbyRepository, currentLocationRepository, input);
         }
 
         throw new IllegalArgumentException("Unknown ViewModel class $modelClass");
