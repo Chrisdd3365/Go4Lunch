@@ -132,7 +132,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 // Construct a CameraPosition focusing on the view and animate the camera to that position.
                 CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(currentLocation)    // Sets the center of the map to current RestaurantLocation
-                        .zoom(17)                   // Sets the zoom
+                        .zoom(15)                   // Sets the zoom
                         .bearing(90)                // Sets the orientation of the camera to east
                         .tilt(0)                    // Sets the tilt of the camera to 0 degree
                         .build();                   // Creates a CameraPosition from the builder

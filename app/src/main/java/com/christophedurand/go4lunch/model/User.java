@@ -15,7 +15,7 @@ public class User {
     @Nullable
     private String avatarURL = "";
     @Nullable
-    private Restaurant restaurant = new Restaurant("", "");
+    private Restaurant restaurant = new Restaurant("", "", "");
     private List<String> favoriteRestaurantsIdsList = new ArrayList<>();
 
 

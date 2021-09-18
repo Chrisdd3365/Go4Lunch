@@ -62,6 +62,15 @@
         app:itemIconTint="@android:color/white"
         app:itemTextColor="@android:color/white"
         app:headerLayout="@layout/home_nav_header"
-        app:menu="@menu/home_menu_drawer" />
+        app:menu="@menu/home_menu_drawer" >
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:layout_gravity="bottom"
+            android:scaleType="fitCenter"
+            android:src="@drawable/bowl" />
+
+    </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>

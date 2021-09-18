@@ -24,6 +24,10 @@
         android:theme="@style/AppTheme.NoActionBar">
 
         <activity
+            android:name=".ui.SettingsActivity">
+        </activity>
+
+        <activity
             android:name=".ui.detailsView.RestaurantDetailsActivity">
         </activity>
 

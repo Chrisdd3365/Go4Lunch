@@ -1,6 +1,7 @@
 package com.christophedurand.go4lunch.ui;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +21,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.model.UserManager;
+import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.christophedurand.go4lunch.ui.mapView.MapFragment;
 import com.christophedurand.go4lunch.utils.Utils;
 import com.google.android.libraries.places.api.Places;
@@ -51,10 +53,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     public static final String apiKey = "AIzaSyD6FndQ_yMQLDPOYVzaeLt1rIuJ72Ntg_M";
 
+    private View headerView;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
 
-    //private ActivityResultLauncher<Intent> activityResultLauncher;
+    private String restaurantId;
 
     private final UserManager userManager = UserManager.getInstance();
 
@@ -75,21 +78,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         Places.initialize(getApplication(), apiKey);
 
-//        activityResultLauncher = registerForActivityResult(
-//                new ActivityResultContracts.StartActivityForResult(), result -> {
-//
-//                    if (result.getResultCode() == RESULT_OK) {
-//                        Place place = Autocomplete.getPlaceFromIntent(result.getData());
-//
-//                    } else if (result.getResultCode() == AutocompleteActivity.RESULT_ERROR) {
-//                        Status status = Autocomplete.getStatusFromIntent(result.getData());
-//
-//                    } else if (result.getResultCode() == RESULT_CANCELED) {
-//                        // The user canceled the operation
-//                    }
-//
-//                });
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        setUserProfileUI(headerView);
     }
 
 
@@ -117,14 +112,18 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+
         int id = item.getItemId();
 
         switch (id) {
             case R.id.nav_lunch:
+                showMyLunch();
                 break;
             case R.id.nav_settings:
+                showSettingsActivity();
                 break;
             case R.id.nav_logout:
                 signOut();
@@ -196,16 +195,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private void configureNavigationView() {
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        View headerView = navigationView.getHeaderView(0);
-        updateUIWithUserData(headerView);
-    }
-
-    private void updateUIWithUserData(View headerView) {
+        headerView = navigationView.getHeaderView(0);
         setUserProfileUI(headerView);
     }
 
     private void setUserProfileUI(View headerView) {
-
         TextView userNameTextView = headerView.findViewById(R.id.user_name_text_view);
         TextView userMailTextView = headerView.findViewById(R.id.user_mail_text_view);
         ImageView userAvatarImageView = headerView.findViewById(R.id.user_avatar_image_view);
@@ -226,7 +220,24 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                         .placeholder(avatarPlaceHolder)
                         .into(userAvatarImageView);
             }
+
+            restaurantId = user.getRestaurant().getId();
         });
+    }
+
+    private void showMyLunch() {
+        if (restaurantId != null) {
+            Intent intent = new Intent(this, RestaurantDetailsActivity.class);
+            intent.putExtra("restaurantId", restaurantId);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "Veuillez choisir votre restaurant !", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showSettingsActivity() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     private void signOut() {

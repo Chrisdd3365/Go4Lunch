@@ -90,15 +90,15 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
     @Override
     public void onClickItemList(String restaurantId) { }
 
-    private void joiningButtonIsTapped(String chosenRestaurantName) {
+    private void joiningButtonIsTapped(String chosenRestaurantName, String chosenRestaurantAddress) {
         joiningImageButton.setOnClickListener(view -> {
             UserManager.getInstance().getCurrentUserData().addOnSuccessListener(currentUser -> {
                 if ((currentUser.getRestaurant() != null && currentUser.getRestaurant().getId() != null)
                         && currentUser.getRestaurant().getId().contains(restaurantId)) {
-                    UserManager.getInstance().updateChosenRestaurant("", "", currentUser.getUid());
+                    UserManager.getInstance().updateChosenRestaurant("", "", "", currentUser.getUid());
                     joiningImageButton.setImageResource(R.drawable.ic_check_circle_red);
                 } else {
-                    UserManager.getInstance().updateChosenRestaurant(restaurantId, chosenRestaurantName, currentUser.getUid());
+                    UserManager.getInstance().updateChosenRestaurant(restaurantId, chosenRestaurantName, chosenRestaurantAddress, currentUser.getUid());
                     joiningImageButton.setImageResource(R.drawable.ic_check_circle_green);
                 }
             });
@@ -171,7 +171,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
             workmatesRecyclerViewAdapter = new WorkmatesRecyclerViewAdapter(this, detailsViewState.getWorkmatesList());
             workmatesRecyclerView.setAdapter(workmatesRecyclerViewAdapter);
 
-            joiningButtonIsTapped(restaurantName);
+            joiningButtonIsTapped(restaurantName, restaurantAddress);
         });
     }
 

@@ -14,6 +14,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.ui.MainActivity;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -42,28 +43,39 @@ public class NotificationsService extends FirebaseMessagingService {
         // Create a Channel (Android 8)
         String channelId = "channelId";
 
-        // Build a Notification object
-        NotificationCompat.Builder notificationBuilder =
-                new NotificationCompat.Builder(this, channelId)
-                        .setSmallIcon(R.drawable.ic_restaurant)
-                        .setContentTitle(notification.getTitle())
-                        .setContentText(notification.getBody())
-                        .setAutoCancel(true)
-                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                        .setContentIntent(pendingIntent);
+        UserManager.getInstance().getCurrentUserData().addOnSuccessListener(currentUser -> {
 
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            UserManager.getInstance().getAllUsers().whereEqualTo("restaurant.id", currentUser.getRestaurant().getId()).get().addOnSuccessListener(queryDocumentSnapshots -> {
 
-        // Support Version >= Android 8
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence channelName = "Go4Lunch Messages";
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel mChannel = new NotificationChannel(channelId, channelName, importance);
-            notificationManager.createNotificationChannel(mChannel);
-        }
+                StringBuilder workmatesList = new StringBuilder();
+                for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()){
+                    workmatesList.append(document.get("name"));
+                    workmatesList.append(" ");
+                }
+                // Build a Notification object
+                NotificationCompat.Builder notificationBuilder =
+                        new NotificationCompat.Builder(this, channelId)
+                                .setSmallIcon(R.drawable.ic_restaurant_menu)
+                                .setContentTitle(notification.getTitle())
+                                .setContentText(notification.getBody() + "at " + currentUser.getRestaurant().getName() + ", " + currentUser.getRestaurant().getAddress() + " with " + workmatesList)
+                                .setAutoCancel(true)
+                                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                                .setContentIntent(pendingIntent);
 
-        // Show notification
-        notificationManager.notify(NOTIFICATION_TAG, NOTIFICATION_ID, notificationBuilder.build());
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+                // Support Version >= Android 8
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    CharSequence channelName = "Go4Lunch Messages";
+                    int importance = NotificationManager.IMPORTANCE_HIGH;
+                    NotificationChannel mChannel = new NotificationChannel(channelId, channelName, importance);
+                    notificationManager.createNotificationChannel(mChannel);
+                }
+
+                // Show notification
+                notificationManager.notify(NOTIFICATION_TAG, NOTIFICATION_ID, notificationBuilder.build());
+            });
+        });
     }
 
 }

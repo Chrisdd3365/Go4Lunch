@@ -139,10 +139,11 @@ public final class UserRepository {
         });
     }
 
-    public void updateChosenRestaurant(final String chosenRestaurantId, final String chosenRestaurantName, final String userId) {
+    public void updateChosenRestaurant(final String chosenRestaurantId, final String chosenRestaurantName, final String chosenRestaurantAddress, final String userId) {
         getUserData(userId).addOnSuccessListener(documentSnapshot -> {
             getUsersCollection().document(userId).update("restaurant.id", chosenRestaurantId);
             getUsersCollection().document(userId).update("restaurant.name", chosenRestaurantName);
+            getUsersCollection().document(userId).update("restaurant.address", chosenRestaurantAddress);
         });
     }
 

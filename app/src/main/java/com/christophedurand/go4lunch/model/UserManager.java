@@ -82,8 +82,8 @@ public class UserManager {
         userRepository.updateFavoriteRestaurantsIdsList(favoriteRestaurantId, userId);
     }
 
-    public void updateChosenRestaurant(final String chosenRestaurantId, final String chosenRestaurantName, final String userId) {
-        userRepository.updateChosenRestaurant(chosenRestaurantId, chosenRestaurantName, userId);
+    public void updateChosenRestaurant(final String chosenRestaurantId, final String chosenRestaurantName, final String chosenRestaurantAddress, final String userId) {
+        userRepository.updateChosenRestaurant(chosenRestaurantId, chosenRestaurantName, chosenRestaurantAddress, userId);
     }
 
 }
