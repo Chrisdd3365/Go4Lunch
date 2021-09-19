@@ -10,8 +10,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 
 import com.christophedurand.go4lunch.data.details.DetailsRepository;
-import com.christophedurand.go4lunch.model.User;
-import com.christophedurand.go4lunch.model.UserManager;
+import com.christophedurand.go4lunch.ui.workmatesView.User;
+import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.Query;

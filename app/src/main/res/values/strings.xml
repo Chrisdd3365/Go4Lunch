@@ -9,6 +9,7 @@
     // UI
     <string name="description_text">Find a nice restaurant and invite your co-workers for lunch!</string>
     <string name="hungry_title">I\'m Hungry!</string>
+    <string name="workmates_title">Available workmates</string>
 
     // TAB ITEMS TITLE
     <string name="map_view_title">Map View</string>

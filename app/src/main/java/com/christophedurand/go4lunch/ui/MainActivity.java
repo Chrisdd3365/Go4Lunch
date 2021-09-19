@@ -7,8 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.model.Restaurant;
-import com.christophedurand.go4lunch.model.UserManager;
+import com.christophedurand.go4lunch.ui.workmatesView.Restaurant;
+import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseUser;
 

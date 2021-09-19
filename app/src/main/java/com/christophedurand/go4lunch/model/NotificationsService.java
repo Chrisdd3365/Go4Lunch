@@ -14,6 +14,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.ui.MainActivity;
+import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;

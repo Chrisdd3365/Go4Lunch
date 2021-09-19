@@ -13,7 +13,7 @@
         android:title="@string/list_view_title" />
 
     <item
-        android:id="@+id/navigation_workmates"
+        android:id="@+id/navigation_workmates_view"
         android:icon="@drawable/ic_workmates"
         android:title="@string/workmates_view_title" />
 

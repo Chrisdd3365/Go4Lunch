@@ -1,22 +1,29 @@
 package com.christophedurand.go4lunch.ui.mapView;
 
 import android.Manifest;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.model.User;
-import com.christophedurand.go4lunch.model.UserManager;
+import com.christophedurand.go4lunch.ui.workmatesView.User;
+import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.christophedurand.go4lunch.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -48,21 +55,16 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_map_view, container, false);
 
-//        AutocompleteSupportFragment _autoCompleteFragment = (AutocompleteSupportFragment) this.getChildFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-//        if (_autoCompleteFragment != null) {
-//            _autoCompleteFragment.setPlaceFields(Collections.singletonList(Place.Field.NAME));
-//            _autoCompleteFragment.setOnPlaceSelectedListener(this);
-//        }
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
@@ -74,7 +76,30 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     @Override
     public void onResume() {
         super.onResume();
+    }
 
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.options_menu, menu);
+
+        SearchManager searchManager = (SearchManager) requireActivity().getSystemService(Context.SEARCH_SERVICE);
+        MenuItem searchMenuItem = menu.findItem(R.id.search_item);
+        SearchView searchView = (SearchView) searchMenuItem.getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(requireActivity().getComponentName()));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mMapViewModel.onSearchButtonClicked(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mMapViewModel.onSearchButtonClicked(newText);
+                return false;
+            }
+        });
     }
 
 
@@ -105,8 +130,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
 
     private void configureViewModel() {
-        MapViewModelFactory mMapViewModelFactory = MapViewModelFactory.getInstance("this");
-        mMapViewModel = new ViewModelProvider(this, mMapViewModelFactory).get(MapViewModel.class);
+        MapViewModelFactory mapViewModelFactory = MapViewModelFactory.getInstance();
+        mMapViewModel = new ViewModelProvider(this, mapViewModelFactory).get(MapViewModel.class);
     }
 
     private void setOnMapReady(GoogleMap mMap) {
@@ -156,7 +181,9 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                     int numberOfWorkmates = 0;
                     for (DocumentSnapshot workmate : workmatesList) {
                         User user = workmate.toObject(User.class);
-                        if (user.getRestaurant().getId() != null && user.getRestaurant().getId().equals(restaurantId)) {
+                        if (user.getRestaurant() != null
+                                && user.getRestaurant().getId() != null
+                                && user.getRestaurant().getId().equals(restaurantId)) {
                             numberOfWorkmates += 1;
                         }
                     }

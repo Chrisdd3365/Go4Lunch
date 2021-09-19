@@ -9,8 +9,8 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.model.User;
-import com.christophedurand.go4lunch.model.UserManager;
+import com.christophedurand.go4lunch.ui.workmatesView.User;
+import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
 import com.christophedurand.go4lunch.utils.Utils;
 import com.google.firebase.firestore.DocumentSnapshot;
 

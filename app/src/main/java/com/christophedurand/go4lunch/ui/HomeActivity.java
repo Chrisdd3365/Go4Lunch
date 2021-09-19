@@ -2,15 +2,11 @@ package com.christophedurand.go4lunch.ui;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -20,7 +16,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.model.UserManager;
+import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.christophedurand.go4lunch.ui.mapView.MapFragment;
 import com.christophedurand.go4lunch.utils.Utils;
@@ -32,7 +28,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -56,6 +51,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private View headerView;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
+    private BottomNavigationView bottomNavigationView;
 
     private String restaurantId;
 
@@ -97,19 +93,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         }
 
         moveTaskToBack(true);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu, menu);
-
-        SearchManager searchManager =
-                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
-        return true;
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -179,7 +162,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void configureBottomNavigationView() {
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_view);
+        bottomNavigationView = findViewById(R.id.bottom_nav_view);
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
     }

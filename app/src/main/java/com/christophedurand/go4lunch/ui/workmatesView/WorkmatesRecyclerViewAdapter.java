@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.model.User;
 import com.christophedurand.go4lunch.ui.listView.ListInterface;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;

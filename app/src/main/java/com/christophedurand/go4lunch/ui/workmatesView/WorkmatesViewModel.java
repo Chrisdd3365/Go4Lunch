@@ -15,9 +15,6 @@ import androidx.lifecycle.Transformations;
 
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
-import com.christophedurand.go4lunch.model.Restaurant;
-import com.christophedurand.go4lunch.model.User;
-import com.christophedurand.go4lunch.model.UserManager;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.Query;
@@ -91,7 +88,7 @@ public class WorkmatesViewModel extends AndroidViewModel {
 
 
     private FirestoreRecyclerOptions<User> createWorkmatesDataSource(HashMap<Integer, Restaurant> map) {
-        createUsers(map);
+        //createUsers(map);
         Query query = UserManager.getInstance().getAllUsers();
         return new FirestoreRecyclerOptions.Builder<User>().setQuery(query, User.class).setLifecycleOwner(owner).build();
     }

@@ -6,6 +6,7 @@ import android.location.Location;
 import androidx.annotation.NonNull;
 
 import java.util.List;
+import java.util.Objects;
 
 
 public class MapViewState {
@@ -13,13 +14,13 @@ public class MapViewState {
     @NonNull
     private final Location location;
     private final List<MapMarker> mapMarkersList;
-    private final String input;
+    private final String searchQuery;
 
 
-    public MapViewState(@NonNull Location location, List<MapMarker> mapMarkersList, String input) {
+    public MapViewState(@NonNull Location location, List<MapMarker> mapMarkersList, String searchQuery) {
         this.location = location;
         this.mapMarkersList = mapMarkersList;
-        this.input = input;
+        this.searchQuery = searchQuery;
     }
 
 
@@ -32,8 +33,31 @@ public class MapViewState {
         return mapMarkersList;
     }
 
-    public String getInput() {
-        return input;
+    public String getSearchQuery() {
+        return searchQuery;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MapViewState that = (MapViewState) o;
+        return location.equals(that.location) && Objects.equals(mapMarkersList, that.mapMarkersList) && Objects.equals(searchQuery, that.searchQuery);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(location, mapMarkersList, searchQuery);
+    }
+
+    @Override
+    public String toString() {
+        return "MapViewState{" +
+                "location=" + location +
+                ", mapMarkersList=" + mapMarkersList +
+                ", searchQuery='" + searchQuery + '\'' +
+                '}';
     }
 
 }

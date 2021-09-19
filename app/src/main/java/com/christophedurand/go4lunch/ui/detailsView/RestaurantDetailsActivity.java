@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.model.UserManager;
+import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
 import com.christophedurand.go4lunch.ui.listView.ListInterface;
 import com.christophedurand.go4lunch.ui.workmatesView.WorkmatesRecyclerViewAdapter;
 import com.christophedurand.go4lunch.utils.Utils;

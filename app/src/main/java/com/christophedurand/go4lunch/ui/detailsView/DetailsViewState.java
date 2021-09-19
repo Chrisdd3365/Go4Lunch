@@ -1,7 +1,7 @@
 package com.christophedurand.go4lunch.ui.detailsView;
 
 
-import com.christophedurand.go4lunch.model.User;
+import com.christophedurand.go4lunch.ui.workmatesView.User;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
 import java.util.Objects;

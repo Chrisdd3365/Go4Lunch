@@ -1,12 +1,18 @@
 package com.christophedurand.go4lunch.ui.workmatesView;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -37,6 +43,7 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(false);
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -89,6 +96,13 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
         super.onDestroy();
         workmatesViewModel.onCleared();
     }
+
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        menu.clear();
+    }
+
 
     @Override
     public void onClickItemList(String restaurantId) {

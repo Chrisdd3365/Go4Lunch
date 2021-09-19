@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.model.User;
 import com.christophedurand.go4lunch.ui.listView.ListInterface;
 import com.christophedurand.go4lunch.utils.Utils;
 

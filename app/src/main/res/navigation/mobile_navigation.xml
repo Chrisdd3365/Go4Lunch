@@ -20,8 +20,9 @@
         tools:layout="@layout/item_restaurant" />
 
     <fragment
-        android:id="@+id/navigation_workmates"
+        android:id="@+id/navigation_workmates_view"
         android:name="com.christophedurand.go4lunch.ui.workmatesView.WorkmatesFragment"
         android:label="@string/workmates_view_title"
         tools:layout="@layout/fragment_workmates_list" />
+
 </navigation>

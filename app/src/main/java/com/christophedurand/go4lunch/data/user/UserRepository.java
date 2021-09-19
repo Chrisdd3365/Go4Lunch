@@ -5,10 +5,9 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.christophedurand.go4lunch.model.Restaurant;
-import com.christophedurand.go4lunch.model.User;
+import com.christophedurand.go4lunch.ui.workmatesView.Restaurant;
+import com.christophedurand.go4lunch.ui.workmatesView.User;
 import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
