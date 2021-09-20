@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -73,7 +74,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         HomeActivityPermissionsDispatcher.showCameraWithPermissionCheck(this);
 
         Places.initialize(getApplication(), apiKey);
-
     }
 
     @Override
@@ -83,6 +83,20 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         setUserProfileUI(headerView);
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
+        getMenuInflater().inflate(R.menu.options_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.search_item) {
+            return false;
+        }
+        return false;
+    }
 
     @Override
     public void onBackPressed() {

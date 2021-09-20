@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -42,8 +43,6 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setHasOptionsMenu(false);
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -65,6 +64,11 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
         subscribe();
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
     }
 
     @Override
