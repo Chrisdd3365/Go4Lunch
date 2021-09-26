@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.os.Build;
 
@@ -29,9 +30,14 @@ public class NotificationsService extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
-        if (remoteMessage.getNotification() != null) {
-            RemoteMessage.Notification notification = remoteMessage.getNotification();
-            sendVisualNotification(notification);
+        SharedPreferences sharedPreferences = getSharedPreferences("Go4LunchNotification", Context.MODE_PRIVATE);
+        boolean remindMe = sharedPreferences.getBoolean("remindMe", true);
+
+        if (remindMe) {
+            if (remoteMessage.getNotification() != null) {
+                RemoteMessage.Notification notification = remoteMessage.getNotification();
+                sendVisualNotification(notification);
+            }
         }
     }
 
@@ -42,14 +48,14 @@ public class NotificationsService extends FirebaseMessagingService {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
         // Create a Channel (Android 8)
-        String channelId = "channelId";
+        String channelId = getString(R.string.default_notification_channel_id);
 
         UserManager.getInstance().getCurrentUserData().addOnSuccessListener(currentUser -> {
 
             UserManager.getInstance().getAllUsers().whereEqualTo("restaurant.id", currentUser.getRestaurant().getId()).get().addOnSuccessListener(queryDocumentSnapshots -> {
 
                 StringBuilder workmatesList = new StringBuilder();
-                for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()){
+                for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                     workmatesList.append(document.get("name"));
                     workmatesList.append(" ");
                 }

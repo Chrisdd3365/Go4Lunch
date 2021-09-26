@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,9 +23,12 @@ import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.christophedurand.go4lunch.ui.mapView.MapFragment;
 import com.christophedurand.go4lunch.utils.Utils;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -203,23 +208,26 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         Drawable avatarPlaceHolder = Utils.getAvatarPlaceHolder(this);
 
-        userManager.getCurrentUserData().addOnSuccessListener(user -> {
-            String username = TextUtils.isEmpty(user.getName()) ? "No User Name Found" : user.getName();
-            userNameTextView.setText(username);
+        // Using handler to delay this method's call because callback from firebase is too slow
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(() ->
+                userManager.getCurrentUserData().addOnSuccessListener(user -> {
+                    String username = user.getName();
+                    userNameTextView.setText(username);
 
-            String email = TextUtils.isEmpty(user.getEmail()) ? "No Email Found" : user.getEmail();
-            userMailTextView.setText(email);
+                    String email = user.getEmail();
+                    userMailTextView.setText(email);
 
-            if (user.getAvatarURL() != null) {
-                Glide.with(this)
-                        .load(user.getAvatarURL())
-                        .apply(RequestOptions.circleCropTransform())
-                        .placeholder(avatarPlaceHolder)
-                        .into(userAvatarImageView);
-            }
+                    if (user.getAvatarURL() != null) {
+                        Glide.with(this)
+                                .load(user.getAvatarURL())
+                                .apply(RequestOptions.circleCropTransform())
+                                .placeholder(avatarPlaceHolder)
+                                .into(userAvatarImageView);
+                    }
 
-            restaurantId = user.getRestaurant().getId();
-        });
+                    restaurantId = user.getRestaurant().getId();
+                }), 3000);
     }
 
     private void showMyLunch() {

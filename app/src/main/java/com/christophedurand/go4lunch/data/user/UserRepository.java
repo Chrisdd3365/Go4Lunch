@@ -61,12 +61,12 @@ public final class UserRepository {
     }
 
     public void createCurrentUser(Restaurant restaurant, List<String> favoriteRestaurantsIdsList) {
-        FirebaseUser user = getCurrentUser();
-        if (user != null) {
-            String uid = user.getUid();
-            String name = user.getDisplayName();
-            String email = user.getEmail();
-            String avatarURL = (user.getPhotoUrl() != null) ? user.getPhotoUrl().toString() : null;
+        FirebaseUser firebaseUser = getCurrentUser();
+        if (firebaseUser != null) {
+            String uid = firebaseUser.getUid();
+            String name = firebaseUser.getDisplayName();
+            String email = firebaseUser.getEmail();
+            String avatarURL = (firebaseUser.getPhotoUrl() != null) ? firebaseUser.getPhotoUrl().toString() : null;
 
             User userToCreate = new User(uid, name, email, avatarURL, restaurant, favoriteRestaurantsIdsList);
 
