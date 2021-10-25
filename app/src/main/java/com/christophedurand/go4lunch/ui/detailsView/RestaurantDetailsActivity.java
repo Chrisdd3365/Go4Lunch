@@ -109,7 +109,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
         ImageButton callButton = findViewById(R.id.call_image_button);
         callButton.setOnClickListener(view -> {
             if (phoneNumber != null) {
-                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
+                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phoneNumber));
                 startActivity(intent);
             } else {
                 Toast.makeText(this, "Pas de numéro de téléphone", Toast.LENGTH_SHORT).show();

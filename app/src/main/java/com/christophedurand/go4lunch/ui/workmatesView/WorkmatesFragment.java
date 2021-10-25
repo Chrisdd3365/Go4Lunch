@@ -1,19 +1,15 @@
 package com.christophedurand.go4lunch.ui.workmatesView;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -22,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.christophedurand.go4lunch.R;
+import com.christophedurand.go4lunch.ui.HomeActivity;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.christophedurand.go4lunch.ui.listView.ListInterface;
 
@@ -68,6 +65,7 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+//        ((HomeActivity) requireActivity()).getSupportActionBar();
         setHasOptionsMenu(true);
     }
 
@@ -104,7 +102,10 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        menu.clear();
+        menu.findItem(R.id.search_item).setVisible(false);
+
+        super.onCreateOptionsMenu(menu, inflater);
+
     }
 
 

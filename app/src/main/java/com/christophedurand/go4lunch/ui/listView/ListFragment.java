@@ -1,11 +1,11 @@
 package com.christophedurand.go4lunch.ui.listView;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -14,16 +14,25 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 
 public class ListFragment extends Fragment implements ListInterface {
+
+    final static int AUTOCOMPLETE_REQUEST_CODE = 1;
+
 
     private RecyclerView listRecyclerView;
 
@@ -80,23 +89,41 @@ public class ListFragment extends Fragment implements ListInterface {
 
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        SearchView searchView = (SearchView) menu.findItem(R.id.search_item).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                listViewModel.onSearchButtonClicked(query);
-                return false;
-            }
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                listViewModel.onSearchButtonClicked(newText);
-                return false;
+        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                Place place = Autocomplete.getPlaceFromIntent(data);
+                listViewModel.getRestaurantQuery(place.getName());
             }
-        });
+        }
     }
 
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.search_item:
+                // Set the fields to specify which types of place data to
+                // return after the user has made a selection.
+                List<Place.Field> fields = Arrays.asList(
+                        Place.Field.NAME,
+                        Place.Field.ID,
+                        Place.Field.ADDRESS,
+                        Place.Field.LAT_LNG,
+                        Place.Field.PHOTO_METADATAS);
+
+                // Start the autocomplete intent.
+                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields)
+                        .setCountries(Arrays.asList("FR"))
+                        .build(requireContext());
+                startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+                return true;
+            default:
+                return false;
+        }
+    }
 
     @Override
     public void onClickItemList(String restaurantId) {

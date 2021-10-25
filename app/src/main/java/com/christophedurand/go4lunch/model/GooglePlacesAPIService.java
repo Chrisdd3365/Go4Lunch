@@ -1,6 +1,5 @@
 package com.christophedurand.go4lunch.model;
 
-import com.christophedurand.go4lunch.model.pojo.AutocompleteResponse;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 
@@ -12,7 +11,8 @@ import retrofit2.http.Query;
 public interface GooglePlacesAPIService {
 
     @GET("maps/api/place/nearbysearch/json")
-    Call<NearbyRestaurantsResponse> getNearbyPlaces(@Query("type") String type,
+    Call<NearbyRestaurantsResponse> getNearbyPlaces(@Query("keyword") String keyword,
+                                                    @Query("type") String type,
                                                     @Query("location") String location,
                                                     @Query("radius") String radius,
                                                     @Query("key") String apiKey);
@@ -20,9 +20,5 @@ public interface GooglePlacesAPIService {
     @GET("maps/api/place/details/json")
     Call<RestaurantDetailsResponse> getPlaceDetails(@Query("place_id") String placeId,
                                                     @Query("key") String apiKey);
-
-    @GET("maps/api/place/autocomplete/json")
-    Call<AutocompleteResponse> getAutocompleteResult(@Query("input") String input,
-                                                     @Query("key") String apiKey);
 
 }

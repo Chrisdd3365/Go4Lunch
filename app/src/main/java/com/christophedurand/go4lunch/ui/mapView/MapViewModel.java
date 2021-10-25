@@ -14,6 +14,7 @@ import androidx.lifecycle.Transformations;
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
+import com.christophedurand.go4lunch.model.pojo.Restaurant;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class MapViewModel extends AndroidViewModel {
         return mMapViewStateMediatorLiveData;
     }
 
-    private final MutableLiveData<String> searchQueryLiveData = new MutableLiveData<>();
+    private final MutableLiveData<String> mPlaceNameMutableLiveData = new MutableLiveData<>();
 
 
     public MapViewModel(@NonNull Application application,
@@ -42,30 +43,33 @@ public class MapViewModel extends AndroidViewModel {
 
         LiveData<Location> locationLiveData = currentLocationRepository.getCurrentLocationLiveData();
 
+        AutocompleteLiveData autocompleteLiveData = new AutocompleteLiveData(mPlaceNameMutableLiveData, locationLiveData);
+
         LiveData<NearbyRestaurantsResponse> nearbyRestaurantsResponseLiveData =
                 Transformations.switchMap(
-                        locationLiveData,
-                        location -> nearbyRepository.getNearbyRestaurantsResponseByRadiusLiveData(
+                        autocompleteLiveData,
+                        value -> nearbyRepository.getNearbyRestaurantsResponseByRadiusLiveData(
+                                value.first,
                                 "restaurant",
-                                location.getLatitude() + "," + location.getLongitude(),
+                                value.second.getLatitude() + "," + value.second.getLongitude(),
                                 "1000",
                                 apiKey)
                 );
 
         mMapViewStateMediatorLiveData.addSource(locationLiveData, location ->
-                combine(searchQueryLiveData.getValue(), nearbyRestaurantsResponseLiveData.getValue(), location));
+                combine(nearbyRestaurantsResponseLiveData.getValue(), location, mPlaceNameMutableLiveData.getValue()));
 
         mMapViewStateMediatorLiveData.addSource(nearbyRestaurantsResponseLiveData, nearbyRestaurantsResponse ->
-                combine(searchQueryLiveData.getValue(), nearbyRestaurantsResponse, locationLiveData.getValue()));
+                combine(nearbyRestaurantsResponse, locationLiveData.getValue(), mPlaceNameMutableLiveData.getValue()));
 
-        mMapViewStateMediatorLiveData.addSource(searchQueryLiveData, searchQuery ->
-                combine(searchQuery, nearbyRestaurantsResponseLiveData.getValue(), locationLiveData.getValue()));
+        mMapViewStateMediatorLiveData.addSource(mPlaceNameMutableLiveData, placeName ->
+                combine(nearbyRestaurantsResponseLiveData.getValue(), locationLiveData.getValue(), placeName));
 
     }
 
-    private void combine(@Nullable String searchQuery,
-                         @Nullable NearbyRestaurantsResponse nearbyRestaurantsResponse,
-                         @Nullable Location location) {
+    private void combine(@Nullable NearbyRestaurantsResponse nearbyRestaurantsResponse,
+                         @Nullable Location location,
+                         @Nullable String placeName) {
 
         if (location == null || nearbyRestaurantsResponse == null) {
             return;
@@ -73,8 +77,26 @@ public class MapViewModel extends AndroidViewModel {
 
         List<MapMarker> mapMarkersList = new ArrayList<>();
 
-        if (searchQuery == null || searchQuery.isEmpty()) {
-            for (int i=0; i<nearbyRestaurantsResponse.getResults().size(); i++) {
+        if (placeName != null) {
+            for (Restaurant restaurant : nearbyRestaurantsResponse.getResults()) {
+                if (restaurant.getName().equals(placeName)) {
+                    String placeId = restaurant.getPlaceId();
+                    String name = restaurant.getName();
+                    String address = restaurant.getVicinity();
+                    LatLng latLng = new LatLng(restaurant.getGeometry().getLocation().getLat(), restaurant.getGeometry().getLocation().getLng());
+
+                    String photoReference;
+                    if (restaurant.getPhotos() != null) {
+                        photoReference = restaurant.getPhotos().get(0).getPhotoReference();
+                    } else {
+                        photoReference = null;
+                    }
+
+                    mapMarkersList.add(new MapMarker(placeId, name, address, latLng, photoReference, "ic_restaurant_red_marker"));
+                }
+            }
+        } else {
+            for (int i = 0; i < nearbyRestaurantsResponse.getResults().size(); i++) {
                 String placeId = nearbyRestaurantsResponse.getResults().get(i).getPlaceId();
                 String name = nearbyRestaurantsResponse.getResults().get(i).getName();
                 String address = nearbyRestaurantsResponse.getResults().get(i).getVicinity();
@@ -89,37 +111,18 @@ public class MapViewModel extends AndroidViewModel {
 
                 mapMarkersList.add(new MapMarker(placeId, name, address, latLng, photoReference, "ic_restaurant_red_marker"));
             }
-        } else {
-            for (int i=0; i<nearbyRestaurantsResponse.getResults().size(); i++) {
-                String placeId = nearbyRestaurantsResponse.getResults().get(i).getPlaceId();
-                String name = nearbyRestaurantsResponse.getResults().get(i).getName();
-                String address = nearbyRestaurantsResponse.getResults().get(i).getVicinity();
-                LatLng latLng = new LatLng(nearbyRestaurantsResponse.getResults().get(i).getGeometry().getLocation().getLat(), nearbyRestaurantsResponse.getResults().get(i).getGeometry().getLocation().getLng());
-
-                String photoReference;
-                if (nearbyRestaurantsResponse.getResults().get(i).getPhotos() != null) {
-                    photoReference = nearbyRestaurantsResponse.getResults().get(i).getPhotos().get(0).getPhotoReference();
-                } else {
-                    photoReference = null;
-                }
-                if (searchQuery.equalsIgnoreCase(name)) {
-                    mapMarkersList.add(new MapMarker(placeId, name, address, latLng, photoReference, "ic_restaurant_red_marker"));
-                }
-            }
         }
-
 
         mMapViewStateMediatorLiveData.setValue(
                 new MapViewState(
                         location,
-                        mapMarkersList,
-                        searchQuery
+                        mapMarkersList
                 )
         );
     }
 
-    public void onSearchButtonClicked(String restaurantName) {
-        searchQueryLiveData.setValue(restaurantName);
+    public void getQueriedRestaurant(String placeName) {
+        mPlaceNameMutableLiveData.setValue(placeName);
     }
 
 }

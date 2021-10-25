@@ -50,6 +50,7 @@ public class WorkmatesViewModel extends AndroidViewModel {
                 Transformations.switchMap(
                         locationLiveData,
                         location -> nearbyRepository.getNearbyRestaurantsResponseByRadiusLiveData(
+                                "",
                                 "restaurant",
                                 location.getLatitude() + "," + location.getLongitude(),
                                 "1000",

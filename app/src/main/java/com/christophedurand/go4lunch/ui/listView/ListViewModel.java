@@ -20,6 +20,7 @@ import com.christophedurand.go4lunch.model.pojo.Restaurant;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
 import com.christophedurand.go4lunch.model.pojo.RestaurantLocation;
+import com.christophedurand.go4lunch.ui.mapView.AutocompleteLiveData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -39,11 +40,14 @@ public class ListViewModel extends AndroidViewModel  {
 
     // "Final product"
     private final MediatorLiveData<ListViewState> listViewStateMediatorLiveData = new MediatorLiveData<>();
+    public LiveData<ListViewState> getListViewStateMediatorLiveData() {
+        return listViewStateMediatorLiveData;
+    }
 
     // DetailResponse aggregator
     private final MediatorLiveData<Map<String, RestaurantDetailsResponse>> placeIdRestaurantDetailsMapLiveData = new MediatorLiveData<>();
 
-    private final MutableLiveData<String> searchQueryLiveData = new MutableLiveData<>();
+    private final MutableLiveData<String> mPlaceNameMutableLiveData = new MutableLiveData<>();
 
 
     public ListViewModel(@NonNull Application application,
@@ -61,51 +65,43 @@ public class ListViewModel extends AndroidViewModel  {
 
         LiveData<Location> locationLiveData = currentLocationRepository.getCurrentLocationLiveData();
 
+        AutocompleteLiveData autocompleteLiveData = new AutocompleteLiveData(mPlaceNameMutableLiveData, locationLiveData);
+
         LiveData<NearbyRestaurantsResponse> nearbyRestaurantsResponseLiveData =
                 Transformations.switchMap(
-                        locationLiveData,
-                        location -> nearbyRepository.getNearbyRestaurantsResponseByRadiusLiveData(
+                        autocompleteLiveData,
+                        value -> nearbyRepository.getNearbyRestaurantsResponseByRadiusLiveData(
+                                value.first,
                                 "restaurant",
-                                location.getLatitude() + "," + location.getLongitude(),
+                                value.second.getLatitude() + "," + value.second.getLongitude(),
                                 "1000",
                                 apiKey)
                 );
 
         listViewStateMediatorLiveData.addSource(locationLiveData, location ->
-                combine(location, nearbyRestaurantsResponseLiveData.getValue(), placeIdRestaurantDetailsMapLiveData.getValue(), searchQueryLiveData.getValue())
+                combine(location, nearbyRestaurantsResponseLiveData.getValue(), placeIdRestaurantDetailsMapLiveData.getValue())
         );
 
         listViewStateMediatorLiveData.addSource(nearbyRestaurantsResponseLiveData, nearbyRestaurantsResponse ->
-                combine(locationLiveData.getValue(), nearbyRestaurantsResponse, placeIdRestaurantDetailsMapLiveData.getValue(), searchQueryLiveData.getValue())
+                combine(locationLiveData.getValue(), nearbyRestaurantsResponse, placeIdRestaurantDetailsMapLiveData.getValue())
         );
 
         listViewStateMediatorLiveData.addSource(placeIdRestaurantDetailsMapLiveData, map ->
-                combine(locationLiveData.getValue(), nearbyRestaurantsResponseLiveData.getValue(), map, searchQueryLiveData.getValue())
+                combine(locationLiveData.getValue(), nearbyRestaurantsResponseLiveData.getValue(), map)
         );
 
-        listViewStateMediatorLiveData.addSource(searchQueryLiveData, searchQuery ->
-                combine(locationLiveData.getValue(), nearbyRestaurantsResponseLiveData.getValue(), placeIdRestaurantDetailsMapLiveData.getValue(), searchQuery)
-        );
-
-    }
-
-
-    public LiveData<ListViewState> getListViewStateMediatorLiveData() {
-        return listViewStateMediatorLiveData;
     }
 
 
     private void combine(@Nullable Location currentLocation,
                          @Nullable NearbyRestaurantsResponse response,
-                         @Nullable Map<String, RestaurantDetailsResponse> map,
-                         @Nullable String searchQuery) {
+                         @Nullable Map<String, RestaurantDetailsResponse> map) {
 
         if (currentLocation == null) {
             return;
         }
 
         List<RestaurantViewState> restaurantViewStatesList = new ArrayList<>();
-        if (searchQuery == null || searchQuery.isEmpty()) {
             if (response != null) {
                 for (Restaurant restaurant : response.getResults()) {
                     RestaurantDetailsResponse restaurantDetailsResponse = map.get(restaurant.getPlaceId());
@@ -146,62 +142,11 @@ public class ListViewModel extends AndroidViewModel  {
                     }
                 }
             }
-        } else {
-            if (response != null) {
-                for (Restaurant restaurant : response.getResults()) {
-                    RestaurantDetailsResponse restaurantDetailsResponse = map.get(restaurant.getPlaceId());
-                    if (restaurantDetailsResponse != null) {
-                        RestaurantViewState restaurantViewState = new RestaurantViewState(
-                                restaurantDetailsResponse.getResult().getFormattedAddress(),
-                                getDistanceFromLastKnownUserLocation(currentLocation, restaurant.getGeometry().getLocation()),
-                                restaurantDetailsResponse.getResult().getName(),
-                                restaurantDetailsResponse.getResult().getPlaceId(),
-                                getConvertedRatingWith(restaurantDetailsResponse.getResult().getRating()),
-                                getPhotoUrl(restaurantDetailsResponse.getResult().getPhotos()),
-                                getOpeningHours(restaurantDetailsResponse.getResult().getOpeningHours())
-                        );
-
-                        if (searchQuery.equalsIgnoreCase(restaurantDetailsResponse.getResult().getName())) {
-                            restaurantViewStatesList.add(restaurantViewState);
-                        }
-
-                    } else {
-                        if (!alreadyQueriedPlaceIds.contains(restaurant.getPlaceId())) {
-                            alreadyQueriedPlaceIds.add(restaurant.getPlaceId());
-                            placeIdRestaurantDetailsMapLiveData.addSource(
-                                    detailsRepository.getRestaurantDetailsMutableLiveData(restaurant.getPlaceId()),
-                                    detailsResponse -> {
-                                        Map<String, RestaurantDetailsResponse> mapInstance = placeIdRestaurantDetailsMapLiveData.getValue();
-                                        mapInstance.put(restaurant.getPlaceId(), detailsResponse);
-                                        placeIdRestaurantDetailsMapLiveData.setValue(mapInstance);
-                                    }
-                            );
-                        }
-
-                        RestaurantViewState restaurantViewState = new RestaurantViewState(
-                                restaurant.getVicinity(),
-                                getDistanceFromLastKnownUserLocation(currentLocation, restaurant.getGeometry().getLocation()),
-                                restaurant.getName(),
-                                restaurant.getPlaceId(),
-                                getConvertedRatingWith(restaurant.getRating()),
-                                getPhotoUrl(restaurant.getPhotos()),
-                                getOpeningHours(restaurant.getOpeningHours())
-                        );
-
-                        if (searchQuery.equalsIgnoreCase(restaurantDetailsResponse.getResult().getName())) {
-                            restaurantViewStatesList.add(restaurantViewState);
-                        }
-
-                    }
-                }
-            }
-        }
 
         listViewStateMediatorLiveData.setValue(
                 new ListViewState(
                         currentLocation,
-                        restaurantViewStatesList,
-                        searchQuery)
+                        restaurantViewStatesList)
         );
     }
 
@@ -261,8 +206,8 @@ public class ListViewModel extends AndroidViewModel  {
         return (int) distance + "m";
     }
 
-    public void onSearchButtonClicked(String restaurantName) {
-        searchQueryLiveData.setValue(restaurantName);
+    public void getRestaurantQuery(String placeName) {
+        mPlaceNameMutableLiveData.setValue(placeName);
     }
 
 }

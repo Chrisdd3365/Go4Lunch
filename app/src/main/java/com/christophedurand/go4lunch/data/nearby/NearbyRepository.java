@@ -29,9 +29,9 @@ public class NearbyRepository {
         mGooglePlacesAPIService = RetrofitService.getInstance().getGooglePlacesAPIService();
     }
 
-    public LiveData<NearbyRestaurantsResponse> getNearbyRestaurantsResponseByRadiusLiveData(String type, String location, String radius, String apiKey) {
+    public LiveData<NearbyRestaurantsResponse> getNearbyRestaurantsResponseByRadiusLiveData(String keyword, String type, String location, String radius, String apiKey) {
         final MutableLiveData<NearbyRestaurantsResponse> nearbyRestaurantsResponseMutableLiveData = new MutableLiveData<>();
-        Call<NearbyRestaurantsResponse> nearbyRestaurantsList = mGooglePlacesAPIService.getNearbyPlaces(type, location, radius, apiKey);
+        Call<NearbyRestaurantsResponse> nearbyRestaurantsList = mGooglePlacesAPIService.getNearbyPlaces(keyword, type, location, radius, apiKey);
         nearbyRestaurantsList.enqueue(new Callback<NearbyRestaurantsResponse>() {
             @Override
             public void onResponse(@NonNull Call<NearbyRestaurantsResponse> call, @NonNull Response<NearbyRestaurantsResponse> response) {

@@ -8,7 +8,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,12 +22,9 @@ import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.christophedurand.go4lunch.ui.mapView.MapFragment;
 import com.christophedurand.go4lunch.utils.Utils;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -141,10 +137,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     void showCamera() {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.map, MapFragment.newInstance())
-                .addToBackStack("location")
-                .commitAllowingStateLoss();
+//        getSupportFragmentManager().beginTransaction()
+//                .replace(R.id.map, MapFragment.newInstance())
+//                .addToBackStack("location")
+//                .commitAllowingStateLoss();
     }
 
     @OnShowRationale(Manifest.permission.ACCESS_FINE_LOCATION)
