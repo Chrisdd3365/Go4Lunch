@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -41,14 +42,18 @@ class WorkmateViewHolder extends RecyclerView.ViewHolder {
 
         String description;
         if (user.getRestaurant().getId().equals("") || user.getRestaurant().getName().equals("")) {
-             description = "has not decided yet.";
+             description = user.getName() + " has not decided yet.";
         } else {
             description = user.getName() + " is eating at " + user.getRestaurant().getName() + ".";
         }
         descriptionTextView.setText(description);
 
         itemView.setOnClickListener(v -> {
-            listener.onClickItemList(user.getRestaurant().getId());
+            if (!user.getRestaurant().getId().equals("")) {
+                listener.onClickItemList(user.getRestaurant().getId());
+            } else {
+                Toast.makeText(itemView.getContext(), user.getName() + " has not decided yet.", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 

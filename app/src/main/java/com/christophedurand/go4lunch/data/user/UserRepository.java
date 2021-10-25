@@ -60,7 +60,7 @@ public final class UserRepository {
         return AuthUI.getInstance().signOut(context);
     }
 
-    public void createCurrentUser(Restaurant restaurant, List<String> favoriteRestaurantsIdsList) {
+    public void createCurrentUser(Restaurant restaurant, List<String> favoriteRestaurantsIdsList, boolean hasSetNotifications) {
         FirebaseUser firebaseUser = getCurrentUser();
         if (firebaseUser != null) {
             String uid = firebaseUser.getUid();
@@ -68,7 +68,7 @@ public final class UserRepository {
             String email = firebaseUser.getEmail();
             String avatarURL = (firebaseUser.getPhotoUrl() != null) ? firebaseUser.getPhotoUrl().toString() : null;
 
-            User userToCreate = new User(uid, name, email, avatarURL, restaurant, favoriteRestaurantsIdsList);
+            User userToCreate = new User(uid, name, email, avatarURL, restaurant, favoriteRestaurantsIdsList, hasSetNotifications);
 
             Task<DocumentSnapshot> userData = getCurrentUserData();
             if (userData != null) {
@@ -95,8 +95,8 @@ public final class UserRepository {
         }
     }
 
-    public void createUser(String userId, String userName, String email, String avatarURL, Restaurant restaurant, List<String> favoriteRestaurantsIdsList) {
-        final User userToCreate = new User(userId, userName, email, avatarURL, restaurant, favoriteRestaurantsIdsList);
+    public void createUser(String userId, String userName, String email, String avatarURL, Restaurant restaurant, List<String> favoriteRestaurantsIdsList, boolean hasSetNotifications) {
+        final User userToCreate = new User(userId, userName, email, avatarURL, restaurant, favoriteRestaurantsIdsList, hasSetNotifications);
         Task<DocumentSnapshot> userData = getUserData(userId);
         if (userData != null) {
             userData.addOnSuccessListener(documentSnapshot -> {
@@ -143,6 +143,12 @@ public final class UserRepository {
             getUsersCollection().document(userId).update("restaurant.id", chosenRestaurantId);
             getUsersCollection().document(userId).update("restaurant.name", chosenRestaurantName);
             getUsersCollection().document(userId).update("restaurant.address", chosenRestaurantAddress);
+        });
+    }
+
+    public void updateHasSetNotifications(final boolean hasSetNotifications, final String userId) {
+        getUserData(userId).addOnSuccessListener(documentSnapshot -> {
+            getUsersCollection().document(userId).update("hasSetNotifications", hasSetNotifications);
         });
     }
 

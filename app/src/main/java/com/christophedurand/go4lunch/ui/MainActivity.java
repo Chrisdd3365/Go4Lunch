@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == AUTH_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                userManager.createCurrentUser(new Restaurant("", "", ""), new ArrayList<>());
+                userManager.createCurrentUser(new Restaurant("", "", ""), new ArrayList<>(), false);
                 startHomeActivity();
             }
         }

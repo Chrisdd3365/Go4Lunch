@@ -23,6 +23,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.christophedurand.go4lunch.R;
+import com.christophedurand.go4lunch.ui.HomeActivity;
+import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.christophedurand.go4lunch.ui.workmatesView.User;
 import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
 import com.christophedurand.go4lunch.utils.Utils;
@@ -59,6 +61,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     private MapViewModel mMapViewModel;
 
+    private Map<Object, MapMarker> _markerHashMap = new HashMap<>();
+
 
     public static MapFragment newInstance() {
         return new MapFragment();
@@ -89,6 +93,11 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        HomeActivity homeActivity = (HomeActivity) requireActivity();
+        if (homeActivity.toolbar != null) {
+            homeActivity.toolbar.setTitle(R.string.hungry_title);
+        }
+
         setHasOptionsMenu(true);
     }
 
@@ -141,10 +150,33 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         }
     }
 
+    private void onMapMarkerClicked(GoogleMap googleMap) {
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(@NonNull Marker marker) {
+                _mapItemParentConstraintLayout.setVisibility(View.VISIBLE);
+                setMarkerDetailsView(marker.getTag());
+                return false;
+            }
+        });
+    }
+
+    private void onMapMarkerDetailsClicked(String restaurantId) {
+        _mapItemParentConstraintLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(requireActivity(), RestaurantDetailsActivity.class);
+                intent.putExtra("restaurantId", restaurantId);
+                startActivity(intent);
+            }
+        });
+    }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         setOnMapReady(googleMap);
+        onMapMarkerClicked(googleMap);
     }
 
     @Override
@@ -216,7 +248,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     private void markNearbyRestaurants(GoogleMap googleMap, List<MapMarker> mapMarkersList) {
         if (mapMarkersList != null) {
-            Map<Object, MapMarker> markerHashMap = new HashMap<>();
             for (MapMarker mapMarker : mapMarkersList) {
                 String restaurantId = mapMarker.getPlaceId();
                 LatLng restaurantLatLng = mapMarker.getLatLng();
@@ -237,11 +268,10 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                                     .position(restaurantLatLng)
                                     .icon(Utils.bitmapDescriptorFromVector(getActivity(), Utils.getResId(setMapMarkerIcon(numberOfWorkmates), R.drawable.class)))
                     );
-                    marker.setTag(mapMarker.getPlaceId());
-                    markerHashMap.put(marker.getTag(), mapMarker);
+                    marker.setTag(restaurantId);
+                    _markerHashMap.put(marker.getTag(), mapMarker);
                 });
             }
-            //setMarkerDetailsView(markerHashMap);
         }
     }
 
@@ -252,18 +282,20 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         _mapItemAddressTextView = _mapItemParentConstraintLayout.findViewById(R.id.map_item_address_text_view);
     }
 
-    private void setMarkerDetailsView(Map<Object, MapMarker> markerMap, Marker marker) {
-        String photoReference = markerMap.get(marker.getTag()).getPhotoReference();
+    private void setMarkerDetailsView(Object markerTag) {
+        String photoReference = _markerHashMap.get(markerTag).getPhotoReference();
         String photoURL = Utils.buildGooglePhotoURL(photoReference);
         Glide.with(requireContext())
                 .load(photoURL)
                 .into(_mapItemImageView);
 
-        String name = markerMap.get(marker.getTag()).getName();
+        String name = _markerHashMap.get(markerTag).getName();
         _mapItemNameTextView.setText(name);
 
-        String vicinity = markerMap.get(marker.getTag()).getVicinity();
+        String vicinity = _markerHashMap.get(markerTag).getVicinity();
         _mapItemAddressTextView.setText(vicinity);
+
+        onMapMarkerDetailsClicked(_markerHashMap.get(markerTag).getPlaceId());
     }
 
     private String setMapMarkerIcon(int numberOfWorkmates) {

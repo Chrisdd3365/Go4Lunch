@@ -19,13 +19,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.christophedurand.go4lunch.R;
+import com.christophedurand.go4lunch.ui.HomeActivity;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -78,6 +78,8 @@ public class ListFragment extends Fragment implements ListInterface {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        ((HomeActivity) requireActivity()).toolbar.setTitle(R.string.hungry_title);
+
         setHasOptionsMenu(true);
     }
 

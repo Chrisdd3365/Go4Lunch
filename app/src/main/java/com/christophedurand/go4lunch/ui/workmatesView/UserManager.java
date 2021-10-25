@@ -13,7 +13,7 @@ import java.util.List;
 public class UserManager {
 
     private static volatile UserManager instance;
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
 
     private UserManager() {
@@ -43,8 +43,8 @@ public class UserManager {
         return userRepository.signOut(context);
     }
 
-    public void createCurrentUser(Restaurant restaurant, List<String> favoriteRestaurantsIdsList) {
-        userRepository.createCurrentUser(restaurant, favoriteRestaurantsIdsList);
+    public void createCurrentUser(Restaurant restaurant, List<String> favoriteRestaurantsIdsList, boolean hasSetNotifications) {
+        userRepository.createCurrentUser(restaurant, favoriteRestaurantsIdsList, hasSetNotifications);
     }
 
     public Task<User> getCurrentUserData() {
@@ -58,8 +58,8 @@ public class UserManager {
         });
     }
 
-    public void createUser(String userId, String userName, String email, String avatarURL, Restaurant restaurant, List<String> favoriteRestaurantsIdsList) {
-        userRepository.createUser(userId, userName, email, avatarURL, restaurant, favoriteRestaurantsIdsList);
+    public void createUser(String userId, String userName, String email, String avatarURL, Restaurant restaurant, List<String> favoriteRestaurantsIdsList, boolean hasSetNotifications) {
+        userRepository.createUser(userId, userName, email, avatarURL, restaurant, favoriteRestaurantsIdsList, hasSetNotifications);
     }
 
     public void getUser(String userId) {
@@ -84,6 +84,10 @@ public class UserManager {
 
     public void updateChosenRestaurant(final String chosenRestaurantId, final String chosenRestaurantName, final String chosenRestaurantAddress, final String userId) {
         userRepository.updateChosenRestaurant(chosenRestaurantId, chosenRestaurantName, chosenRestaurantAddress, userId);
+    }
+
+    public void updateHasSetNotifications(final boolean hasSetNotifications, final String userId) {
+        userRepository.updateHasSetNotifications(hasSetNotifications, userId);
     }
 
 }

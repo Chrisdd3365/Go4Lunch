@@ -20,7 +20,6 @@ import com.bumptech.glide.request.RequestOptions;
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
-import com.christophedurand.go4lunch.ui.mapView.MapFragment;
 import com.christophedurand.go4lunch.utils.Utils;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -51,9 +50,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     public static final String apiKey = "AIzaSyD6FndQ_yMQLDPOYVzaeLt1rIuJ72Ntg_M";
 
     private View headerView;
-    private Toolbar toolbar;
+    public Toolbar toolbar;
     private DrawerLayout drawerLayout;
-    private BottomNavigationView bottomNavigationView;
 
     private String restaurantId;
 
@@ -137,10 +135,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     void showCamera() {
-//        getSupportFragmentManager().beginTransaction()
-//                .replace(R.id.map, MapFragment.newInstance())
-//                .addToBackStack("location")
-//                .commitAllowingStateLoss();
+
     }
 
     @OnShowRationale(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -177,7 +172,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void configureBottomNavigationView() {
-        bottomNavigationView = findViewById(R.id.bottom_nav_view);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_view);
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
     }
@@ -227,7 +222,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void showMyLunch() {
-        if (restaurantId != null) {
+        if (!restaurantId.equals("")) {
             Intent intent = new Intent(this, RestaurantDetailsActivity.class);
             intent.putExtra("restaurantId", restaurantId);
             startActivity(intent);

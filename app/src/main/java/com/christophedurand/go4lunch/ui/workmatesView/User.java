@@ -17,15 +17,22 @@ public class User {
     @Nullable
     private Restaurant restaurant = new Restaurant("", "", "");
     private List<String> favoriteRestaurantsIdsList = new ArrayList<>();
+    private boolean hasSetNotifications;
 
-
-    public User(String uid, String name, String email, @Nullable String avatarURL, @Nullable Restaurant restaurant, List<String> favoriteRestaurantsIdsList) {
+    public User(String uid,
+                String name,
+                String email,
+                @Nullable String avatarURL,
+                @Nullable Restaurant restaurant,
+                List<String> favoriteRestaurantsIdsList,
+                boolean hasSetNotifications) {
         this.uid = uid;
         this.name = name;
         this.email = email;
         this.avatarURL = avatarURL;
         this.restaurant = restaurant;
         this.favoriteRestaurantsIdsList = favoriteRestaurantsIdsList;
+        this.hasSetNotifications = hasSetNotifications;
     }
 
     public User() { }
@@ -57,30 +64,8 @@ public class User {
         return favoriteRestaurantsIdsList;
     }
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(uid, user.uid) && Objects.equals(name, user.name) && Objects.equals(email, user.email) && Objects.equals(avatarURL, user.avatarURL) && Objects.equals(restaurant, user.restaurant) && Objects.equals(favoriteRestaurantsIdsList, user.favoriteRestaurantsIdsList);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(uid, name, email, avatarURL, restaurant, favoriteRestaurantsIdsList);
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "uid='" + uid + '\'' +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", avatarURL='" + avatarURL + '\'' +
-                ", restaurant=" + restaurant +
-                ", favoriteRestaurantsIdsList=" + favoriteRestaurantsIdsList +
-                '}';
+    public boolean isHasSetNotifications() {
+        return hasSetNotifications;
     }
 
 }

@@ -89,22 +89,22 @@ public class WorkmatesViewModel extends AndroidViewModel {
 
 
     private FirestoreRecyclerOptions<User> createWorkmatesDataSource(HashMap<Integer, Restaurant> map) {
-        //createUsers(map);
+        createUsers(map);
         Query query = UserManager.getInstance().getAllUsers();
         return new FirestoreRecyclerOptions.Builder<User>().setQuery(query, User.class).setLifecycleOwner(owner).build();
     }
 
     private void createUsers(HashMap<Integer, Restaurant> map) {
-        UserManager.getInstance().createUser("0", "Batman", "batman@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>());
-        UserManager.getInstance().createUser("1", "Superman", "superman@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>());
-        UserManager.getInstance().createUser("2", "Iron Man", "iron-man@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>());
-        UserManager.getInstance().createUser("3", "Spiderman", "spiderman@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>());
-        UserManager.getInstance().createUser("4", "Wonder Woman", "wonder-woman@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>());
-        UserManager.getInstance().createUser("5", "Aquaman", "aquaman@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>());
-        UserManager.getInstance().createUser("6", "Obi-Wan", "obi-wan@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>());
-        UserManager.getInstance().createUser("7", "Dark Vador", "dark.vador@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>());
-        UserManager.getInstance().createUser("8", "Son Goku", "songoku@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>());
-        UserManager.getInstance().createUser("9", "Vegeta", "vegeta@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>());
+        UserManager.getInstance().createUser("0", "Batman", "batman@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>(), false);
+        UserManager.getInstance().createUser("1", "Superman", "superman@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>(), false);
+        UserManager.getInstance().createUser("2", "Iron Man", "iron-man@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>(), false);
+        UserManager.getInstance().createUser("3", "Spiderman", "spiderman@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>(), false);
+        UserManager.getInstance().createUser("4", "Wonder Woman", "wonder-woman@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>(), false);
+        UserManager.getInstance().createUser("5", "Aquaman", "aquaman@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>(), false);
+        UserManager.getInstance().createUser("6", "Obi-Wan", "obi-wan@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>(), false);
+        UserManager.getInstance().createUser("7", "Dark Vador", "dark.vador@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>(), false);
+        UserManager.getInstance().createUser("8", "Son Goku", "songoku@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>(), false);
+        UserManager.getInstance().createUser("9", "Vegeta", "vegeta@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>(), false);
     }
 
     public void onCleared() {

@@ -65,7 +65,8 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-//        ((HomeActivity) requireActivity()).getSupportActionBar();
+        ((HomeActivity) requireActivity()).toolbar.setTitle(R.string.workmates_title);
+
         setHasOptionsMenu(true);
     }
 

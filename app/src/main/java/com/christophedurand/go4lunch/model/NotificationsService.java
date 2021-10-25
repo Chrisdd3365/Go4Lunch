@@ -1,12 +1,11 @@
 package com.christophedurand.go4lunch.model;
 
-
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.os.Build;
 
@@ -21,6 +20,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 
+@SuppressLint("MissingFirebaseInstanceTokenRefresh")
 public class NotificationsService extends FirebaseMessagingService {
 
     private final int NOTIFICATION_ID = 1;
@@ -30,19 +30,17 @@ public class NotificationsService extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("Go4LunchNotification", Context.MODE_PRIVATE);
-        boolean remindMe = sharedPreferences.getBoolean("remindMe", true);
-
-        if (remindMe) {
-            if (remoteMessage.getNotification() != null) {
-                RemoteMessage.Notification notification = remoteMessage.getNotification();
-                sendVisualNotification(notification);
+        UserManager.getInstance().getCurrentUserData().addOnSuccessListener(currentUser -> {
+            if (currentUser.isHasSetNotifications()) {
+                if (remoteMessage.getNotification() != null) {
+                    RemoteMessage.Notification notification = remoteMessage.getNotification();
+                    sendVisualNotification(notification);
+                }
             }
-        }
+        });
     }
 
     private void sendVisualNotification(RemoteMessage.Notification notification) {
-
         // Create an Intent that will be shown when user will click on the Notification
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
