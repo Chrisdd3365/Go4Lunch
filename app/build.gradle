@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.christophedurand.go4lunch"
-        minSdkVersion 21
+        minSdkVersion 19
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -24,7 +24,6 @@ android {
 
         debug {
             testCoverageEnabled true
-
         }
     }
 
@@ -67,7 +66,7 @@ dependencies {
 
     // GOOGLE
     implementation 'com.google.android.gms:play-services-auth:19.2.0'
-    implementation 'com.google.android.gms:play-services-maps:17.0.1'
+    implementation 'com.google.android.gms:play-services-maps:18.0.0'
     implementation "com.google.android.gms:play-services-location:18.0.0"
     implementation 'com.google.android.libraries.places:places:2.5.0'
     implementation 'com.google.maps.android:android-maps-utils:2.2.6'
@@ -90,9 +89,8 @@ dependencies {
     // COROUTINES
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1'
 
-    // PERMISSIONS DISPATCHER
-    implementation "org.permissionsdispatcher:permissionsdispatcher:4.8.0"
-    annotationProcessor "org.permissionsdispatcher:permissionsdispatcher-processor:4.8.0"
+    // EASY PERMISSIONS
+    implementation 'pub.devrel:easypermissions:3.0.0'
 
     // UI
     implementation 'androidx.recyclerview:recyclerview:1.2.1'

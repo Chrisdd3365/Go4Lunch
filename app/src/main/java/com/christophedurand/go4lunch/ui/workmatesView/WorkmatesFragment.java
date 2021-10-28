@@ -91,7 +91,9 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
     @Override
     public void onStop() {
         super.onStop();
-        workmatesRecyclerViewAdapter.stopListening();
+        if (workmatesRecyclerViewAdapter != null) {
+            workmatesRecyclerViewAdapter.stopListening();
+        }
     }
 
     @Override

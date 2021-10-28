@@ -1,6 +1,5 @@
 package com.christophedurand.go4lunch.ui;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
@@ -27,7 +26,6 @@ import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -36,18 +34,11 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
-import permissions.dispatcher.NeedsPermission;
-import permissions.dispatcher.OnNeverAskAgain;
-import permissions.dispatcher.OnPermissionDenied;
-import permissions.dispatcher.OnShowRationale;
-import permissions.dispatcher.PermissionRequest;
-import permissions.dispatcher.RuntimePermissions;
 
-
-@RuntimePermissions
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String apiKey = "AIzaSyD6FndQ_yMQLDPOYVzaeLt1rIuJ72Ntg_M";
+
 
     private View headerView;
     public Toolbar toolbar;
@@ -70,9 +61,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         configureNavigationView();
         configureBottomNavigationView();
 
-        HomeActivityPermissionsDispatcher.showCameraWithPermissionCheck(this);
-
         Places.initialize(getApplication(), apiKey);
+
     }
 
     @Override
@@ -91,9 +81,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.search_item) {
-            return false;
-        }
+        item.getItemId();
         return false;
     }
 
@@ -131,36 +119,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.closeDrawer(GravityCompat.START);
 
         return true;
-    }
-
-    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-    void showCamera() {
-
-    }
-
-    @OnShowRationale(Manifest.permission.ACCESS_FINE_LOCATION)
-    void showRationaleForCamera(final PermissionRequest request) {
-        new AlertDialog.Builder(this)
-                .setMessage(R.string.permission_location_rationale)
-                .setPositiveButton(R.string.button_allow, (dialog, button) -> request.proceed())
-                .setNegativeButton(R.string.button_deny, (dialog, button) -> request.cancel())
-                .show();
-    }
-
-    @OnPermissionDenied(Manifest.permission.ACCESS_FINE_LOCATION)
-    void showDeniedForCamera() {
-        Toast.makeText(this, R.string.permission_location_denied, Toast.LENGTH_SHORT).show();
-    }
-
-    @OnNeverAskAgain(Manifest.permission.ACCESS_FINE_LOCATION)
-    void showNeverAskForCamera() {
-        Toast.makeText(this, R.string.permission_location_neverask, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        HomeActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
     }
 
 

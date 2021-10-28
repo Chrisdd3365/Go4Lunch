@@ -119,6 +119,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
+                _mapItemParentConstraintLayout.setVisibility(View.GONE);
+
                 Place place = Autocomplete.getPlaceFromIntent(data);
                 mMapViewModel.getQueriedRestaurant(place.getName());
             }
