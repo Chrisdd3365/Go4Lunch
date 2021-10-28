@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.location.Location;
 import android.os.Looper;
 
+import androidx.annotation.RequiresPermission;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -14,6 +15,10 @@ import com.google.android.gms.location.LocationResult;
 
 
 public class CurrentLocationRepository {
+
+    private static final int LOCATION_REQUEST_INTERVAL_MS = 30_000;
+    private static final float SMALLEST_DISPLACEMENT_THRESHOLD_METER = 100;
+
 
     private final MutableLiveData<Location> currentLocationLiveData = new MutableLiveData<>();
     private LocationCallback callback;
@@ -27,28 +32,34 @@ public class CurrentLocationRepository {
         return currentLocationLiveData;
     }
 
-    @SuppressLint("MissingPermission")
+    @RequiresPermission(anyOf = {"android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION"})
     public void initCurrentLocationUpdate() {
         if (callback == null) {
             callback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
                     Location location = locationResult.getLastLocation();
-                    if (location != null) {
-                        currentLocationLiveData.setValue(location);
-                    }
+                    currentLocationLiveData.setValue(location);
                 }
             };
         }
+
+        fusedLocationClient.removeLocationUpdates(callback);
+
         fusedLocationClient.requestLocationUpdates(
-                LocationRequest.create().setInterval(30_000).setSmallestDisplacement(100),
+                LocationRequest.create()
+                        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                        .setSmallestDisplacement(SMALLEST_DISPLACEMENT_THRESHOLD_METER)
+                        .setInterval(LOCATION_REQUEST_INTERVAL_MS),
                 callback,
                 Looper.getMainLooper()
         );
     }
 
     public void stopLocationRequest() {
-        fusedLocationClient.removeLocationUpdates(callback);
+        if (callback != null) {
+            fusedLocationClient.removeLocationUpdates(callback);
+        }
     }
 
 }

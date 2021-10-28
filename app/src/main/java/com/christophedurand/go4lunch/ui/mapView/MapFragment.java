@@ -93,6 +93,12 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+        ActivityCompat.requestPermissions(
+                requireActivity(),
+                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 0
+        );
+
         HomeActivity homeActivity = (HomeActivity) requireActivity();
         if (homeActivity.toolbar != null) {
             homeActivity.toolbar.setTitle(R.string.hungry_title);
@@ -104,6 +110,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     @Override
     public void onResume() {
         super.onResume();
+        mMapViewModel.refresh();
     }
 
     @Override

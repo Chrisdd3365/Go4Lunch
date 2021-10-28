@@ -2,12 +2,16 @@ package com.christophedurand.go4lunch;
 
 import android.app.Application;
 import android.location.Location;
+import android.util.Pair;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.christophedurand.go4lunch.data.autocomplete.AutocompleteRepository;
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
+import com.christophedurand.go4lunch.data.placeName.PlaceNameRepository;
 import com.christophedurand.go4lunch.model.pojo.Geometry;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
 import com.christophedurand.go4lunch.model.pojo.OpeningHours;
@@ -16,6 +20,7 @@ import com.christophedurand.go4lunch.model.pojo.Restaurant;
 import com.christophedurand.go4lunch.model.pojo.RestaurantLocation;
 import com.christophedurand.go4lunch.ui.mapView.MapViewModel;
 import com.christophedurand.go4lunch.ui.mapView.MapViewState;
+import com.christophedurand.go4lunch.data.permissionChecker.PermissionChecker;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -40,10 +45,15 @@ public class MapViewModelTest {
 
     private final Application application = Mockito.mock(Application.class);
 
+    private final PermissionChecker permissionChecker = Mockito.mock(PermissionChecker.class);
     private final CurrentLocationRepository currentLocationRepository = Mockito.mock(CurrentLocationRepository.class);
     private final NearbyRepository nearbyRepository = Mockito.mock(NearbyRepository.class);
+    private final PlaceNameRepository placeNameRepository = Mockito.mock(PlaceNameRepository.class);
+    private final AutocompleteRepository autocompleteRepository = Mockito.mock(AutocompleteRepository.class);
 
+    private final MutableLiveData<String> placeNameMutableLiveData = new MutableLiveData<>();
     private final MutableLiveData<Location> currentLocationLiveData = new MutableLiveData<>();
+    private final MediatorLiveData<Pair<String, Location>> autocompleteMediatorLiveData = new MediatorLiveData<>();
     private final MutableLiveData<NearbyRestaurantsResponse> nearbyRestaurantsResponseLiveData = new MutableLiveData<>();
 
     private MapViewModel mapViewModel;
@@ -51,6 +61,7 @@ public class MapViewModelTest {
 
     @Before
     public void setUp() {
+
         Location userCurrentLocation = Mockito.mock(Location.class);
         Mockito.doReturn(30.0).when(userCurrentLocation).getLatitude();
         Mockito.doReturn(42.0).when(userCurrentLocation).getLongitude();
@@ -58,6 +69,20 @@ public class MapViewModelTest {
         Mockito.doReturn(currentLocationLiveData)
                 .when(currentLocationRepository)
                 .getCurrentLocationLiveData();
+
+        List<String> placeNameList = Mockito.mock(List.class);
+        placeNameList.add("name1");
+        String placeName = placeNameList.get(0);
+        Mockito.doReturn("name1").when(placeNameList).get(0);
+        placeNameMutableLiveData.setValue(placeName);
+        Mockito.doReturn(placeNameMutableLiveData)
+                .when(placeNameRepository)
+                .getPlaceNameMutableLiveData();
+
+        Mockito.doReturn(autocompleteMediatorLiveData)
+                .when(autocompleteRepository)
+                .getAutocompleteMediatorLiveData();
+
 
         List<Photo> photosList = new ArrayList<>();
         photosList.add(
@@ -95,6 +120,7 @@ public class MapViewModelTest {
         Mockito.doReturn(nearbyRestaurantsResponseLiveData)
                 .when(nearbyRepository)
                 .getNearbyRestaurantsResponseByRadiusLiveData(
+                        "name1",
                         "restaurant",
                         "30.0,42.0",
                         "1000",
@@ -103,8 +129,9 @@ public class MapViewModelTest {
 
         mapViewModel = new MapViewModel(application,
                                         nearbyRepository,
-                                        currentLocationRepository
-        );
+                                        permissionChecker,
+                                        currentLocationRepository,
+                                        placeNameRepository);
     }
 
 
@@ -117,7 +144,7 @@ public class MapViewModelTest {
         MapViewState mapViewState = LiveDataTestUtils.getOrAwaitValue(mapViewModel.getMapViewStateLiveData());
 
         // Then
-        assertEquals(2, mapViewState.getMapMarkersList().size());
+        assertEquals(1, mapViewState.getMapMarkersList().size());
     }
 
     @Test

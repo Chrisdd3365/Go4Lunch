@@ -89,9 +89,6 @@ dependencies {
     // COROUTINES
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1'
 
-    // EASY PERMISSIONS
-    implementation 'pub.devrel:easypermissions:3.0.0'
-
     // UI
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'

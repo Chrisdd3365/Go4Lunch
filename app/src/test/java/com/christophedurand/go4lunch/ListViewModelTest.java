@@ -50,6 +50,7 @@ public class ListViewModelTest {
     private final NearbyRepository nearbyRepository = Mockito.mock(NearbyRepository.class);
     private final DetailsRepository detailsRepository = Mockito.mock(DetailsRepository.class);
 
+    private final MutableLiveData<String> placeNameMutableLiveData = new MutableLiveData<>();
     private final MutableLiveData<Location> currentLocationLiveData = new MutableLiveData<>();
     private final MutableLiveData<NearbyRestaurantsResponse> nearbyRestaurantsResponseLiveData = new MutableLiveData<>();
     private final MutableLiveData<RestaurantDetailsResponse> restaurantDetailsMutableLiveData = new MutableLiveData<>();
@@ -190,6 +191,7 @@ public class ListViewModelTest {
         Mockito.doReturn(nearbyRestaurantsResponseLiveData)
                 .when(nearbyRepository)
                 .getNearbyRestaurantsResponseByRadiusLiveData(
+                        "name1",
                         "restaurant",
                         "30.0,42.0",
                         "1000",

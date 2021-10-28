@@ -1,20 +1,23 @@
 package com.christophedurand.go4lunch.ui.mapView;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.location.Location;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
+import com.christophedurand.go4lunch.data.autocomplete.AutocompleteRepository;
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
+import com.christophedurand.go4lunch.data.placeName.PlaceNameRepository;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
-import com.christophedurand.go4lunch.model.pojo.Restaurant;
+import com.christophedurand.go4lunch.data.permissionChecker.PermissionChecker;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -30,24 +33,36 @@ public class MapViewModel extends AndroidViewModel {
         return mMapViewStateMediatorLiveData;
     }
 
-    private final MutableLiveData<String> mPlaceNameMutableLiveData = new MutableLiveData<>();
+    @NonNull
+    private final PermissionChecker permissionChecker;
+    @NonNull
+    private final CurrentLocationRepository currentLocationRepository;
+    private final PlaceNameRepository placeNameRepository;
 
 
     public MapViewModel(@NonNull Application application,
                         NearbyRepository nearbyRepository,
-                        CurrentLocationRepository currentLocationRepository) {
+                        @NonNull PermissionChecker permissionChecker,
+                        @NonNull CurrentLocationRepository currentLocationRepository,
+                        PlaceNameRepository placeNameRepository) {
 
         super(application);
 
-        currentLocationRepository.initCurrentLocationUpdate();
+        this.permissionChecker = permissionChecker;
+        this.currentLocationRepository = currentLocationRepository;
+        this.placeNameRepository = placeNameRepository;
 
         LiveData<Location> locationLiveData = currentLocationRepository.getCurrentLocationLiveData();
 
-        AutocompleteLiveData autocompleteLiveData = new AutocompleteLiveData(mPlaceNameMutableLiveData, locationLiveData);
+        LiveData<String> placeNameMutableLiveData = placeNameRepository.getPlaceNameMutableLiveData();
+
+        AutocompleteRepository autocompleteRepository = new AutocompleteRepository(placeNameMutableLiveData, locationLiveData);
+
+        MediatorLiveData<Pair<String, Location>> autocompleteMediatorLiveData = autocompleteRepository.getAutocompleteMediatorLiveData();
 
         LiveData<NearbyRestaurantsResponse> nearbyRestaurantsResponseLiveData =
                 Transformations.switchMap(
-                        autocompleteLiveData,
+                        autocompleteMediatorLiveData,
                         value -> nearbyRepository.getNearbyRestaurantsResponseByRadiusLiveData(
                                 value.first,
                                 "restaurant",
@@ -57,19 +72,16 @@ public class MapViewModel extends AndroidViewModel {
                 );
 
         mMapViewStateMediatorLiveData.addSource(locationLiveData, location ->
-                combine(nearbyRestaurantsResponseLiveData.getValue(), location, mPlaceNameMutableLiveData.getValue()));
+                combine(nearbyRestaurantsResponseLiveData.getValue(), location));
 
         mMapViewStateMediatorLiveData.addSource(nearbyRestaurantsResponseLiveData, nearbyRestaurantsResponse ->
-                combine(nearbyRestaurantsResponse, locationLiveData.getValue(), mPlaceNameMutableLiveData.getValue()));
+                combine(nearbyRestaurantsResponse, locationLiveData.getValue()));
 
-        mMapViewStateMediatorLiveData.addSource(mPlaceNameMutableLiveData, placeName ->
-                combine(nearbyRestaurantsResponseLiveData.getValue(), locationLiveData.getValue(), placeName));
 
     }
 
     private void combine(@Nullable NearbyRestaurantsResponse nearbyRestaurantsResponse,
-                         @Nullable Location location,
-                         @Nullable String placeName) {
+                         @Nullable Location location) {
 
         if (location == null || nearbyRestaurantsResponse == null) {
             return;
@@ -77,41 +89,22 @@ public class MapViewModel extends AndroidViewModel {
 
         List<MapMarker> mapMarkersList = new ArrayList<>();
 
-        if (placeName != null) {
-            for (Restaurant restaurant : nearbyRestaurantsResponse.getResults()) {
-                if (restaurant.getName().equals(placeName)) {
-                    String placeId = restaurant.getPlaceId();
-                    String name = restaurant.getName();
-                    String address = restaurant.getVicinity();
-                    LatLng latLng = new LatLng(restaurant.getGeometry().getLocation().getLat(), restaurant.getGeometry().getLocation().getLng());
+        for (int i = 0; i < nearbyRestaurantsResponse.getResults().size(); i++) {
+            String placeId = nearbyRestaurantsResponse.getResults().get(i).getPlaceId();
+            String name = nearbyRestaurantsResponse.getResults().get(i).getName();
+            String address = nearbyRestaurantsResponse.getResults().get(i).getVicinity();
+            LatLng latLng = new LatLng(nearbyRestaurantsResponse.getResults().get(i).getGeometry().getLocation().getLat(), nearbyRestaurantsResponse.getResults().get(i).getGeometry().getLocation().getLng());
 
-                    String photoReference;
-                    if (restaurant.getPhotos() != null) {
-                        photoReference = restaurant.getPhotos().get(0).getPhotoReference();
-                    } else {
-                        photoReference = null;
-                    }
-
-                    mapMarkersList.add(new MapMarker(placeId, name, address, latLng, photoReference, "ic_restaurant_red_marker"));
-                }
+            String photoReference;
+            if (nearbyRestaurantsResponse.getResults().get(i).getPhotos() != null) {
+                photoReference = nearbyRestaurantsResponse.getResults().get(i).getPhotos().get(0).getPhotoReference();
+            } else {
+                photoReference = null;
             }
-        } else {
-            for (int i = 0; i < nearbyRestaurantsResponse.getResults().size(); i++) {
-                String placeId = nearbyRestaurantsResponse.getResults().get(i).getPlaceId();
-                String name = nearbyRestaurantsResponse.getResults().get(i).getName();
-                String address = nearbyRestaurantsResponse.getResults().get(i).getVicinity();
-                LatLng latLng = new LatLng(nearbyRestaurantsResponse.getResults().get(i).getGeometry().getLocation().getLat(), nearbyRestaurantsResponse.getResults().get(i).getGeometry().getLocation().getLng());
 
-                String photoReference;
-                if (nearbyRestaurantsResponse.getResults().get(i).getPhotos() != null) {
-                    photoReference = nearbyRestaurantsResponse.getResults().get(i).getPhotos().get(0).getPhotoReference();
-                } else {
-                    photoReference = null;
-                }
-
-                mapMarkersList.add(new MapMarker(placeId, name, address, latLng, photoReference, "ic_restaurant_red_marker"));
-            }
+            mapMarkersList.add(new MapMarker(placeId, name, address, latLng, photoReference, "ic_restaurant_red_marker"));
         }
+
 
         mMapViewStateMediatorLiveData.setValue(
                 new MapViewState(
@@ -121,8 +114,17 @@ public class MapViewModel extends AndroidViewModel {
         );
     }
 
+    @SuppressLint("MissingPermission")
+    public void refresh() {
+        if (!permissionChecker.hasLocationPermission()) {
+            currentLocationRepository.stopLocationRequest();
+        } else {
+            currentLocationRepository.initCurrentLocationUpdate();
+        }
+    }
+
     public void getQueriedRestaurant(String placeName) {
-        mPlaceNameMutableLiveData.setValue(placeName);
+        placeNameRepository.getQueriedRestaurantByName(placeName);
     }
 
 }
