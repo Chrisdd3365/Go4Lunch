@@ -2,6 +2,7 @@ package com.christophedurand.go4lunch.ui.workmatesView;
 
 import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.location.Location;
 
@@ -15,6 +16,7 @@ import androidx.lifecycle.Transformations;
 
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
+import com.christophedurand.go4lunch.data.permissionChecker.PermissionChecker;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.Query;
@@ -31,18 +33,22 @@ public class WorkmatesViewModel extends AndroidViewModel {
         return workmatesViewStateMediatorLiveData;
     }
 
-    private final LifecycleOwner owner;
+    @NonNull
+    private final PermissionChecker permissionChecker;
+    @NonNull
+    private final CurrentLocationRepository currentLocationRepository;
+
+    private LifecycleOwner _owner;
 
 
     public WorkmatesViewModel(@NonNull Application application,
-                              CurrentLocationRepository currentLocationRepository,
-                              NearbyRepository nearbyRepository,
-                              LifecycleOwner owner) {
+                              @NonNull PermissionChecker permissionChecker,
+                              @NonNull CurrentLocationRepository currentLocationRepository,
+                              NearbyRepository nearbyRepository) {
         super(application);
 
-        this.owner = owner;
-
-        currentLocationRepository.initCurrentLocationUpdate();
+        this.permissionChecker = permissionChecker;
+        this.currentLocationRepository = currentLocationRepository;
 
         LiveData<Location> locationLiveData = currentLocationRepository.getCurrentLocationLiveData();
 
@@ -87,11 +93,19 @@ public class WorkmatesViewModel extends AndroidViewModel {
         workmatesViewStateMediatorLiveData.setValue(new WorkmatesViewState(createWorkmatesDataSource(map)));
     }
 
+    @SuppressLint("MissingPermission")
+    public void refresh() {
+        if (!permissionChecker.hasLocationPermission()) {
+            currentLocationRepository.stopLocationRequest();
+        } else {
+            currentLocationRepository.initCurrentLocationUpdate();
+        }
+    }
 
     private FirestoreRecyclerOptions<User> createWorkmatesDataSource(HashMap<Integer, Restaurant> map) {
-        createUsers(map);
+        //createUsers(map);
         Query query = UserManager.getInstance().getAllUsers();
-        return new FirestoreRecyclerOptions.Builder<User>().setQuery(query, User.class).setLifecycleOwner(owner).build();
+        return new FirestoreRecyclerOptions.Builder<User>().setQuery(query, User.class).setLifecycleOwner(_owner).build();
     }
 
     private void createUsers(HashMap<Integer, Restaurant> map) {
@@ -107,8 +121,8 @@ public class WorkmatesViewModel extends AndroidViewModel {
         UserManager.getInstance().createUser("9", "Vegeta", "vegeta@gmail.com", "", map.get(new Random().nextInt(map.size())), new ArrayList<>(), false);
     }
 
-    public void onCleared() {
-        workmatesViewStateMediatorLiveData.removeObservers(owner);
+    public void getLifecycleOwner(LifecycleOwner owner) {
+        _owner = owner;
     }
 
 }

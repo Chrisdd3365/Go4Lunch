@@ -1,9 +1,9 @@
 package com.christophedurand.go4lunch.data.location;
 
-import android.annotation.SuppressLint;
 import android.location.Location;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -37,7 +37,7 @@ public class CurrentLocationRepository {
         if (callback == null) {
             callback = new LocationCallback() {
                 @Override
-                public void onLocationResult(LocationResult locationResult) {
+                public void onLocationResult(@NonNull LocationResult locationResult) {
                     Location location = locationResult.getLastLocation();
                     currentLocationLiveData.setValue(location);
                 }

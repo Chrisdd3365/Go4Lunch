@@ -16,8 +16,8 @@ public class AutocompleteRepository {
 
 
     public AutocompleteRepository(LiveData<String> placeNameLiveData, LiveData<Location> currentLocationLiveData) {
-        autocompleteMediatorLiveData.addSource(placeNameLiveData, keyword -> autocompleteMediatorLiveData.setValue(Pair.create(keyword, currentLocationLiveData.getValue())));
         autocompleteMediatorLiveData.addSource(currentLocationLiveData, currentLocation -> autocompleteMediatorLiveData.setValue(Pair.create(placeNameLiveData.getValue(), currentLocation)));
+        autocompleteMediatorLiveData.addSource(placeNameLiveData, keyword -> autocompleteMediatorLiveData.setValue(Pair.create(keyword, currentLocationLiveData.getValue())));
     }
 
 }

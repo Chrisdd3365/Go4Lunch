@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.ui.HomeActivity;
+import com.christophedurand.go4lunch.ui.ViewModelFactory;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.christophedurand.go4lunch.ui.listView.ListInterface;
 
@@ -76,6 +77,7 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
         if (workmatesRecyclerViewAdapter != null) {
             workmatesRecyclerViewAdapter.startListening();
         }
+        workmatesViewModel.refresh();
     }
 
     @Override
@@ -99,7 +101,7 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        workmatesViewModel.onCleared();
+        workmatesViewModel.getWorkmatesViewStateMediatorLiveData().removeObservers(this);
     }
 
 
@@ -121,11 +123,13 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
 
 
     private void configureViewModel() {
-        WorkmatesViewModelFactory workmatesViewModelFactory = WorkmatesViewModelFactory.getInstance(getViewLifecycleOwner());
-        workmatesViewModel = new ViewModelProvider(this, workmatesViewModelFactory).get(WorkmatesViewModel.class);
+        ViewModelFactory viewModelFactory = ViewModelFactory.getInstance();
+        workmatesViewModel = new ViewModelProvider(this, viewModelFactory).get(WorkmatesViewModel.class);
     }
 
     private void subscribe() {
+        workmatesViewModel.getLifecycleOwner(this);
+
         workmatesViewModel.getWorkmatesViewStateMediatorLiveData().observe(getViewLifecycleOwner(), workmatesViewState -> {
             workmatesRecyclerViewAdapter = new WorkmatesRecyclerViewAdapter(this, workmatesViewState.getWorkmatesList());
             workmatesRecyclerViewAdapter.startListening();

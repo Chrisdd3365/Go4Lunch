@@ -235,7 +235,7 @@ public class ListViewModelTest {
         // Given
 
         // When
-        ListViewState listViewState = LiveDataTestUtils.getOrAwaitValue(listViewModel.getListViewStateMediatorLiveData());
+        ListViewState listViewState = LiveDataTestUtils.getOrAwaitValue(listViewModel.getListViewStateMediatorLiveData(), 1);
 
         // Then
         assertEquals(5, listViewState.getRestaurantViewStatesList().size());

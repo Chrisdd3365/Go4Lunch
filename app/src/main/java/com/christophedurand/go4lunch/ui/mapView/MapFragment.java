@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.bumptech.glide.Glide;
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.ui.HomeActivity;
+import com.christophedurand.go4lunch.ui.ViewModelFactory;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.christophedurand.go4lunch.ui.workmatesView.User;
 import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
@@ -61,7 +62,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     private MapViewModel mMapViewModel;
 
-    private Map<Object, MapMarker> _markerHashMap = new HashMap<>();
+    private final Map<Object, MapMarker> _markerHashMap = new HashMap<>();
 
 
     public static MapFragment newInstance() {
@@ -210,8 +211,8 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
 
     private void configureViewModel() {
-        MapViewModelFactory mapViewModelFactory = MapViewModelFactory.getInstance();
-        mMapViewModel = new ViewModelProvider(this, mapViewModelFactory).get(MapViewModel.class);
+        ViewModelFactory viewModelFactory = ViewModelFactory.getInstance();
+        mMapViewModel = new ViewModelProvider(this, viewModelFactory).get(MapViewModel.class);
     }
 
     private void setOnMapReady(GoogleMap googleMap) {

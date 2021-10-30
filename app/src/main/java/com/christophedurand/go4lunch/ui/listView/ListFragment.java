@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.ui.HomeActivity;
+import com.christophedurand.go4lunch.ui.ViewModelFactory;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
@@ -33,8 +34,6 @@ public class ListFragment extends Fragment implements ListInterface {
 
     final static int AUTOCOMPLETE_REQUEST_CODE = 1;
 
-
-    private RecyclerView listRecyclerView;
 
     private ListViewModel listViewModel;
 
@@ -54,7 +53,7 @@ public class ListFragment extends Fragment implements ListInterface {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_restaurants_list, container, false);
 
-        listRecyclerView = view.findViewById(R.id.restaurants_list_recycler_view);
+        RecyclerView listRecyclerView = view.findViewById(R.id.restaurants_list_recycler_view);
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
         listRecyclerView.setLayoutManager(layoutManager);
@@ -86,9 +85,14 @@ public class ListFragment extends Fragment implements ListInterface {
     @Override
     public void onResume() {
         super.onResume();
-
+        listViewModel.refresh();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        listViewModel.getListViewStateMediatorLiveData().removeObservers(this);
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -136,8 +140,8 @@ public class ListFragment extends Fragment implements ListInterface {
 
 
     private void configureViewModel() {
-        ListViewModelFactory listViewModelFactory = ListViewModelFactory.getInstance();
-        listViewModel = new ViewModelProvider(this, listViewModelFactory).get(ListViewModel.class);
+        ViewModelFactory viewModelFactory = ViewModelFactory.getInstance();
+        listViewModel = new ViewModelProvider(this, viewModelFactory).get(ListViewModel.class);
     }
 
 }

@@ -141,7 +141,7 @@ public class MapViewModelTest {
 
 
         // When
-        MapViewState mapViewState = LiveDataTestUtils.getOrAwaitValue(mapViewModel.getMapViewStateLiveData());
+        MapViewState mapViewState = LiveDataTestUtils.getOrAwaitValue(mapViewModel.getMapViewStateLiveData(), 1);
 
         // Then
         assertEquals(1, mapViewState.getMapMarkersList().size());
@@ -153,7 +153,7 @@ public class MapViewModelTest {
 
 
         // When
-        MapViewState mapViewState = LiveDataTestUtils.getOrAwaitValue(mapViewModel.getMapViewStateLiveData());
+        MapViewState mapViewState = LiveDataTestUtils.getOrAwaitValue(mapViewModel.getMapViewStateLiveData(), 1);
 
         // Then
         assertNull(mapViewState.getMapMarkersList().get(1).getPhotoReference());

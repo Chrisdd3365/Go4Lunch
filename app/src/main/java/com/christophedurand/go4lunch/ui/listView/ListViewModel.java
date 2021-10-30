@@ -1,18 +1,22 @@
 package com.christophedurand.go4lunch.ui.listView;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.location.Location;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
+import com.christophedurand.go4lunch.data.autocomplete.AutocompleteRepository;
 import com.christophedurand.go4lunch.data.details.DetailsRepository;
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
+import com.christophedurand.go4lunch.data.permissionChecker.PermissionChecker;
+import com.christophedurand.go4lunch.data.placeName.PlaceNameRepository;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
 import com.christophedurand.go4lunch.model.pojo.OpeningHours;
 import com.christophedurand.go4lunch.model.pojo.Photo;
@@ -20,7 +24,6 @@ import com.christophedurand.go4lunch.model.pojo.Restaurant;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
 import com.christophedurand.go4lunch.model.pojo.RestaurantLocation;
-import com.christophedurand.go4lunch.ui.mapView.AutocompleteLiveData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -47,29 +50,40 @@ public class ListViewModel extends AndroidViewModel  {
     // DetailResponse aggregator
     private final MediatorLiveData<Map<String, RestaurantDetailsResponse>> placeIdRestaurantDetailsMapLiveData = new MediatorLiveData<>();
 
-    private final MutableLiveData<String> mPlaceNameMutableLiveData = new MutableLiveData<>();
+    @NonNull
+    private final PermissionChecker permissionChecker;
+    @NonNull
+    private final CurrentLocationRepository currentLocationRepository;
+    private final PlaceNameRepository placeNameRepository;
 
 
     public ListViewModel(@NonNull Application application,
-                         CurrentLocationRepository currentLocationRepository,
+                         @NonNull PermissionChecker permissionChecker,
+                         @NonNull CurrentLocationRepository currentLocationRepository,
+                         PlaceNameRepository placeNameRepository,
                          NearbyRepository nearbyRepository,
                          DetailsRepository detailsRepository) {
 
         super(application);
 
+        this.permissionChecker = permissionChecker;
+        this.currentLocationRepository = currentLocationRepository;
+        this.placeNameRepository = placeNameRepository;
         this.detailsRepository = detailsRepository;
 
         placeIdRestaurantDetailsMapLiveData.setValue(new HashMap<>());
 
-        currentLocationRepository.initCurrentLocationUpdate();
-
         LiveData<Location> locationLiveData = currentLocationRepository.getCurrentLocationLiveData();
 
-        AutocompleteLiveData autocompleteLiveData = new AutocompleteLiveData(mPlaceNameMutableLiveData, locationLiveData);
+        LiveData<String> placeNameMutableLiveData = placeNameRepository.getPlaceNameMutableLiveData();
+
+        AutocompleteRepository autocompleteRepository = new AutocompleteRepository(placeNameMutableLiveData, locationLiveData);
+
+        MediatorLiveData<Pair<String, Location>> autocompleteMediatorLiveData = autocompleteRepository.getAutocompleteMediatorLiveData();
 
         LiveData<NearbyRestaurantsResponse> nearbyRestaurantsResponseLiveData =
                 Transformations.switchMap(
-                        autocompleteLiveData,
+                        autocompleteMediatorLiveData,
                         value -> nearbyRepository.getNearbyRestaurantsResponseByRadiusLiveData(
                                 value.first,
                                 "restaurant",
@@ -150,6 +164,15 @@ public class ListViewModel extends AndroidViewModel  {
         );
     }
 
+    @SuppressLint("MissingPermission")
+    public void refresh() {
+        if (!permissionChecker.hasLocationPermission()) {
+            currentLocationRepository.stopLocationRequest();
+        } else {
+            currentLocationRepository.initCurrentLocationUpdate();
+        }
+    }
+
     private String getPhotoUrl(@Nullable List<Photo> photoList) {
         if (photoList != null) {
             for (Photo photo : photoList) {
@@ -207,7 +230,7 @@ public class ListViewModel extends AndroidViewModel  {
     }
 
     public void getRestaurantQuery(String placeName) {
-        mPlaceNameMutableLiveData.setValue(placeName);
+        placeNameRepository.getQueriedRestaurantByName(placeName);
     }
 
 }
