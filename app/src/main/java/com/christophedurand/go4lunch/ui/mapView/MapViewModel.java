@@ -3,7 +3,6 @@ package com.christophedurand.go4lunch.ui.mapView;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.location.Location;
-import android.util.Pair;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +24,8 @@ import java.util.List;
 
 import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 
+import kotlin.Pair;
+
 
 public class MapViewModel extends AndroidViewModel {
 
@@ -38,25 +39,26 @@ public class MapViewModel extends AndroidViewModel {
     @NonNull
     private final CurrentLocationRepository currentLocationRepository;
     private final PlaceNameRepository placeNameRepository;
+    private final AutocompleteRepository autocompleteRepository;
 
 
     public MapViewModel(@NonNull Application application,
                         NearbyRepository nearbyRepository,
                         @NonNull PermissionChecker permissionChecker,
                         @NonNull CurrentLocationRepository currentLocationRepository,
-                        PlaceNameRepository placeNameRepository) {
+                        PlaceNameRepository placeNameRepository,
+                        AutocompleteRepository autocompleteRepository) {
 
         super(application);
 
         this.permissionChecker = permissionChecker;
         this.currentLocationRepository = currentLocationRepository;
         this.placeNameRepository = placeNameRepository;
+        this.autocompleteRepository = autocompleteRepository;
 
         LiveData<Location> locationLiveData = currentLocationRepository.getCurrentLocationLiveData();
 
         LiveData<String> placeNameMutableLiveData = placeNameRepository.getPlaceNameMutableLiveData();
-
-        AutocompleteRepository autocompleteRepository = new AutocompleteRepository(placeNameMutableLiveData, locationLiveData);
 
         MediatorLiveData<Pair<String, Location>> autocompleteMediatorLiveData = autocompleteRepository.getAutocompleteMediatorLiveData();
 
@@ -64,9 +66,9 @@ public class MapViewModel extends AndroidViewModel {
                 Transformations.switchMap(
                         autocompleteMediatorLiveData,
                         value -> nearbyRepository.getNearbyRestaurantsResponseByRadiusLiveData(
-                                value.first,
+                                value.getFirst(),
                                 "restaurant",
-                                value.second.getLatitude() + "," + value.second.getLongitude(),
+                                value.getSecond().getLatitude() + "," + value.getSecond().getLongitude(),
                                 "1000",
                                 apiKey)
                 );
@@ -104,7 +106,6 @@ public class MapViewModel extends AndroidViewModel {
 
             mapMarkersList.add(new MapMarker(placeId, name, address, latLng, photoReference, "ic_restaurant_red_marker"));
         }
-
 
         mMapViewStateMediatorLiveData.setValue(
                 new MapViewState(

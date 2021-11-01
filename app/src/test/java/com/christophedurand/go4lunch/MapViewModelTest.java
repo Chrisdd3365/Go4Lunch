@@ -2,7 +2,6 @@ package com.christophedurand.go4lunch;
 
 import android.app.Application;
 import android.location.Location;
-import android.util.Pair;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.MediatorLiveData;
@@ -35,6 +34,8 @@ import java.util.List;
 import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+
+import kotlin.Pair;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -70,15 +71,15 @@ public class MapViewModelTest {
                 .when(currentLocationRepository)
                 .getCurrentLocationLiveData();
 
-        List<String> placeNameList = Mockito.mock(List.class);
-        placeNameList.add("name1");
-        String placeName = placeNameList.get(0);
-        Mockito.doReturn("name1").when(placeNameList).get(0);
+        String placeName = "name1";
+        //Mockito.doReturn("name1").when(placeName);
         placeNameMutableLiveData.setValue(placeName);
         Mockito.doReturn(placeNameMutableLiveData)
                 .when(placeNameRepository)
                 .getPlaceNameMutableLiveData();
 
+        Pair<String, Location> autocompleteResponse = new Pair<>(placeName, userCurrentLocation);
+        autocompleteMediatorLiveData.setValue(autocompleteResponse);
         Mockito.doReturn(autocompleteMediatorLiveData)
                 .when(autocompleteRepository)
                 .getAutocompleteMediatorLiveData();
@@ -90,18 +91,6 @@ public class MapViewModelTest {
         );
 
         List<Restaurant> restaurantsList = new ArrayList<>();
-        restaurantsList.add(
-                new Restaurant(
-                        "vicinity",
-                        new Geometry(new RestaurantLocation(39.0, 45.0)),
-                        "icon",
-                        "name",
-                        new OpeningHours(true, null, null),
-                        "placeId",
-                        4.0,
-                        photosList
-                )
-        );
         restaurantsList.add(
                 new Restaurant(
                         "vicinity1",
@@ -131,33 +120,21 @@ public class MapViewModelTest {
                                         nearbyRepository,
                                         permissionChecker,
                                         currentLocationRepository,
-                                        placeNameRepository);
+                                        placeNameRepository,
+                                        autocompleteRepository);
     }
 
 
     @Test
     public void nominal_case() throws InterruptedException {
-        // Given
-
-
-        // When
         MapViewState mapViewState = LiveDataTestUtils.getOrAwaitValue(mapViewModel.getMapViewStateLiveData(), 1);
-
-        // Then
         assertEquals(1, mapViewState.getMapMarkersList().size());
     }
 
     @Test
     public void when_oneRestaurantHasNoPhotos_should_return_fake_photo_reference() throws InterruptedException {
-        // Given
-
-
-        // When
         MapViewState mapViewState = LiveDataTestUtils.getOrAwaitValue(mapViewModel.getMapViewStateLiveData(), 1);
-
-        // Then
-        assertNull(mapViewState.getMapMarkersList().get(1).getPhotoReference());
-
+        assertNull(mapViewState.getMapMarkersList().get(0).getPhotoReference());
     }
 
 }

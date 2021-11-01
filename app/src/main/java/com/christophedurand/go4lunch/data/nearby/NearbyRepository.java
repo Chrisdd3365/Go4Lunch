@@ -1,5 +1,7 @@
 package com.christophedurand.go4lunch.data.nearby;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -39,7 +41,9 @@ public class NearbyRepository {
             }
 
             @Override
-            public void onFailure(@NonNull Call<NearbyRestaurantsResponse> call, @NonNull Throwable t) { }
+            public void onFailure(@NonNull Call<NearbyRestaurantsResponse> call, @NonNull Throwable t) {
+                Log.e("Nearby Repository", "Nearby Repository error" + t);
+            }
         });
 
         return nearbyRestaurantsResponseMutableLiveData;

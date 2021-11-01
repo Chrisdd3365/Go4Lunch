@@ -6,9 +6,12 @@ import android.location.Location;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.MutableLiveData;
 
+import com.christophedurand.go4lunch.data.autocomplete.AutocompleteRepository;
 import com.christophedurand.go4lunch.data.details.DetailsRepository;
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
+import com.christophedurand.go4lunch.data.permissionChecker.PermissionChecker;
+import com.christophedurand.go4lunch.data.placeName.PlaceNameRepository;
 import com.christophedurand.go4lunch.model.pojo.Geometry;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
 import com.christophedurand.go4lunch.model.pojo.Open;
@@ -46,9 +49,12 @@ public class ListViewModelTest {
 
     private final Application application = Mockito.mock(Application.class);
 
+    private final PermissionChecker permissionChecker = Mockito.mock(PermissionChecker.class);
     private final CurrentLocationRepository currentLocationRepository = Mockito.mock(CurrentLocationRepository.class);
     private final NearbyRepository nearbyRepository = Mockito.mock(NearbyRepository.class);
+    private final PlaceNameRepository placeNameRepository = Mockito.mock(PlaceNameRepository.class);
     private final DetailsRepository detailsRepository = Mockito.mock(DetailsRepository.class);
+    private final AutocompleteRepository autocompleteRepository = Mockito.mock(AutocompleteRepository.class);
 
     private final MutableLiveData<String> placeNameMutableLiveData = new MutableLiveData<>();
     private final MutableLiveData<Location> currentLocationLiveData = new MutableLiveData<>();
@@ -223,34 +229,30 @@ public class ListViewModelTest {
 
         listViewModel = new ListViewModel(
                 application,
+                permissionChecker,
                 currentLocationRepository,
+                placeNameRepository,
                 nearbyRepository,
-                detailsRepository
+                detailsRepository,
+                autocompleteRepository
         );
     }
 
 
     @Test
     public void nominal_case() throws InterruptedException {
-        // Given
-
-        // When
         ListViewState listViewState = LiveDataTestUtils.getOrAwaitValue(listViewModel.getListViewStateMediatorLiveData(), 1);
 
-        // Then
         assertEquals(5, listViewState.getRestaurantViewStatesList().size());
     }
 
 
     @Test
     public void when_currentLocationIsNull_should_return_no_data() throws InterruptedException {
-        // Given
         currentLocationLiveData.setValue(null);
 
-        // When
         ListViewState listViewState = LiveDataTestUtils.observeForTesting(listViewModel.getListViewStateMediatorLiveData());
 
-        // Then
         assertNull(listViewState);
     }
 

@@ -1,10 +1,11 @@
 package com.christophedurand.go4lunch.data.autocomplete;
 
 import android.location.Location;
-import android.util.Pair;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
+
+import kotlin.Pair;
 
 
 public class AutocompleteRepository {
@@ -14,10 +15,9 @@ public class AutocompleteRepository {
         return autocompleteMediatorLiveData;
     }
 
-
     public AutocompleteRepository(LiveData<String> placeNameLiveData, LiveData<Location> currentLocationLiveData) {
-        autocompleteMediatorLiveData.addSource(currentLocationLiveData, currentLocation -> autocompleteMediatorLiveData.setValue(Pair.create(placeNameLiveData.getValue(), currentLocation)));
-        autocompleteMediatorLiveData.addSource(placeNameLiveData, keyword -> autocompleteMediatorLiveData.setValue(Pair.create(keyword, currentLocationLiveData.getValue())));
+        autocompleteMediatorLiveData.addSource(currentLocationLiveData, currentLocation -> autocompleteMediatorLiveData.setValue(new Pair(placeNameLiveData.getValue(), currentLocation)));
+        autocompleteMediatorLiveData.addSource(placeNameLiveData, keyword -> autocompleteMediatorLiveData.setValue(new Pair(keyword, currentLocationLiveData.getValue())));
     }
 
 }

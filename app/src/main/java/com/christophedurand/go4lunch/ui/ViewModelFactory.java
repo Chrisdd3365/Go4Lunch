@@ -1,11 +1,14 @@
 package com.christophedurand.go4lunch.ui;
 
 import android.app.Application;
+import android.location.Location;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.christophedurand.go4lunch.data.autocomplete.AutocompleteRepository;
 import com.christophedurand.go4lunch.data.details.DetailsRepository;
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
@@ -67,22 +70,27 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+        LiveData<Location> locationLiveData = mCurrentLocationRepository.getCurrentLocationLiveData();
+        PlaceNameRepository placeNameRepository = new PlaceNameRepository();
+        LiveData<String> placeNameMutableLiveData = placeNameRepository.getPlaceNameMutableLiveData();
         if (modelClass.isAssignableFrom(MapViewModel.class)) {
              return (T) new MapViewModel(
                      mApplication,
                      mNearbyRepository,
                      mPermissionChecker,
                      mCurrentLocationRepository,
-                     new PlaceNameRepository()
+                     placeNameRepository,
+                     new AutocompleteRepository(placeNameMutableLiveData, locationLiveData)
              );
          } else if (modelClass.isAssignableFrom(ListViewModel.class)) {
             return (T) new ListViewModel(
                     mApplication,
                     mPermissionChecker,
                     mCurrentLocationRepository,
-                    new PlaceNameRepository(),
+                    placeNameRepository,
                     mNearbyRepository,
-                    mDetailsRepository
+                    mDetailsRepository,
+                    new AutocompleteRepository(placeNameMutableLiveData, locationLiveData)
             );
         } else if (modelClass.isAssignableFrom(WorkmatesViewModel.class)) {
             return (T) new WorkmatesViewModel(

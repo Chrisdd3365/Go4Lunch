@@ -3,7 +3,6 @@ package com.christophedurand.go4lunch.ui.listView;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.location.Location;
-import android.util.Pair;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,6 +33,8 @@ import java.util.Map;
 
 import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
 
+import kotlin.Pair;
+
 
 public class ListViewModel extends AndroidViewModel  {
 
@@ -55,6 +56,7 @@ public class ListViewModel extends AndroidViewModel  {
     @NonNull
     private final CurrentLocationRepository currentLocationRepository;
     private final PlaceNameRepository placeNameRepository;
+    private final AutocompleteRepository autocompleteRepository;
 
 
     public ListViewModel(@NonNull Application application,
@@ -62,7 +64,8 @@ public class ListViewModel extends AndroidViewModel  {
                          @NonNull CurrentLocationRepository currentLocationRepository,
                          PlaceNameRepository placeNameRepository,
                          NearbyRepository nearbyRepository,
-                         DetailsRepository detailsRepository) {
+                         DetailsRepository detailsRepository,
+                         AutocompleteRepository autocompleteRepository) {
 
         super(application);
 
@@ -70,6 +73,7 @@ public class ListViewModel extends AndroidViewModel  {
         this.currentLocationRepository = currentLocationRepository;
         this.placeNameRepository = placeNameRepository;
         this.detailsRepository = detailsRepository;
+        this.autocompleteRepository = autocompleteRepository;
 
         placeIdRestaurantDetailsMapLiveData.setValue(new HashMap<>());
 
@@ -77,17 +81,15 @@ public class ListViewModel extends AndroidViewModel  {
 
         LiveData<String> placeNameMutableLiveData = placeNameRepository.getPlaceNameMutableLiveData();
 
-        AutocompleteRepository autocompleteRepository = new AutocompleteRepository(placeNameMutableLiveData, locationLiveData);
-
         MediatorLiveData<Pair<String, Location>> autocompleteMediatorLiveData = autocompleteRepository.getAutocompleteMediatorLiveData();
 
         LiveData<NearbyRestaurantsResponse> nearbyRestaurantsResponseLiveData =
                 Transformations.switchMap(
                         autocompleteMediatorLiveData,
                         value -> nearbyRepository.getNearbyRestaurantsResponseByRadiusLiveData(
-                                value.first,
+                                value.getFirst(),
                                 "restaurant",
-                                value.second.getLatitude() + "," + value.second.getLongitude(),
+                                value.getSecond().getLatitude() + "," + value.getSecond().getLongitude(),
                                 "1000",
                                 apiKey)
                 );
