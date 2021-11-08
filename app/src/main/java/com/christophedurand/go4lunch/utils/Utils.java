@@ -15,7 +15,7 @@ import com.christophedurand.go4lunch.R;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
-import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
+import static com.christophedurand.go4lunch.ui.homeView.HomeActivity.apiKey;
 
 import java.lang.reflect.Field;
 

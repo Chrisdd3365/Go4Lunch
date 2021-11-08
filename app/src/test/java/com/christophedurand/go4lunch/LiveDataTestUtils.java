@@ -30,7 +30,6 @@ public class LiveDataTestUtils {
         return (T) data[0];
     }
 
-    // TEST UNITAIRE
     public static <T> T observeForTesting(LiveData<T> liveData) {
         liveData.observeForever(new Observer<T>() {
             @Override

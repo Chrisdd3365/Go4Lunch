@@ -1,52 +1,70 @@
 package com.christophedurand.go4lunch.ui.detailsView;
 
+import com.christophedurand.go4lunch.model.User;
 
-import com.christophedurand.go4lunch.ui.workmatesView.User;
-import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-
-import java.util.Objects;
+import java.util.List;
 
 
 public class DetailsViewState {
 
-    private final RestaurantDetailsViewState restaurantDetailsViewState;
-    private final FirestoreRecyclerOptions<User> workmatesList;
+    private final String restaurantId;
+    private final String restaurantName;
+    private final String restaurantAddress;
+    private final String photoURL;
+    private final String phoneNumber;
+    private final String websiteURL;
+    private final int joiningButtonDrawableResId;
+    private final int favoriteButtonDrawableResId;
+    private final List<User> workmatesList;
 
 
-    public DetailsViewState(RestaurantDetailsViewState restaurantDetailsViewState, FirestoreRecyclerOptions<User> workmatesList) {
-        this.restaurantDetailsViewState = restaurantDetailsViewState;
+    public DetailsViewState(String restaurantId, String restaurantName, String restaurantAddress, String photoURL, String phoneNumber, String websiteURL, int joiningButtonDrawableResId, int favoriteButtonDrawableResId, List<User> workmatesList) {
+        this.restaurantId = restaurantId;
+        this.restaurantName = restaurantName;
+        this.restaurantAddress = restaurantAddress;
+        this.photoURL = photoURL;
+        this.phoneNumber = phoneNumber;
+        this.websiteURL = websiteURL;
+        this.joiningButtonDrawableResId = joiningButtonDrawableResId;
+        this.favoriteButtonDrawableResId = favoriteButtonDrawableResId;
         this.workmatesList = workmatesList;
     }
 
 
-    public RestaurantDetailsViewState getRestaurantDetailsViewState() {
-        return restaurantDetailsViewState;
+    public String getRestaurantId() {
+        return restaurantId;
     }
 
-    public FirestoreRecyclerOptions<User> getWorkmatesList() {
+    public String getRestaurantName() {
+        return restaurantName;
+    }
+
+    public String getRestaurantAddress() {
+        return restaurantAddress;
+    }
+
+    public String getPhotoURL() {
+        return photoURL;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public String getWebsiteURL() {
+        return websiteURL;
+    }
+
+    public int getJoiningButtonDrawableResId() {
+        return joiningButtonDrawableResId;
+    }
+
+    public int getFavoriteButtonDrawableResId() {
+        return favoriteButtonDrawableResId;
+    }
+
+    public List<User> getWorkmatesList() {
         return workmatesList;
-    }
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DetailsViewState that = (DetailsViewState) o;
-        return Objects.equals(restaurantDetailsViewState, that.restaurantDetailsViewState) && Objects.equals(workmatesList, that.workmatesList);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(restaurantDetailsViewState, workmatesList);
-    }
-
-    @Override
-    public String toString() {
-        return "DetailsViewState{" +
-                "restaurantDetailsViewState=" + restaurantDetailsViewState +
-                ", workmatesList=" + workmatesList +
-                '}';
     }
 
 }

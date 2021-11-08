@@ -19,7 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.ui.HomeActivity;
+import com.christophedurand.go4lunch.ui.homeView.HomeActivity;
 import com.christophedurand.go4lunch.ui.ViewModelFactory;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.google.android.libraries.places.api.model.Place;
@@ -140,7 +140,7 @@ public class ListFragment extends Fragment implements ListInterface {
 
 
     private void configureViewModel() {
-        ViewModelFactory viewModelFactory = ViewModelFactory.getInstance();
+        ViewModelFactory viewModelFactory = new ViewModelFactory("");
         listViewModel = new ViewModelProvider(this, viewModelFactory).get(ListViewModel.class);
     }
 

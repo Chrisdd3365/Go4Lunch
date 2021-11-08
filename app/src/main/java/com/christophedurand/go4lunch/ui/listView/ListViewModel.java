@@ -16,6 +16,7 @@ import com.christophedurand.go4lunch.data.details.DetailsRepository;
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.data.permissionChecker.PermissionChecker;
 import com.christophedurand.go4lunch.data.placeName.PlaceNameRepository;
+import com.christophedurand.go4lunch.data.user.UserRepository;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
 import com.christophedurand.go4lunch.model.pojo.OpeningHours;
 import com.christophedurand.go4lunch.model.pojo.Photo;
@@ -23,6 +24,8 @@ import com.christophedurand.go4lunch.model.pojo.Restaurant;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
 import com.christophedurand.go4lunch.model.pojo.RestaurantLocation;
+import com.christophedurand.go4lunch.model.User;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,16 +34,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
+import static com.christophedurand.go4lunch.ui.homeView.HomeActivity.apiKey;
 
 import kotlin.Pair;
 
 
 public class ListViewModel extends AndroidViewModel  {
-
-    private final List<String> alreadyQueriedPlaceIds = new ArrayList<>();
-
-    private final DetailsRepository detailsRepository;
 
     // "Final product"
     private final MediatorLiveData<ListViewState> listViewStateMediatorLiveData = new MediatorLiveData<>();
@@ -49,14 +48,19 @@ public class ListViewModel extends AndroidViewModel  {
     }
 
     // DetailResponse aggregator
-    private final MediatorLiveData<Map<String, RestaurantDetailsResponse>> placeIdRestaurantDetailsMapLiveData = new MediatorLiveData<>();
+    private final MediatorLiveData<Map<String, RestaurantDetailsResponse>> placeIdRestaurantDetailsMapMediatorLiveData = new MediatorLiveData<>();
+
+    private final List<String> alreadyQueriedPlaceIds = new ArrayList<>();
+
 
     @NonNull
     private final PermissionChecker permissionChecker;
     @NonNull
     private final CurrentLocationRepository currentLocationRepository;
+    private final DetailsRepository detailsRepository;
     private final PlaceNameRepository placeNameRepository;
-    private final AutocompleteRepository autocompleteRepository;
+    private final UserRepository userRepository;
+    private final FirebaseAuth firebaseAuth;
 
 
     public ListViewModel(@NonNull Application application,
@@ -65,7 +69,9 @@ public class ListViewModel extends AndroidViewModel  {
                          PlaceNameRepository placeNameRepository,
                          NearbyRepository nearbyRepository,
                          DetailsRepository detailsRepository,
-                         AutocompleteRepository autocompleteRepository) {
+                         AutocompleteRepository autocompleteRepository,
+                         UserRepository userRepository,
+                         FirebaseAuth firebaseAuth) {
 
         super(application);
 
@@ -73,37 +79,45 @@ public class ListViewModel extends AndroidViewModel  {
         this.currentLocationRepository = currentLocationRepository;
         this.placeNameRepository = placeNameRepository;
         this.detailsRepository = detailsRepository;
-        this.autocompleteRepository = autocompleteRepository;
+        this.userRepository = userRepository;
+        this.firebaseAuth = firebaseAuth;
 
-        placeIdRestaurantDetailsMapLiveData.setValue(new HashMap<>());
+
+        placeIdRestaurantDetailsMapMediatorLiveData.setValue(new HashMap<>());
 
         LiveData<Location> locationLiveData = currentLocationRepository.getCurrentLocationLiveData();
-
-        LiveData<String> placeNameMutableLiveData = placeNameRepository.getPlaceNameMutableLiveData();
 
         MediatorLiveData<Pair<String, Location>> autocompleteMediatorLiveData = autocompleteRepository.getAutocompleteMediatorLiveData();
 
         LiveData<NearbyRestaurantsResponse> nearbyRestaurantsResponseLiveData =
                 Transformations.switchMap(
                         autocompleteMediatorLiveData,
-                        value -> nearbyRepository.getNearbyRestaurantsResponseByRadiusLiveData(
-                                value.getFirst(),
-                                "restaurant",
-                                value.getSecond().getLatitude() + "," + value.getSecond().getLongitude(),
-                                "1000",
-                                apiKey)
+                        value ->
+                            nearbyRepository.getNearbyRestaurantsResponseByRadiusLiveData(
+                                    value.getFirst(),
+                                    "restaurant",
+                                    value.getSecond().getLatitude() + "," + value.getSecond().getLongitude(),
+                                    "1000",
+                                    apiKey)
                 );
 
+        LiveData<List<User>>  usersListLiveData = userRepository.fetchAllUsers();
+
+
         listViewStateMediatorLiveData.addSource(locationLiveData, location ->
-                combine(location, nearbyRestaurantsResponseLiveData.getValue(), placeIdRestaurantDetailsMapLiveData.getValue())
+                combine(location, nearbyRestaurantsResponseLiveData.getValue(), placeIdRestaurantDetailsMapMediatorLiveData.getValue(), usersListLiveData.getValue())
         );
 
         listViewStateMediatorLiveData.addSource(nearbyRestaurantsResponseLiveData, nearbyRestaurantsResponse ->
-                combine(locationLiveData.getValue(), nearbyRestaurantsResponse, placeIdRestaurantDetailsMapLiveData.getValue())
+                combine(locationLiveData.getValue(), nearbyRestaurantsResponse, placeIdRestaurantDetailsMapMediatorLiveData.getValue(), usersListLiveData.getValue())
         );
 
-        listViewStateMediatorLiveData.addSource(placeIdRestaurantDetailsMapLiveData, map ->
-                combine(locationLiveData.getValue(), nearbyRestaurantsResponseLiveData.getValue(), map)
+        listViewStateMediatorLiveData.addSource(placeIdRestaurantDetailsMapMediatorLiveData, map ->
+                combine(locationLiveData.getValue(), nearbyRestaurantsResponseLiveData.getValue(), map, usersListLiveData.getValue())
+        );
+
+        listViewStateMediatorLiveData.addSource(usersListLiveData, usersList ->
+                combine(locationLiveData.getValue(), nearbyRestaurantsResponseLiveData.getValue(), placeIdRestaurantDetailsMapMediatorLiveData.getValue(), usersList)
         );
 
     }
@@ -111,53 +125,59 @@ public class ListViewModel extends AndroidViewModel  {
 
     private void combine(@Nullable Location currentLocation,
                          @Nullable NearbyRestaurantsResponse response,
-                         @Nullable Map<String, RestaurantDetailsResponse> map) {
+                         @Nullable Map<String, RestaurantDetailsResponse> map,
+                         @Nullable List<User> usersList) {
 
         if (currentLocation == null) {
             return;
         }
 
         List<RestaurantViewState> restaurantViewStatesList = new ArrayList<>();
-            if (response != null) {
-                for (Restaurant restaurant : response.getResults()) {
-                    RestaurantDetailsResponse restaurantDetailsResponse = map.get(restaurant.getPlaceId());
-                    if (restaurantDetailsResponse != null) {
-                        RestaurantViewState restaurantViewState = new RestaurantViewState(
-                                restaurantDetailsResponse.getResult().getFormattedAddress(),
-                                getDistanceFromLastKnownUserLocation(currentLocation, restaurant.getGeometry().getLocation()),
-                                restaurantDetailsResponse.getResult().getName(),
-                                restaurantDetailsResponse.getResult().getPlaceId(),
-                                getConvertedRatingWith(restaurantDetailsResponse.getResult().getRating()),
-                                getPhotoUrl(restaurantDetailsResponse.getResult().getPhotos()),
-                                getOpeningHours(restaurantDetailsResponse.getResult().getOpeningHours())
-                        );
-                        restaurantViewStatesList.add(restaurantViewState);
-                    } else {
-                        if (!alreadyQueriedPlaceIds.contains(restaurant.getPlaceId())) {
-                            alreadyQueriedPlaceIds.add(restaurant.getPlaceId());
-                            placeIdRestaurantDetailsMapLiveData.addSource(
-                                    detailsRepository.getRestaurantDetailsMutableLiveData(restaurant.getPlaceId()),
-                                    detailsResponse -> {
-                                        Map<String, RestaurantDetailsResponse> mapInstance = placeIdRestaurantDetailsMapLiveData.getValue();
-                                        mapInstance.put(restaurant.getPlaceId(), detailsResponse);
-                                        placeIdRestaurantDetailsMapLiveData.setValue(mapInstance);
-                                    }
-                            );
-                        }
+        if (response != null) {
 
-                        RestaurantViewState restaurantViewState = new RestaurantViewState(
-                                restaurant.getVicinity(),
-                                getDistanceFromLastKnownUserLocation(currentLocation, restaurant.getGeometry().getLocation()),
-                                restaurant.getName(),
-                                restaurant.getPlaceId(),
-                                getConvertedRatingWith(restaurant.getRating()),
-                                getPhotoUrl(restaurant.getPhotos()),
-                                getOpeningHours(restaurant.getOpeningHours())
+            for (Restaurant restaurant : response.getResults()) {
+
+                RestaurantDetailsResponse restaurantDetailsResponse = map.get(restaurant.getPlaceId());
+
+                if (restaurantDetailsResponse != null) {
+                    RestaurantViewState restaurantViewState = new RestaurantViewState(
+                            restaurantDetailsResponse.getResult().getFormattedAddress(),
+                            getDistanceFromLastKnownUserLocation(currentLocation, restaurant.getGeometry().getLocation()),
+                            restaurantDetailsResponse.getResult().getName(),
+                            restaurantDetailsResponse.getResult().getPlaceId(),
+                            getConvertedRatingWith(restaurantDetailsResponse.getResult().getRating()),
+                            getPhotoUrl(restaurantDetailsResponse.getResult().getPhotos()),
+                            getOpeningHours(restaurantDetailsResponse.getResult().getOpeningHours()),
+                            buildNumberOfWorkmatesString(usersList != null ? getNumberOfWorkmates(restaurant.getPlaceId(), usersList) : 0)                    );
+
+                    restaurantViewStatesList.add(restaurantViewState);
+                } else {
+                    if (!alreadyQueriedPlaceIds.contains(restaurant.getPlaceId())) {
+                        alreadyQueriedPlaceIds.add(restaurant.getPlaceId());
+                        placeIdRestaurantDetailsMapMediatorLiveData.addSource(
+                                detailsRepository.getRestaurantDetailsMutableLiveData(restaurant.getPlaceId()),
+                                detailsResponse -> {
+                                    Map<String, RestaurantDetailsResponse> mapInstance = placeIdRestaurantDetailsMapMediatorLiveData.getValue();
+                                    mapInstance.put(restaurant.getPlaceId(), detailsResponse);
+                                    placeIdRestaurantDetailsMapMediatorLiveData.setValue(mapInstance);
+                                }
                         );
-                        restaurantViewStatesList.add(restaurantViewState);
                     }
+
+                    RestaurantViewState restaurantViewState = new RestaurantViewState(
+                            restaurant.getVicinity(),
+                            getDistanceFromLastKnownUserLocation(currentLocation, restaurant.getGeometry().getLocation()),
+                            restaurant.getName(),
+                            restaurant.getPlaceId(),
+                            getConvertedRatingWith(restaurant.getRating()),
+                            getPhotoUrl(restaurant.getPhotos()),
+                            getOpeningHours(restaurant.getOpeningHours()),
+                            buildNumberOfWorkmatesString(usersList != null ? getNumberOfWorkmates(restaurant.getPlaceId(), usersList) : 0)
+                    );
+                    restaurantViewStatesList.add(restaurantViewState);
                 }
             }
+        }
 
         listViewStateMediatorLiveData.setValue(
                 new ListViewState(
@@ -229,6 +249,22 @@ public class ListViewModel extends AndroidViewModel  {
 
         float distance = currentLocation.distanceTo(location);
         return (int) distance + "m";
+    }
+
+    private String buildNumberOfWorkmatesString(int numberOfWorkmates) {
+        return "(" + numberOfWorkmates + ")";
+    }
+
+    private int getNumberOfWorkmates(String placeId, List<User> userList) {
+        int numberOfWorkmates = 0;
+
+        for (User user : userList) {
+           if (user.getRestaurant() != null && user.getRestaurant().getId().equals(placeId)) {
+               numberOfWorkmates += 1;
+            }
+        }
+
+        return numberOfWorkmates;
     }
 
     public void getRestaurantQuery(String placeName) {

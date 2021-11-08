@@ -13,8 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
 import com.christophedurand.go4lunch.R;
+import com.christophedurand.go4lunch.data.user.UserRepository;
 import com.christophedurand.go4lunch.ui.MainActivity;
-import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -30,7 +30,7 @@ public class NotificationsService extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
-        UserManager.getInstance().getCurrentUserData().addOnSuccessListener(currentUser -> {
+        UserRepository.getInstance().getCurrentUser().addOnSuccessListener(currentUser -> {
             if (currentUser.isHasSetNotifications()) {
                 if (remoteMessage.getNotification() != null) {
                     RemoteMessage.Notification notification = remoteMessage.getNotification();
@@ -48,9 +48,9 @@ public class NotificationsService extends FirebaseMessagingService {
         // Create a Channel (Android 8)
         String channelId = getString(R.string.default_notification_channel_id);
 
-        UserManager.getInstance().getCurrentUserData().addOnSuccessListener(currentUser -> {
+        UserRepository.getInstance().getCurrentUser().addOnSuccessListener(currentUser -> {
 
-            UserManager.getInstance().getAllUsers().whereEqualTo("restaurant.id", currentUser.getRestaurant().getId()).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            UserRepository.getInstance().getAllUsers().whereEqualTo("restaurant.id", currentUser.getRestaurant().getId()).get().addOnSuccessListener(queryDocumentSnapshots -> {
 
                 StringBuilder workmatesList = new StringBuilder();
                 for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {

@@ -1,6 +1,7 @@
 package com.christophedurand.go4lunch.ui.mapView;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -23,11 +24,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.ui.HomeActivity;
+import com.christophedurand.go4lunch.ui.homeView.HomeActivity;
 import com.christophedurand.go4lunch.ui.ViewModelFactory;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
-import com.christophedurand.go4lunch.ui.workmatesView.User;
-import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
 import com.christophedurand.go4lunch.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -40,7 +39,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -162,6 +160,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     private void onMapMarkerClicked(GoogleMap googleMap) {
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @SuppressLint("PotentialBehaviorOverride")
             @Override
             public boolean onMarkerClick(@NonNull Marker marker) {
                 _mapItemParentConstraintLayout.setVisibility(View.VISIBLE);
@@ -172,13 +171,10 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
     }
 
     private void onMapMarkerDetailsClicked(String restaurantId) {
-        _mapItemParentConstraintLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(requireActivity(), RestaurantDetailsActivity.class);
-                intent.putExtra("restaurantId", restaurantId);
-                startActivity(intent);
-            }
+        _mapItemParentConstraintLayout.setOnClickListener(v -> {
+            Intent intent = new Intent(requireActivity(), RestaurantDetailsActivity.class);
+            intent.putExtra("restaurantId", restaurantId);
+            startActivity(intent);
         });
     }
 
@@ -211,7 +207,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
 
     private void configureViewModel() {
-        ViewModelFactory viewModelFactory = ViewModelFactory.getInstance();
+        ViewModelFactory viewModelFactory = new ViewModelFactory("");
         mMapViewModel = new ViewModelProvider(this, viewModelFactory).get(MapViewModel.class);
     }
 
@@ -262,25 +258,14 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
                 String restaurantId = mapMarker.getPlaceId();
                 LatLng restaurantLatLng = mapMarker.getLatLng();
 
-                UserManager.getInstance().getAllUsers().get().addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<DocumentSnapshot> workmatesList = queryDocumentSnapshots.getDocuments();
-                    int numberOfWorkmates = 0;
-                    for (DocumentSnapshot workmate : workmatesList) {
-                        User user = workmate.toObject(User.class);
-                        if (user.getRestaurant() != null
-                                && user.getRestaurant().getId() != null
-                                && user.getRestaurant().getId().equals(restaurantId)) {
-                            numberOfWorkmates += 1;
-                        }
-                    }
-                    Marker marker = googleMap.addMarker(
-                            new MarkerOptions()
-                                    .position(restaurantLatLng)
-                                    .icon(Utils.bitmapDescriptorFromVector(getActivity(), Utils.getResId(setMapMarkerIcon(numberOfWorkmates), R.drawable.class)))
-                    );
-                    marker.setTag(restaurantId);
-                    _markerHashMap.put(marker.getTag(), mapMarker);
-                });
+                Marker marker = googleMap.addMarker(
+                        new MarkerOptions()
+                                .position(restaurantLatLng)
+                                .icon(Utils.bitmapDescriptorFromVector(getActivity(), Utils.getResId(mapMarker.getIconResId(), R.drawable.class)))
+                );
+                marker.setTag(restaurantId);
+                _markerHashMap.put(marker.getTag(), mapMarker);
+
             }
         }
     }
@@ -306,14 +291,6 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
         _mapItemAddressTextView.setText(vicinity);
 
         onMapMarkerDetailsClicked(_markerHashMap.get(markerTag).getPlaceId());
-    }
-
-    private String setMapMarkerIcon(int numberOfWorkmates) {
-        if (numberOfWorkmates == 0) {
-            return "ic_restaurant_red_marker";
-        } else {
-            return "ic_restaurant_green_marker";
-        }
     }
 
 }

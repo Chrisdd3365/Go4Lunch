@@ -1,6 +1,5 @@
 package com.christophedurand.go4lunch.ui.listView;
 
-
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -9,12 +8,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.ui.workmatesView.User;
-import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
 import com.christophedurand.go4lunch.utils.Utils;
-import com.google.firebase.firestore.DocumentSnapshot;
-
-import java.util.List;
 
 
 class RestaurantViewHolder extends RecyclerView.ViewHolder {
@@ -61,21 +55,10 @@ class RestaurantViewHolder extends RecyclerView.ViewHolder {
         double rating = restaurantViewState.getRating();
         mRestaurantRatingBar.setRating((float) rating);
 
-        UserManager.getInstance().getAllUsers().get().addOnSuccessListener(queryDocumentSnapshots -> {
-            List<DocumentSnapshot> workmatesList = queryDocumentSnapshots.getDocuments();
-            int numberOfWorkmates = 0;
-            for (DocumentSnapshot workmate : workmatesList) {
-                User user = workmate.toObject(User.class);
-                if (user.getRestaurant().getId() != null && user.getRestaurant().getId().equals(restaurantViewState.getPlaceId())) {
-                    numberOfWorkmates += 1;
-                    mRestaurantWorkmatesTextView.setText("(" + numberOfWorkmates + ")");
-                }
-            }
-        });
+        String numberOfWorkmates = restaurantViewState.getNumberOfWorkmates();
+        mRestaurantWorkmatesTextView.setText(numberOfWorkmates);
 
-        itemView.setOnClickListener(v -> {
-            listener.onClickItemList(restaurantViewState.getPlaceId());
-        });
+        itemView.setOnClickListener(v -> listener.onClickItemList(restaurantViewState.getPlaceId()));
     }
 
 }

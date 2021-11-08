@@ -1,6 +1,5 @@
 package com.christophedurand.go4lunch.ui.workmatesView;
 
-
 import java.util.Objects;
 
 

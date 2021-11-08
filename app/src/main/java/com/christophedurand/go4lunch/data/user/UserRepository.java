@@ -4,9 +4,11 @@ import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.christophedurand.go4lunch.ui.workmatesView.Restaurant;
-import com.christophedurand.go4lunch.ui.workmatesView.User;
+import com.christophedurand.go4lunch.model.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -15,30 +17,25 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
-public final class UserRepository {
+public class UserRepository {
 
     private static final String COLLECTION_USERS = "users";
-
-    private static volatile UserRepository instance;
+    private static UserRepository sUserRepository;
 
 
     private UserRepository() { }
 
     public static UserRepository getInstance() {
-        UserRepository result = instance;
-        if (result != null) {
-            return result;
+        if (sUserRepository == null) {
+            sUserRepository = new UserRepository();
         }
-        synchronized(UserRepository.class) {
-            if (instance == null) {
-                instance = new UserRepository();
-            }
-            return instance;
-        }
+        return sUserRepository;
     }
 
 
@@ -46,22 +43,17 @@ public final class UserRepository {
         return FirebaseFirestore.getInstance().collection(COLLECTION_USERS);
     }
 
-
     @Nullable
-    public FirebaseUser getCurrentUser() {
+    public FirebaseUser getFirebaseCurrentUser() {
         return FirebaseAuth.getInstance().getCurrentUser();
     }
 
-    private String getCurrentUserUID() { return getCurrentUser().getUid(); }
+    private String getCurrentUserUID() { return getFirebaseCurrentUser().getUid(); }
 
     public Task<Void> deleteCurrentUser(Context context) { return AuthUI.getInstance().delete(context); }
 
-    public Task<Void> signOut(Context context){
-        return AuthUI.getInstance().signOut(context);
-    }
-
     public void createCurrentUser(Restaurant restaurant, List<String> favoriteRestaurantsIdsList, boolean hasSetNotifications) {
-        FirebaseUser firebaseUser = getCurrentUser();
+        FirebaseUser firebaseUser = getFirebaseCurrentUser();
         if (firebaseUser != null) {
             String uid = firebaseUser.getUid();
             String name = firebaseUser.getDisplayName();
@@ -86,6 +78,46 @@ public final class UserRepository {
         } else {
             return null;
         }
+    }
+
+    public Task<User> getCurrentUser() {
+        // Get the user from Firestore and cast it to a User model Object
+        return getCurrentUserData().continueWith(task -> task.getResult().toObject(User.class));
+    }
+
+    private final MutableLiveData<Boolean> isJoiningLiveData = new MutableLiveData<>();
+    public MutableLiveData<Boolean> getIsJoiningLiveData() {
+        return isJoiningLiveData;
+    }
+    public void setCurrentUserIsJoining(String restaurantId, String chosenRestaurantName, String chosenRestaurantAddress) {
+        getCurrentUser().addOnSuccessListener(currentUser -> {
+            if ((currentUser.getRestaurant() != null && currentUser.getRestaurant().getId() != null)
+                    && currentUser.getRestaurant().getId().contains(restaurantId)) {
+                updateChosenRestaurant("", "", "", currentUser.getUid());
+                isJoiningLiveData.setValue(false);
+            } else {
+                updateChosenRestaurant(restaurantId, chosenRestaurantName, chosenRestaurantAddress, currentUser.getUid());
+                isJoiningLiveData.setValue(true);
+            }
+        });
+    }
+
+    private final MutableLiveData<Boolean> isFavoriteLiveData = new MutableLiveData<>();
+    public MutableLiveData<Boolean> getIsFavoriteLiveData() {
+        return isFavoriteLiveData;
+    }
+    public void setCurrentUserIsFavorite(String restaurantId) {
+        getCurrentUser().addOnSuccessListener(currentUser -> {
+            if (currentUser.getFavoriteRestaurantsIdsList() == null || !currentUser.getFavoriteRestaurantsIdsList().contains(restaurantId)) {
+                updateFavoriteRestaurantsIdsList(restaurantId, currentUser.getUid());
+                currentUser.getFavoriteRestaurantsIdsList().add(restaurantId);
+                isFavoriteLiveData.setValue(true);
+            } else {
+                updateFavoriteRestaurantsIdsList(restaurantId, currentUser.getUid());
+                currentUser.getFavoriteRestaurantsIdsList().remove(restaurantId);
+                isFavoriteLiveData.setValue(false);
+            }
+        });
     }
 
     public void deleteCurrentUserFromFirestore() {
@@ -116,8 +148,89 @@ public final class UserRepository {
         return getUsersCollection().orderBy("name");
     }
 
+    public LiveData<List<User>> fetchAllUsers() {
+        final MutableLiveData<List<User>> allUsersMutableLiveData = new MutableLiveData<>();
+
+        getAllUsers().get().addOnSuccessListener(queryDocumentSnapshots -> {
+
+            if (queryDocumentSnapshots == null) {
+                return;
+            }
+
+            List<User> users = new ArrayList<>();
+            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                users.add(document.toObject(User.class));
+            }
+            allUsersMutableLiveData.setValue(users);
+        });
+
+        return allUsersMutableLiveData;
+    }
+
+    public Query getAllUsersListWithout(String currentUserId) {
+        return getUsersCollection().whereNotEqualTo("uid", currentUserId);
+    }
+
+    public LiveData<List<User>> fetchAllUsersListWithout(String currentUserId) {
+        final MutableLiveData<List<User>> filteredUsersListLiveData = new MutableLiveData<>();
+
+        getAllUsersListWithout(currentUserId).get().addOnSuccessListener(queryDocumentSnapshots -> {
+
+            if (queryDocumentSnapshots == null) {
+                return;
+            }
+
+            List<User> users = new ArrayList<>();
+            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                users.add(document.toObject(User.class));
+            }
+            filteredUsersListLiveData.setValue(users);
+        });
+
+        return filteredUsersListLiveData;
+    }
+
     public Query getUsersFilteredListBy(String restaurantId) {
         return getUsersCollection().whereEqualTo("restaurant.id", restaurantId);
+    }
+
+    public LiveData<List<User>> fetchUsersFilteredList(String restaurantId) {
+        final MutableLiveData<List<User>> filteredUsersListLiveData = new MutableLiveData<>(new ArrayList<>());
+
+        getUsersFilteredListBy(restaurantId).get().addOnSuccessListener(queryDocumentSnapshots -> {
+
+            if (queryDocumentSnapshots == null) {
+                return;
+            }
+
+            List<User> users = new ArrayList<>();
+            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                users.add(document.toObject(User.class));
+            }
+            filteredUsersListLiveData.setValue(users);
+        });
+
+        return filteredUsersListLiveData;
+    }
+
+    private final MutableLiveData<Integer> numberOfWorkmatesMutableLiveData = new MutableLiveData<>();
+    public MutableLiveData<Integer> getNumberOfWorkmatesMutableLiveData() {
+        return numberOfWorkmatesMutableLiveData;
+    }
+
+    public void getNumberOfWorkmatesFor(String restaurantId) {
+        getAllUsers().get().addOnSuccessListener(queryDocumentSnapshots -> {
+            List<DocumentSnapshot> workmatesList = queryDocumentSnapshots.getDocuments();
+
+            int numberOfWorkmates = 0;
+            for (DocumentSnapshot workmate : workmatesList) {
+                User user = workmate.toObject(User.class);
+                if (user != null && user.getRestaurant() != null && user.getRestaurant().getId() != null && user.getRestaurant().getId().equals(restaurantId)) {
+                    numberOfWorkmates += 1;
+                }
+                numberOfWorkmatesMutableLiveData.setValue(numberOfWorkmates);
+            }
+        });
     }
 
     public void deleteUser(String userId)  {
@@ -128,7 +241,7 @@ public final class UserRepository {
         getUserData(userId).addOnSuccessListener(documentSnapshot -> {
             User user = documentSnapshot.toObject(User.class);
 
-            if (user.getFavoriteRestaurantsIdsList().contains(favoriteRestaurantId)) {
+            if (user != null && user.getFavoriteRestaurantsIdsList().contains(favoriteRestaurantId)) {
                 user.getFavoriteRestaurantsIdsList().remove(favoriteRestaurantId);
             } else {
                 user.getFavoriteRestaurantsIdsList().add(favoriteRestaurantId);

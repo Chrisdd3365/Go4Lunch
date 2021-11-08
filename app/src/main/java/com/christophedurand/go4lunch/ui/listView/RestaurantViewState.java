@@ -1,7 +1,5 @@
 package com.christophedurand.go4lunch.ui.listView;
 
-import java.util.Objects;
-
 
 public class RestaurantViewState {
 
@@ -12,9 +10,10 @@ public class RestaurantViewState {
     private final double rating;
     private final String photoURL;
     private final String openingHours;
+    private final String numberOfWorkmates;
 
 
-    public RestaurantViewState(String address, String distance, String name, String placeId, double rating, String photoURL, String openingHours) {
+    public RestaurantViewState(String address, String distance, String name, String placeId, double rating, String photoURL, String openingHours, String numberOfWorkmates) {
         this.address = address;
         this.distance = distance;
         this.name = name;
@@ -22,6 +21,7 @@ public class RestaurantViewState {
         this.rating = rating;
         this.photoURL = photoURL;
         this.openingHours = openingHours;
+        this.numberOfWorkmates = numberOfWorkmates;
     }
 
 
@@ -53,31 +53,8 @@ public class RestaurantViewState {
         return openingHours;
     }
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RestaurantViewState that = (RestaurantViewState) o;
-        return Double.compare(that.rating, rating) == 0 && Objects.equals(address, that.address) && Objects.equals(distance, that.distance) && Objects.equals(name, that.name) && Objects.equals(placeId, that.placeId) && Objects.equals(photoURL, that.photoURL) && Objects.equals(openingHours, that.openingHours);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(address, distance, name, placeId, rating, photoURL, openingHours);
-    }
-
-    @Override
-    public String toString() {
-        return "RestaurantViewState{" +
-                "address='" + address + '\'' +
-                ", distance='" + distance + '\'' +
-                ", name='" + name + '\'' +
-                ", placeId='" + placeId + '\'' +
-                ", rating=" + rating +
-                ", photoURL='" + photoURL + '\'' +
-                ", openingHours='" + openingHours + '\'' +
-                '}';
+    public String getNumberOfWorkmates() {
+        return numberOfWorkmates;
     }
 
 }

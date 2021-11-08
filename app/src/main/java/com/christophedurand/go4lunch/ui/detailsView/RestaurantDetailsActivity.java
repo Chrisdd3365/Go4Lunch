@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
+import com.christophedurand.go4lunch.ui.ViewModelFactory;
 import com.christophedurand.go4lunch.ui.listView.ListInterface;
 import com.christophedurand.go4lunch.ui.workmatesView.WorkmatesRecyclerViewAdapter;
 import com.christophedurand.go4lunch.utils.Utils;
@@ -40,6 +40,9 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
 
         setContentView(R.layout.activity_detailed_restaurant);
 
+        joiningImageButton = findViewById(R.id.joining_image_button);
+        likeImageButton = findViewById(R.id.like_image_button);
+
         configureWorkmatesRecyclerView();
 
         Bundle extras = getIntent().getExtras();
@@ -50,18 +53,14 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
         configureViewModel();
         subscribe();
 
-        configureLikeButtonImage();
+        joiningButtonIsTapped();
         likeButtonIsTapped();
 
-        configureJoiningButtonImage();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (workmatesRecyclerViewAdapter != null) {
-            workmatesRecyclerViewAdapter.startListening();
-        }
     }
 
     @Override
@@ -77,31 +76,21 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
     @Override
     public void onStop() {
         super.onStop();
-        workmatesRecyclerViewAdapter.stopListening();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        restaurantDetailsViewModel.onCleared();
+        restaurantDetailsViewModel.getDetailsViewStateLiveData().removeObservers(this);
     }
 
 
     @Override
     public void onClickItemList(String restaurantId) { }
 
-    private void joiningButtonIsTapped(String chosenRestaurantName, String chosenRestaurantAddress) {
+    private void joiningButtonIsTapped() {
         joiningImageButton.setOnClickListener(view -> {
-            UserManager.getInstance().getCurrentUserData().addOnSuccessListener(currentUser -> {
-                if ((currentUser.getRestaurant() != null && currentUser.getRestaurant().getId() != null)
-                        && currentUser.getRestaurant().getId().contains(restaurantId)) {
-                    UserManager.getInstance().updateChosenRestaurant("", "", "", currentUser.getUid());
-                    joiningImageButton.setImageResource(R.drawable.ic_check_circle_red);
-                } else {
-                    UserManager.getInstance().updateChosenRestaurant(restaurantId, chosenRestaurantName, chosenRestaurantAddress, currentUser.getUid());
-                    joiningImageButton.setImageResource(R.drawable.ic_check_circle_green);
-                }
-            });
+            restaurantDetailsViewModel.setJoiningButtonState();
         });
     }
 
@@ -119,17 +108,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
 
     private void likeButtonIsTapped() {
         likeImageButton.setOnClickListener(view -> {
-            UserManager.getInstance().getCurrentUserData().addOnSuccessListener(currentUser -> {
-                if (currentUser.getFavoriteRestaurantsIdsList() == null || !currentUser.getFavoriteRestaurantsIdsList().contains(restaurantId)) {
-                    UserManager.getInstance().updateFavoriteRestaurantsIdsList(restaurantId, currentUser.getUid());
-                    currentUser.getFavoriteRestaurantsIdsList().add(restaurantId);
-                    likeImageButton.setImageResource(R.drawable.ic_star_filled);
-                } else {
-                    UserManager.getInstance().updateFavoriteRestaurantsIdsList(restaurantId, currentUser.getUid());
-                    currentUser.getFavoriteRestaurantsIdsList().remove(restaurantId);
-                    likeImageButton.setImageResource(R.drawable.ic_star_outline);
-                }
-            });
+            restaurantDetailsViewModel.setFavoriteButtonState();
         });
     }
 
@@ -147,31 +126,37 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
 
 
     private void configureViewModel() {
-        RestaurantDetailsViewModelFactory restaurantDetailsViewModelFactory = new RestaurantDetailsViewModelFactory(restaurantId, this);
-        restaurantDetailsViewModel = new ViewModelProvider(this, restaurantDetailsViewModelFactory).get(RestaurantDetailsViewModel.class);
+        ViewModelFactory viewModelFactory = new ViewModelFactory(restaurantId);
+        restaurantDetailsViewModel = new ViewModelProvider(this, viewModelFactory).get(RestaurantDetailsViewModel.class);
     }
 
     private void subscribe() {
         restaurantDetailsViewModel.getDetailsViewStateLiveData().observe(this, detailsViewState -> {
-            String photoReference = detailsViewState.getRestaurantDetailsViewState().getPhotoURL();
+            String photoReference = detailsViewState.getPhotoURL();
             configureRestaurantImage(photoReference);
 
-            String restaurantName = detailsViewState.getRestaurantDetailsViewState().getRestaurantName();
+            String restaurantName = detailsViewState.getRestaurantName();
             configureRestaurantName(restaurantName);
 
-            String restaurantAddress = detailsViewState.getRestaurantDetailsViewState().getRestaurantAddress();
+            String restaurantAddress = detailsViewState.getRestaurantAddress();
             configureRestaurantAddress(restaurantAddress);
 
-            String phoneNumber = detailsViewState.getRestaurantDetailsViewState().getPhoneNumber();
+            String phoneNumber = detailsViewState.getPhoneNumber();
             callButtonIsTapped(phoneNumber);
 
-            String websiteURL = detailsViewState.getRestaurantDetailsViewState().getWebsiteURL();
+            String websiteURL = detailsViewState.getWebsiteURL();
             websiteButtonIsTapped(websiteURL);
 
-            workmatesRecyclerViewAdapter = new WorkmatesRecyclerViewAdapter(this, detailsViewState.getWorkmatesList());
+            int joiningDrawableResId = detailsViewState.getJoiningButtonDrawableResId();
+            joiningImageButton.setImageResource(joiningDrawableResId);
+
+            int favoriteDrawableResId = detailsViewState.getFavoriteButtonDrawableResId();
+            likeImageButton.setImageResource(favoriteDrawableResId);
+
+            workmatesRecyclerViewAdapter = new WorkmatesRecyclerViewAdapter(this);
+            workmatesRecyclerViewAdapter.setNewData(detailsViewState.getWorkmatesList());
             workmatesRecyclerView.setAdapter(workmatesRecyclerViewAdapter);
 
-            joiningButtonIsTapped(restaurantName, restaurantAddress);
         });
     }
 
@@ -188,29 +173,6 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
     private void configureRestaurantAddress(String restaurantAddress) {
         TextView restaurantAddressTextView = findViewById(R.id.restaurant_address_text_view);
         restaurantAddressTextView.setText(restaurantAddress);
-    }
-
-    private void configureJoiningButtonImage() {
-        joiningImageButton = findViewById(R.id.joining_image_button);
-        UserManager.getInstance().getCurrentUserData().addOnSuccessListener(currentUser -> {
-            if ((currentUser.getRestaurant() != null && currentUser.getRestaurant().getId() != null)
-                    && currentUser.getRestaurant().getId().contains(restaurantId)) {
-                joiningImageButton.setImageResource(R.drawable.ic_check_circle_green);
-            } else {
-                joiningImageButton.setImageResource(R.drawable.ic_check_circle_red);
-            }
-        });
-    }
-
-    private void configureLikeButtonImage() {
-        likeImageButton = findViewById(R.id.like_image_button);
-        UserManager.getInstance().getCurrentUserData().addOnSuccessListener(currentUser -> {
-            if (currentUser.getFavoriteRestaurantsIdsList() == null || !currentUser.getFavoriteRestaurantsIdsList().contains(restaurantId)) {
-                likeImageButton.setImageResource(R.drawable.ic_star_outline);
-            } else {
-                likeImageButton.setImageResource(R.drawable.ic_star_filled);
-            }
-        });
     }
 
     private void configureWorkmatesRecyclerView() {

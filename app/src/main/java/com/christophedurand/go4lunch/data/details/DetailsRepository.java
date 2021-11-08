@@ -18,7 +18,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
+import static com.christophedurand.go4lunch.ui.homeView.HomeActivity.apiKey;
 
 
 public class DetailsRepository {

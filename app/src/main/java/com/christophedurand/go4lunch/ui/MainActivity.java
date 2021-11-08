@@ -7,8 +7,9 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.christophedurand.go4lunch.R;
+import com.christophedurand.go4lunch.data.user.UserRepository;
+import com.christophedurand.go4lunch.ui.homeView.HomeActivity;
 import com.christophedurand.go4lunch.ui.workmatesView.Restaurant;
-import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -22,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     public static int AUTH_REQUEST_CODE = 1;
 
 
-    private final UserManager userManager = UserManager.getInstance();
+    private final UserRepository userRepository = UserRepository.getInstance();
 
 
     @Override
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == AUTH_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                userManager.createCurrentUser(new Restaurant("", "", ""), new ArrayList<>(), false);
+                userRepository.createCurrentUser(new Restaurant("", "", ""), new ArrayList<>(), false);
                 startHomeActivity();
             }
         }
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 new AuthUI.IdpConfig.TwitterBuilder().build()
         );
 
-        FirebaseUser user = userManager.getCurrentUser();
+        FirebaseUser user = userRepository.getFirebaseCurrentUser();
         if (user != null) {
             startHomeActivity();
         } else {

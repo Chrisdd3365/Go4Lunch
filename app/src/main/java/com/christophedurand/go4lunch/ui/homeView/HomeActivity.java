@@ -1,12 +1,10 @@
-package com.christophedurand.go4lunch.ui;
+package com.christophedurand.go4lunch.ui.homeView;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,9 +15,12 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
+import com.christophedurand.go4lunch.ui.MainActivity;
+import com.christophedurand.go4lunch.ui.settingsView.SettingsActivity;
+import com.christophedurand.go4lunch.ui.ViewModelFactory;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.christophedurand.go4lunch.utils.Utils;
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -30,6 +31,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
@@ -41,17 +43,20 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
 
     private View headerView;
-    public Toolbar toolbar;
     private DrawerLayout drawerLayout;
+    public Toolbar toolbar;
+
+    private TextView userNameTextView;
+    private TextView userMailTextView;
+    private ImageView userAvatarImageView;
 
     private String restaurantId;
 
-    private final UserManager userManager = UserManager.getInstance();
+    private HomeViewModel homeViewModel;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_home);
@@ -63,13 +68,14 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         Places.initialize(getApplication(), apiKey);
 
+        configureViewModel();
+        subscribe();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        setUserProfileUI(headerView);
+        configureCurrentUserProfileUI(headerView);
     }
 
 
@@ -147,37 +153,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         headerView = navigationView.getHeaderView(0);
-        setUserProfileUI(headerView);
+        configureCurrentUserProfileUI(headerView);
     }
 
-    private void setUserProfileUI(View headerView) {
-        TextView userNameTextView = headerView.findViewById(R.id.user_name_text_view);
-        TextView userMailTextView = headerView.findViewById(R.id.user_mail_text_view);
-        ImageView userAvatarImageView = headerView.findViewById(R.id.user_avatar_image_view);
-
-        Drawable avatarPlaceHolder = Utils.getAvatarPlaceHolder(this);
-
-        // Using handler to delay this method's call because callback from firebase is too slow
-        final Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(() ->
-                userManager.getCurrentUserData().addOnSuccessListener(user -> {
-                    String username = user.getName();
-                    userNameTextView.setText(username);
-
-                    String email = user.getEmail();
-                    userMailTextView.setText(email);
-
-                    if (user.getAvatarURL() != null) {
-                        Glide.with(this)
-                                .load(user.getAvatarURL())
-                                .apply(RequestOptions.circleCropTransform())
-                                .placeholder(avatarPlaceHolder)
-                                .into(userAvatarImageView);
-                    }
-
-                    restaurantId = user.getRestaurant().getId();
-                }), 3000);
+    private void configureCurrentUserProfileUI(View headerView) {
+        userNameTextView = headerView.findViewById(R.id.user_name_text_view);
+        userMailTextView = headerView.findViewById(R.id.user_mail_text_view);
+        userAvatarImageView = headerView.findViewById(R.id.user_avatar_image_view);
     }
+
 
     private void showMyLunch() {
         if (!restaurantId.equals("")) {
@@ -195,9 +179,39 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void signOut() {
-        userManager.signOut(this).addOnCompleteListener(task -> {
+        AuthUI.getInstance().signOut(this).addOnCompleteListener(task -> {
             startActivity(new Intent(HomeActivity.this, MainActivity.class));
             finish();
+        });
+    }
+
+
+    private void configureViewModel() {
+        ViewModelFactory viewModelFactory = new ViewModelFactory("");
+        homeViewModel = new ViewModelProvider(this, viewModelFactory).get(HomeViewModel.class);
+    }
+
+    private void subscribe() {
+        Drawable avatarPlaceHolder = Utils.getAvatarPlaceHolder(this);
+
+        homeViewModel.getHomeViewStateMediatorLiveData().observe(this, homeViewState -> {
+            if (homeViewState.getCurrentUser() != null && homeViewState.getCurrentUser().getRestaurant() != null) {
+                String username = homeViewState.getCurrentUser().getName();
+                userNameTextView.setText(username);
+
+                String email = homeViewState.getCurrentUser().getEmail();
+                userMailTextView.setText(email);
+
+                if (homeViewState.getCurrentUser().getAvatarURL() != null) {
+                    Glide.with(this)
+                            .load(homeViewState.getCurrentUser().getAvatarURL())
+                            .apply(RequestOptions.circleCropTransform())
+                            .placeholder(avatarPlaceHolder)
+                            .into(userAvatarImageView);
+                }
+
+                restaurantId = homeViewState.getCurrentUser().getRestaurant().getId();
+            }
         });
     }
 

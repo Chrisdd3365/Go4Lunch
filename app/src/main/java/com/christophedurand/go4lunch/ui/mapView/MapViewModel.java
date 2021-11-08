@@ -15,14 +15,17 @@ import com.christophedurand.go4lunch.data.autocomplete.AutocompleteRepository;
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
 import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
 import com.christophedurand.go4lunch.data.placeName.PlaceNameRepository;
+import com.christophedurand.go4lunch.data.user.UserRepository;
 import com.christophedurand.go4lunch.model.pojo.NearbyRestaurantsResponse;
 import com.christophedurand.go4lunch.data.permissionChecker.PermissionChecker;
+import com.christophedurand.go4lunch.model.User;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.christophedurand.go4lunch.ui.HomeActivity.apiKey;
+import static com.christophedurand.go4lunch.ui.homeView.HomeActivity.apiKey;
 
 import kotlin.Pair;
 
@@ -34,12 +37,14 @@ public class MapViewModel extends AndroidViewModel {
         return mMapViewStateMediatorLiveData;
     }
 
+
     @NonNull
     private final PermissionChecker permissionChecker;
     @NonNull
     private final CurrentLocationRepository currentLocationRepository;
     private final PlaceNameRepository placeNameRepository;
-    private final AutocompleteRepository autocompleteRepository;
+    private final UserRepository userRepository;
+    private final FirebaseAuth firebaseAuth;
 
 
     public MapViewModel(@NonNull Application application,
@@ -47,18 +52,20 @@ public class MapViewModel extends AndroidViewModel {
                         @NonNull PermissionChecker permissionChecker,
                         @NonNull CurrentLocationRepository currentLocationRepository,
                         PlaceNameRepository placeNameRepository,
-                        AutocompleteRepository autocompleteRepository) {
+                        AutocompleteRepository autocompleteRepository,
+                        UserRepository userRepository,
+                        FirebaseAuth firebaseAuth) {
 
         super(application);
 
         this.permissionChecker = permissionChecker;
         this.currentLocationRepository = currentLocationRepository;
         this.placeNameRepository = placeNameRepository;
-        this.autocompleteRepository = autocompleteRepository;
+        this.userRepository = userRepository;
+        this.firebaseAuth = firebaseAuth;
+
 
         LiveData<Location> locationLiveData = currentLocationRepository.getCurrentLocationLiveData();
-
-        LiveData<String> placeNameMutableLiveData = placeNameRepository.getPlaceNameMutableLiveData();
 
         MediatorLiveData<Pair<String, Location>> autocompleteMediatorLiveData = autocompleteRepository.getAutocompleteMediatorLiveData();
 
@@ -73,17 +80,23 @@ public class MapViewModel extends AndroidViewModel {
                                 apiKey)
                 );
 
+        LiveData<List<User>> usersListLiveData = userRepository.fetchAllUsers();
+
+
         mMapViewStateMediatorLiveData.addSource(locationLiveData, location ->
-                combine(nearbyRestaurantsResponseLiveData.getValue(), location));
+                combine(nearbyRestaurantsResponseLiveData.getValue(), location, usersListLiveData.getValue()));
 
         mMapViewStateMediatorLiveData.addSource(nearbyRestaurantsResponseLiveData, nearbyRestaurantsResponse ->
-                combine(nearbyRestaurantsResponse, locationLiveData.getValue()));
+                combine(nearbyRestaurantsResponse, locationLiveData.getValue(), usersListLiveData.getValue()));
 
+        mMapViewStateMediatorLiveData.addSource(usersListLiveData, userList ->
+                combine(nearbyRestaurantsResponseLiveData.getValue(), locationLiveData.getValue(), userList));
 
     }
 
     private void combine(@Nullable NearbyRestaurantsResponse nearbyRestaurantsResponse,
-                         @Nullable Location location) {
+                         @Nullable Location location,
+                         @Nullable List<User> usersList) {
 
         if (location == null || nearbyRestaurantsResponse == null) {
             return;
@@ -104,7 +117,7 @@ public class MapViewModel extends AndroidViewModel {
                 photoReference = null;
             }
 
-            mapMarkersList.add(new MapMarker(placeId, name, address, latLng, photoReference, "ic_restaurant_red_marker"));
+            mapMarkersList.add(new MapMarker(placeId, name, address, latLng, photoReference, usersList != null && getNumberOfWorkmates(placeId, usersList) != 0 ? "ic_restaurant_green_marker" : "ic_restaurant_red_marker"));
         }
 
         mMapViewStateMediatorLiveData.setValue(
@@ -122,6 +135,18 @@ public class MapViewModel extends AndroidViewModel {
         } else {
             currentLocationRepository.initCurrentLocationUpdate();
         }
+    }
+
+    private int getNumberOfWorkmates(String placeId, List<User> userList) {
+        int numberOfWorkmates = 0;
+
+        for (User user : userList) {
+            if (user.getRestaurant() != null && user.getRestaurant().getId().equals(placeId)) {
+                numberOfWorkmates += 1;
+            }
+        }
+
+        return numberOfWorkmates;
     }
 
     public void getQueriedRestaurant(String placeName) {

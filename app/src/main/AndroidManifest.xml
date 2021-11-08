@@ -23,7 +23,7 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
         <activity
-            android:name=".ui.SettingsActivity">
+            android:name=".ui.settingsView.SettingsActivity">
         </activity>
 
         <activity
@@ -31,7 +31,7 @@
         </activity>
 
         <activity
-            android:name=".ui.HomeActivity">
+            android:name=".ui.homeView.HomeActivity">
             <meta-data android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>

@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.christophedurand.go4lunch.R;
-import com.christophedurand.go4lunch.ui.HomeActivity;
+import com.christophedurand.go4lunch.ui.homeView.HomeActivity;
 import com.christophedurand.go4lunch.ui.ViewModelFactory;
 import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
 import com.christophedurand.go4lunch.ui.listView.ListInterface;
@@ -74,10 +74,6 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
     @Override
     public void onResume() {
         super.onResume();
-        if (workmatesRecyclerViewAdapter != null) {
-            workmatesRecyclerViewAdapter.startListening();
-        }
-        workmatesViewModel.refresh();
     }
 
     @Override
@@ -93,9 +89,6 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
     @Override
     public void onStop() {
         super.onStop();
-        if (workmatesRecyclerViewAdapter != null) {
-            workmatesRecyclerViewAdapter.stopListening();
-        }
     }
 
     @Override
@@ -123,16 +116,14 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
 
 
     private void configureViewModel() {
-        ViewModelFactory viewModelFactory = ViewModelFactory.getInstance();
+        ViewModelFactory viewModelFactory = new ViewModelFactory("");
         workmatesViewModel = new ViewModelProvider(this, viewModelFactory).get(WorkmatesViewModel.class);
     }
 
     private void subscribe() {
-        workmatesViewModel.getLifecycleOwner(this);
-
         workmatesViewModel.getWorkmatesViewStateMediatorLiveData().observe(getViewLifecycleOwner(), workmatesViewState -> {
-            workmatesRecyclerViewAdapter = new WorkmatesRecyclerViewAdapter(this, workmatesViewState.getWorkmatesList());
-            workmatesRecyclerViewAdapter.startListening();
+            workmatesRecyclerViewAdapter = new WorkmatesRecyclerViewAdapter(this);
+            workmatesRecyclerViewAdapter.setNewData(workmatesViewState.getWorkmatesList());
             workmatesRecyclerView.setAdapter(workmatesRecyclerViewAdapter);
         });
     }

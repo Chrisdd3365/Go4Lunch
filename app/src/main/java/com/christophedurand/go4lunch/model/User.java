@@ -1,10 +1,11 @@
-package com.christophedurand.go4lunch.ui.workmatesView;
+package com.christophedurand.go4lunch.model;
 
 import androidx.annotation.Nullable;
 
+import com.christophedurand.go4lunch.ui.workmatesView.Restaurant;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
 public class User {

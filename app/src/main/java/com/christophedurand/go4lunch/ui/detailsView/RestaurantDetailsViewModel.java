@@ -5,16 +5,17 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 
+import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.data.details.DetailsRepository;
-import com.christophedurand.go4lunch.ui.workmatesView.User;
-import com.christophedurand.go4lunch.ui.workmatesView.UserManager;
+import com.christophedurand.go4lunch.data.user.UserRepository;
+import com.christophedurand.go4lunch.model.User;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
-import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.firebase.firestore.Query;
+import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.List;
 
 
 public class RestaurantDetailsViewModel extends AndroidViewModel {
@@ -24,53 +25,81 @@ public class RestaurantDetailsViewModel extends AndroidViewModel {
         return detailsViewStateMediatorLiveData;
     }
 
-    private final LifecycleOwner owner;
+
+
+    private final UserRepository userRepository;
+    private final FirebaseAuth firebaseAuth;
+    private final String restaurantId;
 
 
     public RestaurantDetailsViewModel(@NonNull Application application,
                                       DetailsRepository detailsRepository,
-                                      String restaurantId,
-                                      LifecycleOwner owner) {
+                                      UserRepository userRepository,
+                                      FirebaseAuth firebaseAuth,
+                                      String restaurantId) {
         super(application);
 
-        this.owner = owner;
+        this.userRepository = userRepository;
+        this.firebaseAuth = firebaseAuth;
+        this.restaurantId = restaurantId;
 
-        LiveData<RestaurantDetailsResponse> restaurantDetailsResponseLiveData =
-                detailsRepository.getRestaurantDetailsMutableLiveData(restaurantId);
+        LiveData<RestaurantDetailsResponse> restaurantDetailsResponseLiveData = detailsRepository.getRestaurantDetailsMutableLiveData(restaurantId);
+
+        LiveData<List<User>> usersFilteredListLiveData = userRepository.fetchUsersFilteredList(restaurantId);
+
+        LiveData<Boolean> joiningMutableLiveData = userRepository.getIsJoiningLiveData();
+
+        LiveData<Boolean> favoriteMutableLiveData= userRepository.getIsFavoriteLiveData();
 
         detailsViewStateMediatorLiveData.addSource(restaurantDetailsResponseLiveData, response ->
-                combine(response)
+                combine(response, joiningMutableLiveData.getValue(), favoriteMutableLiveData.getValue(), usersFilteredListLiveData.getValue())
+        );
+
+        detailsViewStateMediatorLiveData.addSource(joiningMutableLiveData, joining ->
+                combine(restaurantDetailsResponseLiveData.getValue(), joining, favoriteMutableLiveData.getValue(), usersFilteredListLiveData.getValue())
+        );
+
+        detailsViewStateMediatorLiveData.addSource(favoriteMutableLiveData, favorite ->
+                combine(restaurantDetailsResponseLiveData.getValue(), joiningMutableLiveData.getValue(), favorite, usersFilteredListLiveData.getValue())
+            );
+
+        detailsViewStateMediatorLiveData.addSource(usersFilteredListLiveData, usersFilteredList ->
+                 combine(restaurantDetailsResponseLiveData.getValue(), joiningMutableLiveData.getValue(), favoriteMutableLiveData.getValue(), usersFilteredList)
         );
 
     }
 
-    private void combine(@Nullable RestaurantDetailsResponse response) {
+    private void combine(@Nullable RestaurantDetailsResponse response,
+                         @Nullable Boolean joiningButtonState,
+                         @Nullable Boolean favoriteButtonState,
+                         List<User> usersFilteredList) {
 
         if (response == null) {
             return;
         }
 
-        RestaurantDetailsViewState restaurantDetailsViewState = new RestaurantDetailsViewState(
-                    response.getResult().getPlaceId(),
-                    response.getResult().getName(),
-                    response.getResult().getFormattedAddress(),
-                    response.getResult().getPhotos().get(0).getPhotoReference(),
-                    response.getResult().getInternationalPhoneNumber(),
-                    response.getResult().getWebsite()
+        detailsViewStateMediatorLiveData.setValue(
+                new DetailsViewState(
+                        response.getResult().getPlaceId(),
+                        response.getResult().getName(),
+                        response.getResult().getFormattedAddress(),
+                        response.getResult().getPhotos().get(0).getPhotoReference(),
+                        response.getResult().getInternationalPhoneNumber(),
+                        response.getResult().getWebsite(),
+                        joiningButtonState != null && joiningButtonState ? R.drawable.ic_check_circle_green : R.drawable.ic_check_circle_red,
+                        favoriteButtonState != null && favoriteButtonState ? R.drawable.ic_star_filled : R.drawable.ic_star_outline,
+                        usersFilteredList
+                )
         );
 
-        FirestoreRecyclerOptions<User> workmatesList = createWorkmatesFilteredDataSource(response.getResult().getPlaceId());
-        DetailsViewState detailsViewState = new DetailsViewState(restaurantDetailsViewState, workmatesList);
-        detailsViewStateMediatorLiveData.setValue(detailsViewState);
     }
 
-    private FirestoreRecyclerOptions<User> createWorkmatesFilteredDataSource(String restaurantId) {
-        Query query = UserManager.getInstance().getUsersFilteredListBy(restaurantId);
-        return new FirestoreRecyclerOptions.Builder<User>().setQuery(query, User.class).setLifecycleOwner(owner).build();
+    public void setJoiningButtonState() {
+        userRepository.setCurrentUserIsJoining(restaurantId, "", "");
     }
 
-    public void onCleared() {
-        detailsViewStateMediatorLiveData.removeObservers(owner);
+    public void setFavoriteButtonState() {
+        userRepository.setCurrentUserIsFavorite(restaurantId);
     }
 
 }
