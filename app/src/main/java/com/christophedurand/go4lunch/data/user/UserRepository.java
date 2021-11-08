@@ -171,7 +171,7 @@ public class UserRepository {
         return getUsersCollection().whereNotEqualTo("uid", currentUserId);
     }
 
-    public LiveData<List<User>> fetchAllUsersListWithout(String currentUserId) {
+    public LiveData<List<User>> fetchWorkmatesList(String currentUserId) {
         final MutableLiveData<List<User>> filteredUsersListLiveData = new MutableLiveData<>();
 
         getAllUsersListWithout(currentUserId).get().addOnSuccessListener(queryDocumentSnapshots -> {

@@ -28,7 +28,7 @@ public class WorkmatesViewModel extends AndroidViewModel {
                               FirebaseAuth firebaseAuth) {
         super(application);
 
-        LiveData<List<User>> allUsersLiveData = userRepository.fetchAllUsersListWithout(firebaseAuth.getUid());
+        LiveData<List<User>> allUsersLiveData = userRepository.fetchWorkmatesList(firebaseAuth.getUid());
 
         workmatesViewStateMediatorLiveData.addSource(allUsersLiveData, allUsers -> {
             combine(allUsers);

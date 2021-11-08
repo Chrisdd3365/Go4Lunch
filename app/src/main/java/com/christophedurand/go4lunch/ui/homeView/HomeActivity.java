@@ -78,6 +78,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         configureCurrentUserProfileUI(headerView);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        homeViewModel.getHomeViewStateMediatorLiveData().removeObservers(this);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(@NonNull Menu menu) {

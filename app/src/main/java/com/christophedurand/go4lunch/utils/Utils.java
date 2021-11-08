@@ -36,45 +36,8 @@ public class Utils {
 
     public static void loadImage(Context context, String url, ImageView imageView) {
         if (TextUtils.isEmpty(url)) return;
-//        Glide.with(context)
-//                .asBitmap()
-//                .load(url)
-//                .listener(new RequestListener<Bitmap>() {
-//                    @Override
-//                    public boolean onResourceReady(Bitmap resource,
-//                                                   Object model,
-//                                                   Target<Bitmap> target,
-//                                                   DataSource dataSource,
-//                                                   boolean isFirstResource) {
-//                        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-//                            if (marker.isInfoWindowShown()) {
-//                                marker.showInfoWindow();
-//                            }
-//                        }, 3000);
-//
-//                        return false;
-//                    }
-//
-//                    @Override
-//                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-//                        return false;
-//                    }
-//
-//                })
-//                .into(imageView);
         Glide.with(context).asBitmap().load(url).into(imageView);
     }
-
-//    public static void loadMarkerIcon(Context context, Marker marker, String iconUrl) {
-//        if (TextUtils.isEmpty(iconUrl)) return;
-//        Glide.with(context).load(iconUrl).asBitmap().centerCrop().into(new SimpleTarget<Bitmap>() {
-//            @Override
-//            public void onResourceReady(Bitmap bitmap, GlideAnimation<? super Bitmap> glideAnimation) {
-//                BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(bitmap);
-//                marker.setIcon(icon);
-//            }
-//        });
-//    }
 
     public static BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
         Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);

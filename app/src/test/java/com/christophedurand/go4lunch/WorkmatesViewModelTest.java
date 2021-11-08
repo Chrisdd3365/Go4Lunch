@@ -76,7 +76,7 @@ public class WorkmatesViewModelTest {
         workmatesListLiveData.setValue(usersList);
         Mockito.doReturn(workmatesListLiveData)
                 .when(userRepository)
-                .fetchAllUsersListWithout("uid2");
+                .fetchWorkmatesList("uid2");
 
         workmatesViewModel = new WorkmatesViewModel(
                 application,

@@ -29,6 +29,11 @@ public class SettingsActivity extends AppCompatActivity {
         subscribe();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        settingsViewModel.getSettingsViewStateMediatorLiveData().removeObservers(this);
+    }
 
     private void notificationsSwitchCompatIsTapped(String userId) {
         _notificationsSwitchCompat.setOnCheckedChangeListener((buttonView, isChecked) ->
