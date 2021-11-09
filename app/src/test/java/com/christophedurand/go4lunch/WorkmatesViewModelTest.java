@@ -60,7 +60,7 @@ public class WorkmatesViewModelTest {
         );
         usersList.add(
                 new User(
-                        "uid2",
+                        firebaseAuth.getUid(),
                         "name2",
                         "email2",
                         "avatarURL2",
@@ -76,7 +76,7 @@ public class WorkmatesViewModelTest {
         workmatesListLiveData.setValue(usersList);
         Mockito.doReturn(workmatesListLiveData)
                 .when(userRepository)
-                .fetchWorkmatesList("uid2");
+                .fetchWorkmatesList(firebaseAuth.getUid());
 
         workmatesViewModel = new WorkmatesViewModel(
                 application,
@@ -89,7 +89,7 @@ public class WorkmatesViewModelTest {
     @Test
     public void nominal_case() throws InterruptedException {
         WorkmatesViewState workmatesViewState = LiveDataTestUtils.getOrAwaitValue(workmatesViewModel.getWorkmatesViewStateMediatorLiveData(), 1);
-        assertEquals(1, workmatesViewState.getWorkmatesList().size());
+        assertEquals(2, workmatesViewState.getWorkmatesList().size());
     }
 
 }

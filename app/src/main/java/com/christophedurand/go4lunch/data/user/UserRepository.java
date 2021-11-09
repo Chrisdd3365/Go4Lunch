@@ -172,7 +172,7 @@ public class UserRepository {
     }
 
     public LiveData<List<User>> fetchWorkmatesList(String currentUserId) {
-        final MutableLiveData<List<User>> filteredUsersListLiveData = new MutableLiveData<>();
+        final MutableLiveData<List<User>> filteredUsersListLiveData = new MutableLiveData<>(new ArrayList<>());
 
         getAllUsersListWithout(currentUserId).get().addOnSuccessListener(queryDocumentSnapshots -> {
 

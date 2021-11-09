@@ -1,5 +1,8 @@
 package com.christophedurand.go4lunch;
 
+import android.os.Handler;
+import android.util.Log;
+
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
@@ -21,7 +24,9 @@ public class LiveDataTestUtils {
                 liveData.removeObserver(this);
             }
         };
+
         liveData.observeForever(observer);
+
         // Don't wait indefinitely if the LiveData is not set.
         if (!latch.await(2, TimeUnit.SECONDS)) {
             throw new RuntimeException("LiveData value was never set.");

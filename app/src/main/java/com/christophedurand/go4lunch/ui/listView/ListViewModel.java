@@ -101,7 +101,7 @@ public class ListViewModel extends AndroidViewModel  {
                                     apiKey)
                 );
 
-        LiveData<List<User>>  usersListLiveData = userRepository.fetchAllUsers();
+        LiveData<List<User>> usersListLiveData = userRepository.fetchAllUsers();
 
 
         listViewStateMediatorLiveData.addSource(locationLiveData, location ->

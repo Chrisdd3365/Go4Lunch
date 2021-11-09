@@ -22,11 +22,16 @@ public class WorkmatesViewModel extends AndroidViewModel {
         return workmatesViewStateMediatorLiveData;
     }
 
+    private final UserRepository userRepository;
+    private final FirebaseAuth firebaseAuth;
 
     public WorkmatesViewModel(@NonNull Application application,
                               UserRepository userRepository,
                               FirebaseAuth firebaseAuth) {
         super(application);
+
+        this.userRepository = userRepository;
+        this.firebaseAuth = firebaseAuth;
 
         LiveData<List<User>> allUsersLiveData = userRepository.fetchWorkmatesList(firebaseAuth.getUid());
 
