@@ -85,6 +85,14 @@ public class UserRepository {
         return getCurrentUserData().continueWith(task -> task.getResult().toObject(User.class));
     }
 
+    public LiveData<User> getCurrentUserLiveData() {
+        final MutableLiveData<User> currentUserMutableLiveData = new MutableLiveData<>();
+        getCurrentUser().addOnSuccessListener(currentUser -> {
+            currentUserMutableLiveData.setValue(currentUser);
+        });
+        return currentUserMutableLiveData;
+    }
+
     private final MutableLiveData<Boolean> isJoiningLiveData = new MutableLiveData<>();
     public MutableLiveData<Boolean> getIsJoiningLiveData() {
         return isJoiningLiveData;

@@ -5,8 +5,8 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import com.christophedurand.go4lunch.data.user.UserRepository;
 import com.christophedurand.go4lunch.model.User;
@@ -28,13 +28,8 @@ public class SettingsViewModel extends AndroidViewModel {
 
         _userRepository = userRepository;
 
-        MutableLiveData<User> currentUserLiveData = new MutableLiveData<>();
+        LiveData<User> currentUserLiveData = _userRepository.getCurrentUserLiveData();
 
-        userRepository.getCurrentUser().addOnSuccessListener(user -> {
-            if (user != null) {
-                currentUserLiveData.setValue(user);
-            }
-        });
 
         settingsViewStateMediatorLiveData.addSource(currentUserLiveData, currentUser -> {
             combine(currentUser);

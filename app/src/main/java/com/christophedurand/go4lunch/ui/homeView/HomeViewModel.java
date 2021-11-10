@@ -5,8 +5,8 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import com.christophedurand.go4lunch.data.user.UserRepository;
 import com.christophedurand.go4lunch.model.User;
@@ -19,18 +19,17 @@ public class HomeViewModel extends AndroidViewModel {
         return homeViewStateMediatorLiveData;
     }
 
+    private final UserRepository _userRepository;
+
 
     public HomeViewModel(@NonNull Application application,
                          UserRepository userRepository) {
         super(application);
 
-        MutableLiveData<User> currentUserLiveData = new MutableLiveData<>();
+        _userRepository = userRepository;
 
-        userRepository.getCurrentUser().addOnSuccessListener(user -> {
-            if (user != null) {
-                currentUserLiveData.setValue(user);
-            }
-        });
+        LiveData<User> currentUserLiveData = _userRepository.getCurrentUserLiveData();
+
 
         homeViewStateMediatorLiveData.addSource(currentUserLiveData, currentUser -> {
             combine(currentUser);
