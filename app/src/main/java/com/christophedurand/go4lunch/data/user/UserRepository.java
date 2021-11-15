@@ -97,6 +97,7 @@ public class UserRepository {
     public MutableLiveData<Boolean> getIsJoiningLiveData() {
         return isJoiningLiveData;
     }
+
     public void setCurrentUserIsJoining(String restaurantId, String chosenRestaurantName, String chosenRestaurantAddress) {
         getCurrentUser().addOnSuccessListener(currentUser -> {
             if ((currentUser.getRestaurant() != null && currentUser.getRestaurant().getId() != null)

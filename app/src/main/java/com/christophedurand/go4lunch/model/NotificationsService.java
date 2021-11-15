@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -15,6 +16,7 @@ import androidx.core.app.NotificationCompat;
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.data.user.UserRepository;
 import com.christophedurand.go4lunch.ui.MainActivity;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -79,6 +81,11 @@ public class NotificationsService extends FirebaseMessagingService {
 
                 // Show notification
                 notificationManager.notify(NOTIFICATION_TAG, NOTIFICATION_ID, notificationBuilder.build());
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e("NOTIFICATIONS SERVICE", "onFailure : " + e.toString());
+                }
             });
         });
     }

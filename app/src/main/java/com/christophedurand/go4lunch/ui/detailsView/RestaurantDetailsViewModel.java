@@ -102,4 +102,6 @@ public class RestaurantDetailsViewModel extends AndroidViewModel {
         userRepository.setCurrentUserIsFavorite(restaurantId);
     }
 
+
+
 }
