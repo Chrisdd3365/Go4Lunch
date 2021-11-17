@@ -9,16 +9,22 @@ public class HomeViewState {
 
     @Nullable
     private final User currentUser;
+    private final String chosenRestaurantId;
 
 
-    public HomeViewState(@Nullable User currentUser) {
+    public HomeViewState(@Nullable User currentUser, String chosenRestaurantId) {
         this.currentUser = currentUser;
+        this.chosenRestaurantId = chosenRestaurantId;
     }
 
 
     @Nullable
     public User getCurrentUser() {
         return currentUser;
+    }
+
+    public String getChosenRestaurantId() {
+        return chosenRestaurantId;
     }
 
 }

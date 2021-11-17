@@ -33,6 +33,8 @@ public class HomeViewModelTest {
 
     private final MutableLiveData<User> currentUserLiveData = new MutableLiveData<>();
 
+    private final LiveData<String> chosenRestaurantIdLiveData = new MutableLiveData<>();
+
     private HomeViewModel homeViewModel;
 
 
@@ -51,11 +53,16 @@ public class HomeViewModelTest {
                 new ArrayList<>(),
                 false
         );
-
         currentUserLiveData.setValue(currentUser);
         Mockito.doReturn(currentUserLiveData)
                 .when(userRepository)
                 .getCurrentUserLiveData();
+
+        String restaurantId = "restaurantId";
+        chosenRestaurantIdLiveData.setValue(restaurantId)
+        Mockito.doReturn(chosenRestaurantIdLiveData)
+                .when(userRepository)
+                .getChosenRestaurantIdLiveData();
 
         homeViewModel = new HomeViewModel(
                 application,

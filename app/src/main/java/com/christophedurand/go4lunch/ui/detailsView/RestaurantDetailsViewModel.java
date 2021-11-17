@@ -49,7 +49,7 @@ public class RestaurantDetailsViewModel extends AndroidViewModel {
 
         LiveData<Boolean> joiningMutableLiveData = userRepository.getIsJoiningLiveData();
 
-        LiveData<Boolean> favoriteMutableLiveData= userRepository.getIsFavoriteLiveData();
+        LiveData<Boolean> favoriteMutableLiveData = userRepository.getIsFavoriteLiveData();
 
         detailsViewStateMediatorLiveData.addSource(restaurantDetailsResponseLiveData, response ->
                 combine(response, joiningMutableLiveData.getValue(), favoriteMutableLiveData.getValue(), usersFilteredListLiveData.getValue())
@@ -94,14 +94,20 @@ public class RestaurantDetailsViewModel extends AndroidViewModel {
 
     }
 
-    public void setJoiningButtonState() {
-        userRepository.setCurrentUserIsJoining(restaurantId, "", "");
+    public void getJoiningButtonState() {
+        userRepository.getInitialStateOfIsJoining(restaurantId);
+    }
+
+    public void setJoiningButtonState(String chosenRestaurantName, String chosenRestaurantAddress) {
+        userRepository.setCurrentUserIsJoining(restaurantId, chosenRestaurantName, chosenRestaurantAddress);
+    }
+
+    public void getFavoriteButtonState() {
+        userRepository.getInitialStateOfIsFavorite(restaurantId);
     }
 
     public void setFavoriteButtonState() {
         userRepository.setCurrentUserIsFavorite(restaurantId);
     }
-
-
 
 }

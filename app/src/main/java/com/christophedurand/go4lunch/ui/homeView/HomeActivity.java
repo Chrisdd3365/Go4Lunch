@@ -76,6 +76,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
         configureCurrentUserProfileUI(headerView);
+        homeViewModel.getUpdatedRestaurantId();
     }
 
     @Override
@@ -215,7 +216,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                             .into(userAvatarImageView);
                 }
 
-                restaurantId = homeViewState.getCurrentUser().getRestaurant().getId();
+                restaurantId = homeViewState.getChosenRestaurantId();
             }
         });
     }

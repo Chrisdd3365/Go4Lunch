@@ -30,20 +30,32 @@ public class HomeViewModel extends AndroidViewModel {
 
         LiveData<User> currentUserLiveData = _userRepository.getCurrentUserLiveData();
 
+        LiveData<String> chosenRestaurantIdLiveData = _userRepository.getRestaurantIdLiveData();
+
 
         homeViewStateMediatorLiveData.addSource(currentUserLiveData, currentUser -> {
-            combine(currentUser);
+            combine(currentUser, chosenRestaurantIdLiveData.getValue());
+        });
+
+        homeViewStateMediatorLiveData.addSource(chosenRestaurantIdLiveData, chosenRestaurantId -> {
+            combine(currentUserLiveData.getValue(), chosenRestaurantId);
         });
 
     }
 
 
-    private void combine(@Nullable User currentUser) {
+    private void combine(@Nullable User currentUser,
+                         String chosenRestaurantId) {
         homeViewStateMediatorLiveData.setValue(
                 new HomeViewState(
-                        currentUser
+                        currentUser,
+                        chosenRestaurantId
                 )
         );
+    }
+
+    public void getUpdatedRestaurantId() {
+        _userRepository.getUpdatedChosenRestaurantId();
     }
 
 }

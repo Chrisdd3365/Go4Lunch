@@ -53,9 +53,9 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
         configureViewModel();
         subscribe();
 
-        joiningButtonIsTapped();
-        likeButtonIsTapped();
+        configureButtonState();
 
+        likeButtonIsTapped();
     }
 
     @Override
@@ -88,9 +88,9 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
     @Override
     public void onClickItemList(String restaurantId) { }
 
-    private void joiningButtonIsTapped() {
+    private void joiningButtonIsTapped(String chosenRestaurantName, String chosenRestaurantAddress) {
         joiningImageButton.setOnClickListener(view -> {
-            restaurantDetailsViewModel.setJoiningButtonState();
+            restaurantDetailsViewModel.setJoiningButtonState(chosenRestaurantName, chosenRestaurantAddress);
         });
     }
 
@@ -157,6 +157,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
             workmatesRecyclerViewAdapter.setNewData(detailsViewState.getWorkmatesList());
             workmatesRecyclerView.setAdapter(workmatesRecyclerViewAdapter);
 
+            joiningButtonIsTapped(restaurantName, restaurantAddress);
         });
     }
 
@@ -173,6 +174,11 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
     private void configureRestaurantAddress(String restaurantAddress) {
         TextView restaurantAddressTextView = findViewById(R.id.restaurant_address_text_view);
         restaurantAddressTextView.setText(restaurantAddress);
+    }
+
+    private void configureButtonState() {
+        restaurantDetailsViewModel.getJoiningButtonState();
+        restaurantDetailsViewModel.getFavoriteButtonState();
     }
 
     private void configureWorkmatesRecyclerView() {

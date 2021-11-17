@@ -42,7 +42,7 @@ class WorkmateViewHolder extends RecyclerView.ViewHolder {
                 .into(avatarImageView);
 
         String description;
-        if (user.getRestaurant().getId().equals("") || user.getRestaurant().getName().equals("")) {
+        if (user.getRestaurant().getId().equals("")) {
              description = user.getName() + " has not decided yet.";
         } else {
             description = user.getName() + " is eating at " + user.getRestaurant().getName() + ".";

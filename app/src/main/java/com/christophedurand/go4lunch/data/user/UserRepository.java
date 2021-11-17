@@ -97,7 +97,6 @@ public class UserRepository {
     public MutableLiveData<Boolean> getIsJoiningLiveData() {
         return isJoiningLiveData;
     }
-
     public void setCurrentUserIsJoining(String restaurantId, String chosenRestaurantName, String chosenRestaurantAddress) {
         getCurrentUser().addOnSuccessListener(currentUser -> {
             if ((currentUser.getRestaurant() != null && currentUser.getRestaurant().getId() != null)
@@ -107,6 +106,29 @@ public class UserRepository {
             } else {
                 updateChosenRestaurant(restaurantId, chosenRestaurantName, chosenRestaurantAddress, currentUser.getUid());
                 isJoiningLiveData.setValue(true);
+            }
+        });
+    }
+
+    public void getInitialStateOfIsJoining(String restaurantId) {
+        getCurrentUser().addOnSuccessListener(currentUser -> {
+            if ((currentUser.getRestaurant() != null && currentUser.getRestaurant().getId() != null)
+                    && currentUser.getRestaurant().getId().contains(restaurantId)) {
+                isJoiningLiveData.setValue(true);
+            } else {
+                isJoiningLiveData.setValue(false);
+            }
+        });
+    }
+
+    private final MutableLiveData<String> chosenRestaurantIdLiveData = new MutableLiveData<>();
+    public MutableLiveData<String> getRestaurantIdLiveData() {
+        return chosenRestaurantIdLiveData;
+    }
+    public void getUpdatedChosenRestaurantId() {
+        getCurrentUser().addOnSuccessListener(currentUser -> {
+            if (currentUser.getRestaurant() != null && !currentUser.getRestaurant().getId().equals("")) {
+                chosenRestaurantIdLiveData.setValue(currentUser.getRestaurant().getId());
             }
         });
     }
@@ -125,6 +147,16 @@ public class UserRepository {
                 updateFavoriteRestaurantsIdsList(restaurantId, currentUser.getUid());
                 currentUser.getFavoriteRestaurantsIdsList().remove(restaurantId);
                 isFavoriteLiveData.setValue(false);
+            }
+        });
+    }
+
+    public void getInitialStateOfIsFavorite(String restaurantId) {
+        getCurrentUser().addOnSuccessListener(currentUser -> {
+            if (currentUser.getFavoriteRestaurantsIdsList() == null || !currentUser.getFavoriteRestaurantsIdsList().contains(restaurantId)) {
+                isFavoriteLiveData.setValue(false);
+            } else {
+                isFavoriteLiveData.setValue(true);
             }
         });
     }
