@@ -64,7 +64,7 @@ public class NotificationsService extends FirebaseMessagingService {
                         new NotificationCompat.Builder(this, channelId)
                                 .setSmallIcon(R.drawable.ic_restaurant_menu)
                                 .setContentTitle(notification.getTitle())
-                                .setContentText(notification.getBody() + "at " + currentUser.getRestaurant().getName() + ", " + currentUser.getRestaurant().getAddress() + " with " + workmatesList)
+                                .setContentText(notification.getBody() + getString(R.string.at) + currentUser.getRestaurant().getName() + ", " + currentUser.getRestaurant().getAddress() + getString(R.string.with) + workmatesList)
                                 .setAutoCancel(true)
                                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                                 .setContentIntent(pendingIntent);
@@ -80,8 +80,7 @@ public class NotificationsService extends FirebaseMessagingService {
                 }
 
                 // Show notification
-                notificationManager.notify(NOTIFICATION_TAG, NOTIFICATION_ID, notificationBuilder.build());
-            }).addOnFailureListener(new OnFailureListener() {
+                notificationManager.notify(NOTIFICATION_TAG, NOTIFICATION_ID, notificationBuilder.build()); }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     Log.e("NOTIFICATIONS SERVICE", "onFailure : " + e.toString());

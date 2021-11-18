@@ -11,6 +11,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Transformations;
 
+import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.data.autocomplete.AutocompleteRepository;
 import com.christophedurand.go4lunch.data.details.DetailsRepository;
 import com.christophedurand.go4lunch.data.location.CurrentLocationRepository;
@@ -215,14 +216,14 @@ public class ListViewModel extends AndroidViewModel  {
         } else if (openingHours != null && openingHours.isOpenNow() != null) {
 
             if (openingHours.isOpenNow()) {
-                return "Open";
+                return getApplication().getString(R.string.open_title);
             } else {
-                return "Closed";
+                return getApplication().getString(R.string.closed_title);
             }
 
         }
 
-        return "Opening Hours Unavailable";
+        return getApplication().getString(R.string.opening_hours_unavailable);
     }
 
     private double getConvertedRatingWith(double rating) {

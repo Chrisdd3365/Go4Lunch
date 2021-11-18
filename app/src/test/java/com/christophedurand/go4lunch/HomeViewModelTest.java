@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import android.app.Application;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.christophedurand.go4lunch.data.user.UserRepository;
@@ -33,7 +34,7 @@ public class HomeViewModelTest {
 
     private final MutableLiveData<User> currentUserLiveData = new MutableLiveData<>();
 
-    private final LiveData<String> chosenRestaurantIdLiveData = new MutableLiveData<>();
+    private final MutableLiveData<String> chosenRestaurantIdLiveData = new MutableLiveData<>();
 
     private HomeViewModel homeViewModel;
 
@@ -59,10 +60,10 @@ public class HomeViewModelTest {
                 .getCurrentUserLiveData();
 
         String restaurantId = "restaurantId";
-        chosenRestaurantIdLiveData.setValue(restaurantId)
+        chosenRestaurantIdLiveData.setValue(restaurantId);
         Mockito.doReturn(chosenRestaurantIdLiveData)
                 .when(userRepository)
-                .getChosenRestaurantIdLiveData();
+                .getRestaurantIdLiveData();
 
         homeViewModel = new HomeViewModel(
                 application,

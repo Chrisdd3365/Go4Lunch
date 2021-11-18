@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    // GENERAL
+    <string name="app_name">Go4Lunch</string>
+
+    // UI
+    <string name="description_text">Trouve un restaurant sympa et invite tes collègues à déjeuner !</string>
+    <string name="hungry_title">J\'ai Faim !</string>
+    <string name="workmates_title">Collègues Disponibles</string>
+    <string name="call_title">Appeler</string>
+    <string name="favorite_title">Favoris</string>
+    <string name="website_title">Site Web</string>
+    <string name="has_not_decided_yet">" n\'a pas encore décidé."</string>
+    <string name="is_eating_at">" va manger à "</string>
+    <string name="notifications_title">Notifications</string>
+    <string name="no_phone_number_title">Désolé, pas de numéro de téléphone disponible.</string>
+    <string name="no_website_title">Désolé, pas de site web disponible.</string>
+    <string name="choose_restaurant_title">Choisis d\'abord ton plan déj !</string>
+    <string name="open_title">Ouvert</string>
+    <string name="closed_title">Fermé</string>
+    <string name="opening_hours_unavailable">Horaires d\'ouverture indisponibles</string>
+
+    // TAB ITEMS TITLE
+    <string name="map_view_title">Carte</string>
+    <string name="list_view_title">Liste</string>
+    <string name="workmates_view_title">Collègues</string>
+
+    // NAVIGATION DRAWER
+    <string name="action_your_lunch">Ton plan déj</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="action_logout">Déconnexion</string>
+
+    // NOTIFICATION
+    <string name="at">"à "</string>
+    <string name="with">" avec "</string>
+
+    // OTHERS
+    <string name="button_allow">Accepter</string>
+    <string name="button_deny">Rejeter</string>
+
+</resources>

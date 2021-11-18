@@ -101,7 +101,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
                 Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phoneNumber));
                 startActivity(intent);
             } else {
-                Toast.makeText(this, "Pas de numéro de téléphone", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.no_phone_number_title), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -119,7 +119,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(websiteURL));
                 startActivity(browserIntent);
             } else {
-                Toast.makeText(this, "Pas de site internet disponible", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.no_website_title), Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -170,12 +170,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
 
     private void showMyLunch() {
-        if (!restaurantId.equals("")) {
+        if (restaurantId != null && !restaurantId.equals("") ) {
             Intent intent = new Intent(this, RestaurantDetailsActivity.class);
             intent.putExtra("restaurantId", restaurantId);
             startActivity(intent);
         } else {
-            Toast.makeText(this, "Veuillez choisir votre restaurant !", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.choose_restaurant_title), Toast.LENGTH_SHORT).show();
         }
     }
 

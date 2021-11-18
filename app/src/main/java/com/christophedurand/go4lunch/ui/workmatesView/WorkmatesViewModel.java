@@ -25,6 +25,7 @@ public class WorkmatesViewModel extends AndroidViewModel {
     private final UserRepository userRepository;
     private final FirebaseAuth firebaseAuth;
 
+
     public WorkmatesViewModel(@NonNull Application application,
                               UserRepository userRepository,
                               FirebaseAuth firebaseAuth) {

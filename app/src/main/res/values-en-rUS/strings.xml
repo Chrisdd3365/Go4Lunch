@@ -1,14 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <resources>
 
     // GENERAL
     <string name="app_name">Go4Lunch</string>
-
-    // NOTIFICATION
-    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
-
-    // FACEBOOK
-    <string name="facebook_application_id" translatable="false">1164754350562024</string>
-    <string name="fb_login_protocol_scheme" translatable="false">fb1164754350562024</string>
 
     // UI
     <string name="description_text">Find a nice restaurant and invite your co-workers for lunch!</string>
@@ -33,9 +28,6 @@
     <string name="workmates_view_title">Workmates</string>
 
     // NAVIGATION DRAWER
-    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
-    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
-    <string name="nav_header_desc" translatable="false">Navigation header</string>
     <string name="action_your_lunch">Your Lunch</string>
     <string name="action_settings">Settings</string>
     <string name="action_logout">Logout</string>

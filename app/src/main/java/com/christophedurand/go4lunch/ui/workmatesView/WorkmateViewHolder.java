@@ -43,9 +43,9 @@ class WorkmateViewHolder extends RecyclerView.ViewHolder {
 
         String description;
         if (user.getRestaurant().getId().equals("")) {
-             description = user.getName() + " has not decided yet.";
+             description = user.getName() + itemView.getContext().getString(R.string.has_not_decided_yet);
         } else {
-            description = user.getName() + " is eating at " + user.getRestaurant().getName() + ".";
+            description = user.getName() + itemView.getContext().getString(R.string.is_eating_at) + user.getRestaurant().getName() + ".";
         }
         descriptionTextView.setText(description);
 
@@ -53,7 +53,7 @@ class WorkmateViewHolder extends RecyclerView.ViewHolder {
             if (!user.getRestaurant().getId().equals("")) {
                 listener.onClickItemList(user.getRestaurant().getId());
             } else {
-                Toast.makeText(itemView.getContext(), user.getName() + " has not decided yet.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(itemView.getContext(), user.getName() + itemView.getContext().getString(R.string.has_not_decided_yet), Toast.LENGTH_SHORT).show();
             }
         });
     }
