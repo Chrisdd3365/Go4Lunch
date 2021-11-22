@@ -15,7 +15,7 @@ import com.christophedurand.go4lunch.R;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
-import static com.christophedurand.go4lunch.ui.homeView.HomeActivity.apiKey;
+import static com.christophedurand.go4lunch.ui.homeView.HomeActivity.API_KEY;
 
 import java.lang.reflect.Field;
 
@@ -25,12 +25,12 @@ public class Utils {
     public static final String PHOTO_URL = "https://maps.googleapis.com/maps/api/place/photo?photoreference=%s&key=%s&maxheight=10000";
 
     public static String buildGooglePhotoURL(String photoReference) {
-        return String.format(PHOTO_URL, photoReference, apiKey);
+        return String.format(PHOTO_URL, photoReference, API_KEY);
     }
 
     public static void loadGooglePhoto(Context context, ImageView imageView, String photoReference) {
         //TODO: MOVE TO VM
-        String url = String.format(PHOTO_URL, photoReference, apiKey);
+        String url = String.format(PHOTO_URL, photoReference, API_KEY);
         loadImage(context, url, imageView);
     }
 

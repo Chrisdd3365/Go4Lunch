@@ -18,7 +18,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.christophedurand.go4lunch.ui.homeView.HomeActivity.apiKey;
+import static com.christophedurand.go4lunch.ui.homeView.HomeActivity.API_KEY;
 
 
 public class DetailsRepository {
@@ -46,7 +46,7 @@ public class DetailsRepository {
         if (restaurantDetailsResponse != null) {
             restaurantDetailsMutableLiveData.setValue(restaurantDetailsResponse);
         } else {
-            Call<RestaurantDetailsResponse> restaurantDetails = mGooglePlacesAPIService.getPlaceDetails(placeId, apiKey);
+            Call<RestaurantDetailsResponse> restaurantDetails = mGooglePlacesAPIService.getPlaceDetails(placeId, API_KEY);
             restaurantDetails.enqueue(new Callback<RestaurantDetailsResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<RestaurantDetailsResponse> call,

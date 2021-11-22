@@ -25,7 +25,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.christophedurand.go4lunch.ui.homeView.HomeActivity.apiKey;
+import static com.christophedurand.go4lunch.ui.homeView.HomeActivity.API_KEY;
 
 import kotlin.Pair;
 
@@ -77,7 +77,7 @@ public class MapViewModel extends AndroidViewModel {
                                 "restaurant",
                                 value.getSecond().getLatitude() + "," + value.getSecond().getLongitude(),
                                 "1000",
-                                apiKey)
+                                API_KEY)
                 );
 
         LiveData<List<User>> usersListLiveData = userRepository.fetchAllUsers();

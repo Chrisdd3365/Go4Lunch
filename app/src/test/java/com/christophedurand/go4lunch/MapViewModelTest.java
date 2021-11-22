@@ -34,7 +34,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.christophedurand.go4lunch.ui.homeView.HomeActivity.apiKey;
+import static com.christophedurand.go4lunch.ui.homeView.HomeActivity.API_KEY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -114,7 +114,7 @@ public class MapViewModelTest {
                         "restaurant",
                         "30.0,42.0",
                         "1000",
-                        apiKey
+                        API_KEY
                 );
 
         List<User> usersList = new ArrayList<>();

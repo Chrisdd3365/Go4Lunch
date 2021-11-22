@@ -8,12 +8,13 @@ android {
 
     defaultConfig {
         applicationId "com.christophedurand.go4lunch"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField 'String', 'API_KEY', API_KEY
     }
 
     buildTypes {

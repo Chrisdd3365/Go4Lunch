@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.christophedurand.go4lunch.BuildConfig;
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.ui.MainActivity;
 import com.christophedurand.go4lunch.ui.settingsView.SettingsActivity;
@@ -39,7 +40,7 @@ import androidx.navigation.ui.NavigationUI;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static final String apiKey = "AIzaSyD6FndQ_yMQLDPOYVzaeLt1rIuJ72Ntg_M";
+    public static final String API_KEY = BuildConfig.API_KEY;
 
 
     private View headerView;
@@ -66,7 +67,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         configureNavigationView();
         configureBottomNavigationView();
 
-        Places.initialize(getApplication(), apiKey);
+        Places.initialize(getApplication(), API_KEY);
 
         configureViewModel();
         subscribe();
@@ -75,8 +76,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onResume() {
         super.onResume();
-        configureCurrentUserProfileUI(headerView);
         homeViewModel.getUpdatedRestaurantId();
+        configureCurrentUserProfileUI(headerView);
     }
 
     @Override
