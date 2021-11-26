@@ -21,7 +21,7 @@ import android.view.ViewGroup;
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.ui.homeView.HomeActivity;
 import com.christophedurand.go4lunch.ui.ViewModelFactory;
-import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
+import com.christophedurand.go4lunch.ui.detailsView.DetailsActivity;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
@@ -133,7 +133,7 @@ public class ListFragment extends Fragment implements ListInterface {
 
     @Override
     public void onClickItemList(String restaurantId) {
-        Intent intent = new Intent(requireActivity(), RestaurantDetailsActivity.class);
+        Intent intent = new Intent(requireActivity(), DetailsActivity.class);
         intent.putExtra("restaurantId", restaurantId);
         startActivity(intent);
     }

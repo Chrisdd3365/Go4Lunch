@@ -2,6 +2,7 @@ package com.christophedurand.go4lunch;
 
 import android.app.Application;
 import android.location.Location;
+import android.util.Log;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.MediatorLiveData;
@@ -174,12 +175,12 @@ public class ListViewModelTest {
                 );
 
         RestaurantDetails restaurantDetails = new RestaurantDetails(
-                "formattedAddress",
+                "vicinity1",
                 new Geometry(new RestaurantLocation(31.0, 43.0)),
                 "icon1",
                 "internationalPhoneNumber",
                 "name1",
-                new OpeningHours(true, null, null),
+                new OpeningHours(true, periodsList, weekdayText),
                 "placeId",
                 4.2,
                 "reference",
@@ -204,7 +205,7 @@ public class ListViewModelTest {
                         "email",
                         "avatarURL",
                         new com.christophedurand.go4lunch.ui.workmatesView.Restaurant(
-                                "placeId1",
+                                "placeId",
                                 "name1",
                                 "vicinity1"
                         ),

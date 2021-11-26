@@ -27,7 +27,7 @@
         </activity>
 
         <activity
-            android:name=".ui.detailsView.RestaurantDetailsActivity">
+            android:name=".ui.detailsView.DetailsActivity">
         </activity>
 
         <activity

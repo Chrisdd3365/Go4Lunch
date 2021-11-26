@@ -19,7 +19,7 @@ import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.ui.MainActivity;
 import com.christophedurand.go4lunch.ui.settingsView.SettingsActivity;
 import com.christophedurand.go4lunch.ui.ViewModelFactory;
-import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
+import com.christophedurand.go4lunch.ui.detailsView.DetailsActivity;
 import com.christophedurand.go4lunch.utils.Utils;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.libraries.places.api.Places;
@@ -172,7 +172,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     private void showMyLunch() {
         if (restaurantId != null && !restaurantId.equals("") ) {
-            Intent intent = new Intent(this, RestaurantDetailsActivity.class);
+            Intent intent = new Intent(this, DetailsActivity.class);
             intent.putExtra("restaurantId", restaurantId);
             startActivity(intent);
         } else {

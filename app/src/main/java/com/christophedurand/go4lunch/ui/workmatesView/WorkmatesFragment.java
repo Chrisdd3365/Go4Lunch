@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.ui.homeView.HomeActivity;
 import com.christophedurand.go4lunch.ui.ViewModelFactory;
-import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
+import com.christophedurand.go4lunch.ui.detailsView.DetailsActivity;
 import com.christophedurand.go4lunch.ui.listView.ListInterface;
 
 
@@ -109,7 +109,7 @@ public class WorkmatesFragment extends Fragment implements ListInterface {
 
     @Override
     public void onClickItemList(String restaurantId) {
-        Intent intent = new Intent(requireActivity(), RestaurantDetailsActivity.class);
+        Intent intent = new Intent(requireActivity(), DetailsActivity.class);
         intent.putExtra("restaurantId", restaurantId);
         startActivity(intent);
     }

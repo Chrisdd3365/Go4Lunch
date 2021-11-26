@@ -17,7 +17,7 @@ import com.christophedurand.go4lunch.model.pojo.RestaurantDetails;
 import com.christophedurand.go4lunch.model.pojo.RestaurantDetailsResponse;
 import com.christophedurand.go4lunch.model.pojo.RestaurantLocation;
 import com.christophedurand.go4lunch.ui.detailsView.DetailsViewState;
-import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsViewModel;
+import com.christophedurand.go4lunch.ui.detailsView.DetailsViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.junit.Before;
@@ -32,7 +32,7 @@ import java.util.List;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class RestaurantDetailsViewModelTest {
+public class DetailsViewModelTest {
 
     @Rule
     public InstantTaskExecutorRule rule = new InstantTaskExecutorRule();
@@ -51,7 +51,7 @@ public class RestaurantDetailsViewModelTest {
 
     private final MutableLiveData<Boolean> favoriteMutableLiveData = new MutableLiveData<>();
 
-    private RestaurantDetailsViewModel restaurantDetailsViewModel;
+    private DetailsViewModel mDetailsViewModel;
 
 
     @Before
@@ -123,7 +123,7 @@ public class RestaurantDetailsViewModelTest {
                 .when(userRepository)
                 .getIsFavoriteLiveData();
 
-        restaurantDetailsViewModel = new RestaurantDetailsViewModel(
+        mDetailsViewModel = new DetailsViewModel(
                 application,
                 detailsRepository,
                 userRepository,
@@ -135,7 +135,7 @@ public class RestaurantDetailsViewModelTest {
 
     @Test
     public void nominal_case() throws InterruptedException {
-        DetailsViewState detailsViewState = LiveDataTestUtils.getOrAwaitValue(restaurantDetailsViewModel.getDetailsViewStateLiveData(), 1);
+        DetailsViewState detailsViewState = LiveDataTestUtils.getOrAwaitValue(mDetailsViewModel.getDetailsViewStateLiveData(), 1);
         assertEquals("placeId", detailsViewState.getRestaurantId());
     }
 

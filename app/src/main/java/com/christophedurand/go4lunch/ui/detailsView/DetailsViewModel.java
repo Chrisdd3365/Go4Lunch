@@ -18,7 +18,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.List;
 
 
-public class RestaurantDetailsViewModel extends AndroidViewModel {
+public class DetailsViewModel extends AndroidViewModel {
 
     private final MediatorLiveData<DetailsViewState> detailsViewStateMediatorLiveData = new MediatorLiveData<>();
     public LiveData<DetailsViewState> getDetailsViewStateLiveData() {
@@ -32,11 +32,11 @@ public class RestaurantDetailsViewModel extends AndroidViewModel {
     private final String restaurantId;
 
 
-    public RestaurantDetailsViewModel(@NonNull Application application,
-                                      DetailsRepository detailsRepository,
-                                      UserRepository userRepository,
-                                      FirebaseAuth firebaseAuth,
-                                      String restaurantId) {
+    public DetailsViewModel(@NonNull Application application,
+                            DetailsRepository detailsRepository,
+                            UserRepository userRepository,
+                            FirebaseAuth firebaseAuth,
+                            String restaurantId) {
         super(application);
 
         this.userRepository = userRepository;

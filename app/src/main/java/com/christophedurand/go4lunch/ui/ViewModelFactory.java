@@ -15,7 +15,7 @@ import com.christophedurand.go4lunch.data.nearby.NearbyRepository;
 import com.christophedurand.go4lunch.data.permissionChecker.PermissionChecker;
 import com.christophedurand.go4lunch.data.placeName.PlaceNameRepository;
 import com.christophedurand.go4lunch.data.user.UserRepository;
-import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsViewModel;
+import com.christophedurand.go4lunch.ui.detailsView.DetailsViewModel;
 import com.christophedurand.go4lunch.ui.homeView.HomeViewModel;
 import com.christophedurand.go4lunch.ui.listView.ListViewModel;
 import com.christophedurand.go4lunch.ui.mapView.MapViewModel;
@@ -91,8 +91,8 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
                     mUserRepository,
                     mFirebaseAuth
             );
-        } else if (modelClass.isAssignableFrom(RestaurantDetailsViewModel.class)) {
-            return (T) new RestaurantDetailsViewModel(
+        } else if (modelClass.isAssignableFrom(DetailsViewModel.class)) {
+            return (T) new DetailsViewModel(
                     mApplication,
                     mDetailsRepository,
                     mUserRepository,

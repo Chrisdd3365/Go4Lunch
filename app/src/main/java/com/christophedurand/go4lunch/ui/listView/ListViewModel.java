@@ -149,7 +149,8 @@ public class ListViewModel extends AndroidViewModel  {
                             getConvertedRatingWith(restaurantDetailsResponse.getResult().getRating()),
                             getPhotoUrl(restaurantDetailsResponse.getResult().getPhotos()),
                             getOpeningHours(restaurantDetailsResponse.getResult().getOpeningHours()),
-                            buildNumberOfWorkmatesString(usersList != null ? getNumberOfWorkmates(restaurant.getPlaceId(), usersList) : 0)                    );
+                            buildNumberOfWorkmatesString(usersList != null ? getNumberOfWorkmates(restaurant.getPlaceId(), usersList) : 0)
+                    );
 
                     restaurantViewStatesList.add(restaurantViewState);
                 } else {

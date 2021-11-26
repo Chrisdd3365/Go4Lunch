@@ -26,7 +26,7 @@ import com.bumptech.glide.Glide;
 import com.christophedurand.go4lunch.R;
 import com.christophedurand.go4lunch.ui.homeView.HomeActivity;
 import com.christophedurand.go4lunch.ui.ViewModelFactory;
-import com.christophedurand.go4lunch.ui.detailsView.RestaurantDetailsActivity;
+import com.christophedurand.go4lunch.ui.detailsView.DetailsActivity;
 import com.christophedurand.go4lunch.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -172,7 +172,7 @@ public class MapFragment extends Fragment implements LocationListener, OnMapRead
 
     private void onMapMarkerDetailsClicked(String restaurantId) {
         _mapItemParentConstraintLayout.setOnClickListener(v -> {
-            Intent intent = new Intent(requireActivity(), RestaurantDetailsActivity.class);
+            Intent intent = new Intent(requireActivity(), DetailsActivity.class);
             intent.putExtra("restaurantId", restaurantId);
             startActivity(intent);
         });

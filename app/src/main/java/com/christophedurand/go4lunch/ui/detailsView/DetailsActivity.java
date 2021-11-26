@@ -22,7 +22,7 @@ import com.christophedurand.go4lunch.ui.workmatesView.WorkmatesRecyclerViewAdapt
 import com.christophedurand.go4lunch.utils.Utils;
 
 
-public class RestaurantDetailsActivity extends AppCompatActivity implements ListInterface {
+public class DetailsActivity extends AppCompatActivity implements ListInterface {
 
     private ImageButton likeImageButton;
     private ImageButton joiningImageButton;
@@ -31,7 +31,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
     private WorkmatesRecyclerViewAdapter workmatesRecyclerViewAdapter;
 
     private String restaurantId;
-    private RestaurantDetailsViewModel restaurantDetailsViewModel;
+    private DetailsViewModel mDetailsViewModel;
 
 
     @Override
@@ -81,7 +81,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
     @Override
     public void onDestroy() {
         super.onDestroy();
-        restaurantDetailsViewModel.getDetailsViewStateLiveData().removeObservers(this);
+        mDetailsViewModel.getDetailsViewStateLiveData().removeObservers(this);
     }
 
 
@@ -90,7 +90,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
 
     private void joiningButtonIsTapped(String chosenRestaurantName, String chosenRestaurantAddress) {
         joiningImageButton.setOnClickListener(view -> {
-            restaurantDetailsViewModel.setJoiningButtonState(chosenRestaurantName, chosenRestaurantAddress);
+            mDetailsViewModel.setJoiningButtonState(chosenRestaurantName, chosenRestaurantAddress);
         });
     }
 
@@ -108,7 +108,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
 
     private void likeButtonIsTapped() {
         likeImageButton.setOnClickListener(view -> {
-            restaurantDetailsViewModel.setFavoriteButtonState();
+            mDetailsViewModel.setFavoriteButtonState();
         });
     }
 
@@ -127,11 +127,11 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
 
     private void configureViewModel() {
         ViewModelFactory viewModelFactory = new ViewModelFactory(restaurantId);
-        restaurantDetailsViewModel = new ViewModelProvider(this, viewModelFactory).get(RestaurantDetailsViewModel.class);
+        mDetailsViewModel = new ViewModelProvider(this, viewModelFactory).get(DetailsViewModel.class);
     }
 
     private void subscribe() {
-        restaurantDetailsViewModel.getDetailsViewStateLiveData().observe(this, detailsViewState -> {
+        mDetailsViewModel.getDetailsViewStateLiveData().observe(this, detailsViewState -> {
             String photoReference = detailsViewState.getPhotoURL();
             configureRestaurantImage(photoReference);
 
@@ -177,8 +177,8 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements List
     }
 
     private void configureButtonState() {
-        restaurantDetailsViewModel.getJoiningButtonState();
-        restaurantDetailsViewModel.getFavoriteButtonState();
+        mDetailsViewModel.getJoiningButtonState();
+        mDetailsViewModel.getFavoriteButtonState();
     }
 
     private void configureWorkmatesRecyclerView() {
