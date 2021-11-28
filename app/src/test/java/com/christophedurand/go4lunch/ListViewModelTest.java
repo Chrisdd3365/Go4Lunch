@@ -2,7 +2,6 @@ package com.christophedurand.go4lunch;
 
 import android.app.Application;
 import android.location.Location;
-import android.util.Log;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.MediatorLiveData;
@@ -72,6 +71,8 @@ public class ListViewModelTest {
     private final MutableLiveData<List<User>> usersListLiveData = new MutableLiveData<>();
 
     private ListViewModel listViewModel;
+
+    private final List<Restaurant> restaurantsList = new ArrayList<>();
 
 
     @Before
@@ -148,7 +149,6 @@ public class ListViewModelTest {
         weekdayText.add("Friday");
         weekdayText.add("Saturday");
 
-        List<Restaurant> restaurantsList = new ArrayList<>();
         restaurantsList.add(
                 new Restaurant(
                         "vicinity1",
@@ -162,8 +162,6 @@ public class ListViewModelTest {
                 )
         );
 
-        NearbyRestaurantsResponse nearbyRestaurantsResponse = new NearbyRestaurantsResponse(restaurantsList);
-        nearbyRestaurantsResponseLiveData.setValue(nearbyRestaurantsResponse);
         Mockito.doReturn(nearbyRestaurantsResponseLiveData)
                 .when(nearbyRepository)
                 .getNearbyRestaurantsResponseByRadiusLiveData(
@@ -236,6 +234,10 @@ public class ListViewModelTest {
     public void nominal_case() throws InterruptedException {
         ListViewState listViewState = LiveDataTestUtils.getOrAwaitValue(listViewModel.getListViewStateMediatorLiveData(), 1);
         assertEquals(0, listViewState.getRestaurantViewStatesList().size());
+        NearbyRestaurantsResponse nearbyRestaurantsResponse = new NearbyRestaurantsResponse(restaurantsList);
+        nearbyRestaurantsResponseLiveData.setValue(nearbyRestaurantsResponse);
+        listViewState = LiveDataTestUtils.getOrAwaitValue(listViewModel.getListViewStateMediatorLiveData(), 1);
+        assertEquals(1, listViewState.getRestaurantViewStatesList().size());
     }
 
     @Test
